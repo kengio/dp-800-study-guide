@@ -1,0 +1,103 @@
+# CLAUDE.md
+
+Study notes for the Microsoft DP-800: Developing AI-Enabled Database Solutions certification exam.
+
+## Repository Structure
+
+```text
+dp-800-study-guide/
+├── certification/
+│   ├── README.md               # Certification index with exam overview and progress tracker
+│   ├── 01-database-objects/    # Design and implement database objects
+│   ├── 02-programmability-objects/ # Views, functions, stored procedures, triggers
+│   ├── 03-advanced-tsql/       # CTEs, window functions, JSON, regex, graph queries
+│   ├── 04-ai-assisted-tools/   # GitHub Copilot, MCP, AI security
+│   ├── 05-data-security-compliance/ # Encryption, masking, RLS, auditing
+│   ├── 06-performance-optimization/ # Configs, isolation levels, query plans
+│   ├── 07-cicd-database-projects/   # SQL Database Projects, CI/CD, deployment
+│   ├── 08-azure-services-integration/ # DAB, REST/GraphQL, monitoring, CDC
+│   ├── 09-models-embeddings/   # External models, embedding generation
+│   ├── 10-intelligent-search/  # Full-text, vector, and hybrid search
+│   ├── 11-rag/                 # Retrieval-augmented generation
+│   └── resources/              # Practice questions, mock exams, exam tips
+└── code-examples/
+    └── tsql/                   # T-SQL code examples (always .md files)
+```
+
+Each topic folder contains a `README.md` index and numbered `.md` topic files.
+
+## Content Guidelines
+
+### Content Placement
+
+- **Single certification** — all content lives under `certification/`
+- **Code examples** go in `code-examples/tsql/` as `.md` files, never `.sql`
+
+### Code Examples
+
+- **Always `.md` files**, never `.sql` — store in `code-examples/tsql/`
+- Fenced code blocks with language tags (`sql`, `tsql`, `json`, `yaml`)
+- Group related snippets under `##` headings; add YAML frontmatter with `tags`
+
+### File Size
+
+- **Target: 300–600 lines**; hard limit: ~800 lines (~20–25 KB)
+- **Exception:** `mock-exam/questions.md` files — do not split
+- **Split** when 2+ distinct sub-topics can stand alone → `03-topic-part1.md` + `03-topic-part2.md`:
+  1. Same number prefix; append `-part1` / `-part2`
+  2. Each part gets own YAML frontmatter and intro
+  3. Terminal sections (Use Cases → Official Docs) go in **Part 2 only**; Part 1 ends with forward link
+  4. Update topic `README.md` index; delete original; fix all links repo-wide
+
+### Markdown Conventions
+
+- Run markdownlint on every modified file; blank lines before/after headings (MD022)
+- Language tags on all code blocks (`sql`, `tsql`, `json`)
+- **Practice answers:** Obsidian foldable `> [!success]- Answer` callout
+- **Practice choices:** A/B/C/D on separate lines (no bullets); two trailing spaces for line breaks
+
+### Diagrams & Images
+
+- **Architecture diagrams:** Mermaid (`flowchart`, `sequenceDiagram`, `graph`)
+- **Directory trees:** ASCII text, not Mermaid
+- **Screenshots:** `images/<feature>/`; standard markdown `![Alt](path)` with caption; ≤800 px wide
+
+### Links
+
+- **Link to files, not folders** (`path/to/README.md`, not `path/to/`)
+- **Always `./README.md`** for local READMEs — bare `README.md` resolves ambiguously in Obsidian
+- Verify target files exist after edits
+
+### Section Ordering (End of Topic Files)
+
+Terminal sections in this exact order:
+
+1. `## Use Cases`
+2. `## Common Issues & Errors`
+3. `## Best Practices` *(optional)*
+4. `## Exam Tips`
+5. `## Key Takeaways`
+6. `## Related Topics`
+7. `## Official Documentation`
+8. `---` separator + navigation link (always last)
+
+**Nav format:** `**[← Previous](./NN-prev.md) | [↑ Back to Section](./README.md) | [Next →](./NN-next.md)**`
+
+- Part 1 files: end with only forward link to Part 2
+- Part 2 files: full three-way nav
+
+## README Standards
+
+### Certification README (`certification/README.md`)
+
+Required: YAML frontmatter (`title`, `type: certification`, `aliases`, `tags`), Exam Overview table, Domain Weights (Mermaid pie), Study Topics table with weights, Practice & Resources table, Prerequisites, Study Progress Tracker (checkboxes).
+
+### Topic Folder README (`<topic-folder>/README.md`)
+
+Required: YAML frontmatter (`title`, `type: category`, `tags`, `status`), topic title with exam weight, Topics Overview (Mermaid flowchart), Section Contents table, Key Concepts, Related Resources, Back/Next navigation.
+
+## Exam Domain Mapping
+
+- **Domain 1 — Design and develop (35–40%):** 01-database-objects, 02-programmability-objects, 03-advanced-tsql, 04-ai-assisted-tools
+- **Domain 2 — Secure, optimize, deploy (35–40%):** 05-data-security-compliance, 06-performance-optimization, 07-cicd-database-projects, 08-azure-services-integration
+- **Domain 3 — AI capabilities (25–30%):** 09-models-embeddings, 10-intelligent-search, 11-rag

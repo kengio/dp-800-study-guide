@@ -1,0 +1,442 @@
+---
+title: REST and GraphQL Endpoints in DAB
+type: study-material
+tags:
+  - dp-800
+  - rest
+  - graphql
+  - endpoints
+  - pagination
+---
+
+# REST and GraphQL Endpoints in DAB
+
+## Overview
+
+Data API Builder exposes both REST and GraphQL endpoints from the same configuration. REST follows OData conventions with URL-based filtering; GraphQL provides flexible querying with typed schemas. Both support pagination, caching, filtering, and security. Understanding which endpoint type to use and how to configure each is key for the DP-800 exam.
+
+## REST Endpoint Configuration
+
+### Global REST Settings
+
+```json
+{
+  "runtime": {
+    "rest": {
+      "enabled": true,
+      "path": "/api",
+      "request-body-strict": true
+    }
+  }
+}
+```
+
+- `path`: Base path for all REST endpoints (default `/api`)
+- `request-body-strict`: When `true`, rejects request body fields that don't map to entity columns
+
+### Per-Entity REST Configuration
+
+```json
+"Order": {
+  "source": { "object": "dbo.Orders", "type": "table", "key-fields": ["OrderId"] },
+  "rest": {
+    "enabled": true,
+    "path": "orders",
+    "methods": ["get", "post", "put", "patch", "delete"]
+  }
+}
+```
+
+The entity's REST path defaults to the entity name. Override with `path`.
+
+## REST HTTP Methods
+
+| Method | Operation | URL Pattern | Body |
+| :--- | :--- | :--- | :--- |
+| GET | Read one or many | `/api/Order` or `/api/Order/42` | None |
+| POST | Create | `/api/Order` | JSON of new row |
+| PUT | Replace (full update) | `/api/Order/42` | Complete JSON |
+| PATCH | Partial update | `/api/Order/42` | Changed fields only |
+| DELETE | Delete | `/api/Order/42` | None |
+
+### GET — Querying Data
+
+```bash
+# Get all orders (paginated)
+GET /api/Order
+
+# Get single order by PK
+GET /api/Order/42
+
+# Filter: Status = 'Active' and CustomerId = 100
+GET /api/Order?$filter=Status eq 'Active' and CustomerId eq 100
+
+# Select specific columns
+GET /api/Order?$select=OrderId,Status,OrderDate
+
+# Order by date descending
+GET /api/Order?$orderby=OrderDate desc
+
+# Pagination: first 10, ordered by date
+GET /api/Order?$first=10&$orderby=OrderDate desc
+
+# Next page using cursor
+GET /api/Order?$first=10&$after=eyJPcmRlcklkIjoxMH0=
+```
+
+### POST — Creating a Record
+
+```bash
+POST /api/Order
+Content-Type: application/json
+
+{
+  "CustomerId": 42,
+  "Status": "Pending",
+  "TotalAmount": 99.99
+}
+```
+
+Response (201 Created):
+```json
+{
+  "value": [
+    { "OrderId": 1001, "CustomerId": 42, "Status": "Pending", "TotalAmount": 99.99 }
+  ]
+}
+```
+
+### PUT — Full Replace
+
+```bash
+PUT /api/Order/1001
+Content-Type: application/json
+
+{
+  "CustomerId": 42,
+  "Status": "Shipped",
+  "TotalAmount": 99.99
+}
+```
+
+All fields must be provided — missing fields are set to NULL (or default).
+
+### PATCH — Partial Update
+
+```bash
+PATCH /api/Order/1001
+Content-Type: application/json
+
+{
+  "Status": "Delivered"
+}
+```
+
+Only the specified fields are updated.
+
+### Exposing Stored Procedures via REST
+
+```json
+"SearchProducts": {
+  "source": {
+    "object": "dbo.SearchProducts",
+    "type": "stored-procedure",
+    "parameters": {
+      "SearchTerm": "string",
+      "MaxPrice": "number"
+    }
+  },
+  "rest": {
+    "enabled": true,
+    "methods": ["get"]
+  },
+  "permissions": [{ "role": "anonymous", "actions": ["execute"] }]
+}
+```
+
+Calling a stored procedure via REST (GET with query string params):
+```bash
+GET /api/SearchProducts?SearchTerm=widget&MaxPrice=50
+```
+
+For stored procedures that modify data, use `"methods": ["post"]`:
+```bash
+POST /api/CreateOrder
+Content-Type: application/json
+{ "CustomerId": 42, "ProductId": 7, "Quantity": 3 }
+```
+
+## GraphQL Endpoint Configuration
+
+### Global GraphQL Settings
+
+```json
+{
+  "runtime": {
+    "graphql": {
+      "enabled": true,
+      "path": "/graphql",
+      "allow-introspection": true,
+      "depth-limit": 4
+    }
+  }
+}
+```
+
+- `depth-limit`: Prevents deeply nested queries that could cause performance issues
+- `allow-introspection`: Disable in production for security
+
+### Per-Entity GraphQL Configuration
+
+```json
+"Product": {
+  "source": { "object": "dbo.Products", "type": "table", "key-fields": ["ProductId"] },
+  "graphql": {
+    "enabled": true,
+    "type": {
+      "singular": "Product",
+      "plural": "Products"
+    }
+  }
+}
+```
+
+### GraphQL Queries
+
+DAB auto-generates query types for each entity:
+
+```graphql
+# Get all products (paginated)
+query {
+  products {
+    items {
+      productId
+      name
+      price
+    }
+    hasNextPage
+    endCursor
+  }
+}
+
+# Get single product by PK
+query {
+  product_by_pk(ProductId: 7) {
+    productId
+    name
+    price
+  }
+}
+
+# Filter products
+query {
+  products(filter: { Price: { lt: 50 } }) {
+    items {
+      productId
+      name
+      price
+    }
+  }
+}
+
+# Order and paginate
+query {
+  products(orderBy: { Price: ASC }, first: 10) {
+    items { productId name price }
+    hasNextPage
+    endCursor
+  }
+}
+```
+
+### GraphQL Mutations
+
+DAB generates create, update, and delete mutations:
+
+```graphql
+# Create
+mutation {
+  createOrder(item: { CustomerId: 42, Status: "Pending", TotalAmount: 99.99 }) {
+    orderId
+    status
+    orderDate
+  }
+}
+
+# Update
+mutation {
+  updateOrder(OrderId: 1001, item: { Status: "Shipped" }) {
+    orderId
+    status
+  }
+}
+
+# Delete
+mutation {
+  deleteOrder(OrderId: 1001) {
+    orderId
+  }
+}
+```
+
+### GraphQL Relationships (Nested Queries)
+
+With relationships configured in `dab-config.json`:
+
+```graphql
+query {
+  orders(filter: { Status: { eq: "Active" } }) {
+    items {
+      orderId
+      orderDate
+      customer {        # one-to-one relationship
+        name
+        email
+      }
+      items {           # one-to-many relationship
+        productId
+        quantity
+        unitPrice
+      }
+    }
+  }
+}
+```
+
+### Stored Procedures as GraphQL Mutations
+
+```json
+"CreateOrder": {
+  "source": {
+    "object": "dbo.CreateOrder",
+    "type": "stored-procedure",
+    "parameters": { "CustomerId": "number", "ProductId": "number", "Quantity": "number" }
+  },
+  "graphql": {
+    "enabled": true,
+    "operation": "mutation",
+    "type": { "singular": "CreateOrderResult" }
+  },
+  "permissions": [{ "role": "authenticated", "actions": ["execute"] }]
+}
+```
+
+```graphql
+mutation {
+  executeCreateOrder(CustomerId: 42, ProductId: 7, Quantity: 3) {
+    orderId
+  }
+}
+```
+
+## Caching Settings
+
+```json
+{
+  "runtime": {
+    "cache": {
+      "enabled": true,
+      "ttl-seconds": 300
+    }
+  },
+  "entities": {
+    "Product": {
+      "cache": {
+        "enabled": true,
+        "ttl-seconds": 600
+      }
+    },
+    "Order": {
+      "cache": {
+        "enabled": false
+      }
+    }
+  }
+}
+```
+
+Caching is in-memory within the DAB process — suitable for read-heavy, slowly-changing reference data (products, categories). Disable for frequently updated transactional data (orders, inventory).
+
+## Pagination
+
+DAB uses **cursor-based pagination** (not offset-based) for consistency with large datasets:
+
+```json
+{
+  "runtime": {
+    "pagination": {
+      "default-page-size": 20,
+      "max-page-size": 100
+    }
+  }
+}
+```
+
+REST pagination response:
+```json
+{
+  "value": [ ... ],
+  "nextLink": "/api/Order?$first=20&$after=eyJPcmRlcklkIjoyMH0="
+}
+```
+
+GraphQL pagination response:
+```json
+{
+  "data": {
+    "orders": {
+      "items": [ ... ],
+      "hasNextPage": true,
+      "endCursor": "eyJPcmRlcklkIjoyMH0="
+    }
+  }
+}
+```
+
+## Use Cases
+
+- **REST for mobile/web clients**: Standard HTTP verbs with OData filtering for straightforward CRUD operations
+- **GraphQL for complex queries**: Fetch nested related data in a single request instead of multiple REST calls
+- **Stored procedures for business logic**: Expose complex multi-step operations (create order with inventory check) as single API calls
+- **Caching for reference data**: Cache product catalog or lookup tables for 5–10 minutes to reduce database load
+
+## Common Issues & Errors
+
+| Issue | Cause | Fix |
+| :--- | :--- | :--- |
+| `Method not allowed` on PUT/DELETE | Method not in entity's `methods` list | Add the method to `"rest": { "methods": [...] }` |
+| GraphQL `null` for nested relationship | Relationship not configured | Add `relationships` section to entity config |
+| `403 Forbidden` | Role not granted action | Verify `permissions` in entity config includes the user's role |
+| PUT returns 404 | PK value not in request body | PUT requires PK in URL; body provides the full new state |
+| Stored proc `GET` method not working | SP defaults to `post` | Explicitly set `"methods": ["get"]` for read-only SPs |
+
+## Exam Tips
+
+- **PUT vs PATCH**: PUT replaces the entire row; PATCH updates only specified fields — important behavioral difference
+- **GraphQL `operation`** for stored procedures: `"query"` for reads, `"mutation"` for writes
+- Caching applies to GET/query operations only — mutations always hit the database
+- `allow-introspection: false` is a production security best practice — prevents schema enumeration
+- Cursor-based pagination (`$after`) is DAB's default — not offset (`$skip`) — handles large datasets without count queries
+
+## Key Takeaways
+
+- REST uses OData-style `$filter`, `$select`, `$orderby`, `$first`, `$after` query parameters
+- GraphQL provides typed schema with auto-generated queries and mutations per entity
+- Stored procedures are exposed as REST endpoints or GraphQL mutations with explicit parameter typing
+- Relationships enable nested GraphQL queries — a major advantage over REST for complex data shapes
+
+## Related Topics
+
+- [01-Data API Builder](./01-data-api-builder.md)
+- [03-Monitoring](./03-monitoring.md)
+- [04-Change & Event Handling](./04-change-event-handling.md)
+
+## Official Documentation
+
+- [DAB REST Endpoints](https://learn.microsoft.com/en-us/azure/data-api-builder/rest)
+- [DAB GraphQL Endpoints](https://learn.microsoft.com/en-us/azure/data-api-builder/graphql)
+- [DAB Pagination](https://learn.microsoft.com/en-us/azure/data-api-builder/pagination)
+
+---
+
+**[← Previous](./01-data-api-builder.md) | [↑ Back to Section](./README.md) | [Next →](./03-monitoring.md)**
