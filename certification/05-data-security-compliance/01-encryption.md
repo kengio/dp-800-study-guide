@@ -45,8 +45,8 @@ FROM sys.dm_database_encryption_keys;
 **TDE encryption states:**
 | State | Description |
 | :--- | :--- |
-| 0 | No database encryption key, no encryption |
-| 1 | Unencrypted |
+| 0 | No DEK exists; no encryption |
+| 1 | DEK exists but encryption not enabled |
 | 2 | Encryption in progress |
 | 3 | Encrypted |
 | 4 | Key change in progress |

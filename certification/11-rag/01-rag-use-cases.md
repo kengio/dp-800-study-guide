@@ -263,7 +263,7 @@ Top results → LLM via Azure OpenAI
 
 Advantages: Managed search service with built-in RRF; scales independently of database
 
-## Use Cases Summary
+## Use Cases
 
 | Use Case | Data Type | Search Type | Latency Target |
 | :--- | :--- | :--- | :--- |

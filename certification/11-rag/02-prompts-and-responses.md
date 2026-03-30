@@ -143,8 +143,7 @@ BEGIN
         SIMILAR_TO = @query_vector,
         METRIC = 'cosine',
         TOP_N = @top_k
-    ) AS vs
-    JOIN dbo.Products p ON p.ProductId = vs.ProductId;
+    ) AS vs;
 
     -- ── Step 3: Construct the prompt ──────────────────────────────────────
     DECLARE @system_msg  NVARCHAR(MAX) = N'You are a helpful product advisor. '
@@ -320,7 +319,7 @@ BEGIN TRY
         -- Rate limited: log and retry
         SET @api_error = 'Rate limit exceeded. Retry after: '
             + JSON_VALUE(@response, '$.response.headers.Retry-After');
-        RAISERROR(@api_error, 11, 1);  -- severity 11 = informational
+        RAISERROR(@api_error, 10, 1);  -- severity ≤10 = informational (not caught by CATCH; use 11+ to trigger CATCH)
     END
     ELSE IF @http_code = 400
     BEGIN
@@ -378,7 +377,7 @@ END;
 | `HTTP 429 Too Many Requests` | Rate limit hit | Implement retry with exponential backoff; increase quota |
 | `HTTP 400 Bad Request` | Prompt too long or malformed JSON | Check token count; validate JSON payload; escape special chars |
 | JSON parse error on response | Response is not valid JSON | Check `$.response.status.http.code` first; may be an HTML error page |
-| `QUOTENAME` truncates at 128 chars | QUOTENAME has a limit | For long strings, use `REPLACE(@text, '"', '\"')` instead |
+| `QUOTENAME` returns NULL for inputs > 128 chars | `QUOTENAME` accepts `nvarchar(128)` — returns NULL (not a truncated value) for longer input | For long strings, use `REPLACE(@text, '"', '\"')` instead |
 | Inconsistent responses | Temperature > 0 | Set `"temperature": 0` for factual/deterministic output |
 
 ## Exam Tips

@@ -193,8 +193,8 @@ SELECT * FROM Ranked WHERE dr <= 3;
 | Issue | Cause | Resolution |
 | :--- | :--- | :--- |
 | Infinite recursion in CTE | Missing/incorrect termination condition | Add `WHERE` in recursive member; use `MAXRECURSION` |
-| Wrong running total | Missing `ROWS UNBOUNDED PRECEDING` | Default frame is `RANGE UNBOUNDED PRECEDING` — can cause unexpected results with ties |
-| `LAST_VALUE` returns current row | Default frame ends at current row | Add `ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING` |
+| Wrong running total | Missing `ROWS UNBOUNDED PRECEDING` | Default frame is `RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` — can cause unexpected results with ties |
+| `LAST_VALUE` returns current row | Default frame ends at current row | Add `ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING`; or use `ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING` to always get the partition's last value |
 
 ## Exam Tips
 

@@ -127,7 +127,7 @@ ORDER BY DotDistance ASC;
 | :--- | :--- | :--- | :--- |
 | `cosine` | 1 - cos(θ) | 0 to 2 | Text embeddings, direction-based similarity |
 | `euclidean` | √Σ(a-b)² | 0 to ∞ | Spatial/geometric data, normalized vectors |
-| `dot` | -Σ(a×b) | -∞ to +∞ | When vectors are already L2-normalized |
+| `dot` | 1 - Σ(aᵢ×bᵢ) | -∞ to +∞ | When vectors are already L2-normalized |
 
 **Rule of thumb:** Use `cosine` for text embeddings — it is invariant to vector magnitude, which varies by document length.
 
