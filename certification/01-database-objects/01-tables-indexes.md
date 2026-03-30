@@ -91,6 +91,7 @@ ON dbo.Orders (OrderDate, CustomerId, TotalAmount);
 ```
 
 **Column store key features:**
+
 - Batch mode execution — processes ~900 rows per batch (vs row-by-row)
 - Delta store — rowgroup buffer for newly inserted rows before compression
 - Row group elimination — skips compressed row groups where min/max don't match the filter
@@ -106,11 +107,104 @@ ON dbo.Orders (OrderDate, CustomerId, TotalAmount);
 | **Forwarding pointers** | Yes (after UPDATEs) | No |
 | **Best for** | Staging/bulk load, then index | Most OLTP tables |
 
+## Filtered Indexes
+
+A filtered index is a non-clustered index with a `WHERE` clause predicate, indexing only the rows that satisfy the filter. This reduces index size and maintenance overhead compared to a full non-clustered index.
+
+**When to use:**
+
+- Sparse columns where only a fraction of rows have meaningful values
+- Partial data subsets (e.g., only active or pending records)
+- Filtering out NULL values from optional columns
+
+**Syntax:**
+
+```sql
+-- Index only on active orders
+CREATE NONCLUSTERED INDEX IX_Orders_Active
+ON Orders(CustomerID, OrderDate)
+WHERE Status = 'Active';
+
+-- Index for non-NULL optional columns
+CREATE NONCLUSTERED INDEX IX_Employees_Manager
+ON Employees(ManagerID)
+WHERE ManagerID IS NOT NULL;
+```
+
+**Limitations:**
+
+- The query optimizer will not use a filtered index if the query uses a parameter or variable for the filter column — only literal values in the WHERE clause reliably match the filter predicate
+- Cannot be used as a covering index for queries that also need rows outside the filter
+- Not supported in all scenarios (e.g., cannot be used with `OR` predicates in some cases)
+
+## Included Columns
+
+The `INCLUDE` clause adds non-key columns to the leaf level of a non-clustered index, creating a **covering index** that satisfies a query entirely from the index without a key lookup back to the base table.
+
+**Key vs. included column decisions:**
+
+| Aspect | Key Column | Included Column |
+| :--- | :--- | :--- |
+| **Sorted** | Yes — in B-tree order | No — stored only at leaf level |
+| **16-key limit** | Counts toward limit | Does not count |
+| **Use for** | WHERE, JOIN ON, ORDER BY | SELECT output columns only |
+| **Index size** | Affects all B-tree levels | Affects leaf level only |
+
+```sql
+-- Covering index for a common query pattern
+CREATE NONCLUSTERED INDEX IX_Orders_Customer_Covering
+ON Orders(CustomerID, OrderDate)
+INCLUDE (TotalAmount, Status, ShipDate);
+```
+
+> **Exam tip:** Included columns eliminate key lookups (shown as RID Lookup or Key Lookup operators in execution plans). When a query selects columns not in the index key, SQL Server performs a key lookup for each row — adding those columns to `INCLUDE` removes this extra operation.
+
+## Index Compression
+
+Compression reduces the on-disk and in-memory size of index and table data, trading slight CPU overhead for reduced I/O.
+
+**ROW compression:** Stores fixed-length data types in a variable-length format, eliminating storage for trailing zeros and spaces. Compatible with most index types.
+
+**PAGE compression:** Builds on ROW compression and adds:
+
+- **Prefix compression** — stores a common prefix per column once per page, replacing repeated values with shorter references
+- **Dictionary compression** — replaces repeated values anywhere on the page with dictionary entries
+
+**COLUMNSTORE compression:** Handled separately from row/page compression. Columnstore uses its own encoding (delta store for new rows → compressed row groups after ~1 M rows). Do not apply ROW/PAGE compression to columnstore indexes.
+
+**Evaluate before applying:**
+
+```sql
+-- Estimate savings first
+EXEC sp_estimate_data_compression_savings
+    @schema_name = 'dbo',
+    @object_name = 'Orders',
+    @index_id = NULL,
+    @partition_number = NULL,
+    @data_compression = 'PAGE';
+
+-- Apply compression
+ALTER TABLE Orders REBUILD WITH (DATA_COMPRESSION = PAGE);
+ALTER INDEX IX_Orders_Customer ON Orders REBUILD WITH (DATA_COMPRESSION = ROW);
+```
+
+## Index Design Considerations
+
+Choosing which columns to index — and how — has a significant impact on query performance and write overhead.
+
+- **Index WHERE, JOIN ON, ORDER BY columns first** — these are the columns the optimizer most needs to seek and sort on
+- **Avoid over-indexing** — every non-clustered index adds overhead to `INSERT`, `UPDATE`, and `DELETE` operations because each index must be maintained
+- **Fill factor** — percentage of each leaf page left free during an index build or rebuild (default `0` = 100% full); a lower fill factor (e.g., 80) leaves room for inserts and reduces page splits on write-heavy tables
+- **Statistics** — SQL Server automatically creates statistics for indexed columns; these statistics drive cardinality estimates in the query optimizer
+- **Index key order matters** — for composite indexes, put the most selective (highest cardinality) equality columns first, then range columns
+
 ## Use Cases
 
 - **Column store indexes**: Data warehouse fact tables, reporting aggregations over millions of rows
 - **Non-clustered with INCLUDE**: Covering indexes to avoid key lookups in common query patterns
 - **Heaps**: Temporary staging tables for bulk inserts before final processing
+- **Filtered indexes**: Active-record patterns, nullable foreign keys, partial dataset queries
+- **Index compression**: Large tables with repetitive data where I/O is the bottleneck
 
 ## Common Issues & Errors
 
@@ -120,6 +214,16 @@ ON dbo.Orders (OrderDate, CustomerId, TotalAmount);
 | Page splits | Sequential GUID PKs cause random inserts | Use `NEWSEQUENTIALID()` or `INT IDENTITY` |
 | Delta store large | Low row count inserts into columnstore | Batch inserts to fill row groups (min 102,400 rows) |
 | `nvarchar(max)` off-row | Value exceeds 8000 bytes | Expected behavior; consider chunking large text |
+| Filtered index not used | Query uses variable/parameter instead of literal | Rewrite query to use literal value or use `OPTION (RECOMPILE)` |
+| Key lookup in plan | Index missing SELECT columns | Add missing columns to `INCLUDE` clause |
+
+## Best Practices
+
+- Prefer `INT IDENTITY` or `NEWSEQUENTIALID()` over `NEWID()` as clustering keys to avoid random page splits
+- Always run `sp_estimate_data_compression_savings` before applying compression to production tables
+- Add columns needed only in `SELECT` to `INCLUDE`, not to the index key, to keep key width narrow
+- Use filtered indexes on low-cardinality flag columns (e.g., `IsActive`, `Status`) rather than full indexes
+- Review execution plans for Key Lookup and RID Lookup operators — these indicate missing covered columns
 
 ## Exam Tips
 
@@ -127,6 +231,8 @@ ON dbo.Orders (OrderDate, CustomerId, TotalAmount);
 - Batch mode execution is available with columnstore indexes — a key performance differentiator
 - `datetime2` is preferred over `datetime` for new development (greater precision, more range)
 - `INCLUDE` columns in non-clustered indexes create covering indexes without widening the key
+- Filtered indexes are not used by the optimizer when the filter column is compared to a variable or parameter — only literals match reliably
+- PAGE compression = ROW compression + prefix + dictionary; always estimate savings first with `sp_estimate_data_compression_savings`
 
 ## Key Takeaways
 
@@ -134,6 +240,25 @@ ON dbo.Orders (OrderDate, CustomerId, TotalAmount);
 - Clustered index = physical row order; only one per table
 - Column store indexes enable vectorized batch execution for analytics
 - Non-clustered columnstore can be added to OLTP tables for hybrid workloads
+- Filtered indexes reduce index size by covering only a subset of rows
+- INCLUDE columns eliminate key lookups by creating covering indexes at the leaf level
+- ROW and PAGE compression reduce storage/I/O at the cost of slight CPU overhead
+
+## Practice Questions
+
+**Practice Question**
+
+A query `SELECT CustomerID, TotalAmount FROM Orders WHERE Status = 'Pending'` performs a key lookup. Which index change eliminates the key lookup?
+
+A. Add a filtered index on Status = 'Pending'
+B. Add CustomerID and TotalAmount as INCLUDE columns to the existing Status index
+C. Rebuild the clustered index with PAGE compression
+D. Create a second clustered index on Status
+
+> [!success]- Answer
+> **B — Add CustomerID and TotalAmount as INCLUDE columns to the existing Status index**
+>
+> Including the SELECT columns (CustomerID, TotalAmount) in the index creates a covering index — the query engine finds everything it needs at the leaf level without a key lookup. A filtered index (A) would help selectivity but doesn't eliminate the key lookup. You cannot have two clustered indexes (D).
 
 ## Related Topics
 
@@ -146,6 +271,8 @@ ON dbo.Orders (OrderDate, CustomerId, TotalAmount);
 - [Tables (SQL Server)](https://learn.microsoft.com/en-us/sql/relational-databases/tables/tables)
 - [Columnstore Indexes Guide](https://learn.microsoft.com/en-us/sql/relational-databases/indexes/columnstore-indexes-overview)
 - [Index Design Guide](https://learn.microsoft.com/en-us/sql/relational-databases/sql-server-index-design-guide)
+- [Create Filtered Indexes](https://learn.microsoft.com/en-us/sql/relational-databases/indexes/create-filtered-indexes)
+- [Data Compression](https://learn.microsoft.com/en-us/sql/relational-databases/data-compression/data-compression)
 
 ---
 

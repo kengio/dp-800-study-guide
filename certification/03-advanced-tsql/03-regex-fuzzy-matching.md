@@ -142,6 +142,98 @@ JOIN dbo.Contacts b ON a.ContactId < b.ContactId
 WHERE JARO_WINKLER_DISTANCE(a.FullName, b.FullName) > 0.92;
 ```
 
+## SOUNDEX and DIFFERENCE Functions
+
+SOUNDEX and DIFFERENCE are built-in T-SQL functions available in SQL Server and Azure SQL — not limited to Fabric — making them broadly applicable for phonetic matching.
+
+- **SOUNDEX(string)**: returns a 4-character phonetic code (one letter + three digits) based on how the string sounds in English
+- **DIFFERENCE(string1, string2)**: compares the SOUNDEX codes of two strings and returns a score from 0 to 4, where 4 means most phonetically similar and 0 means least similar
+- **Use case**: fuzzy matching on names where spelling varies (e.g., "Smith" vs "Smyth"), matching imported data with inconsistent romanization
+- **Limitations**: English-centric algorithm; unreliable for non-Latin characters, non-English names, or languages with different phonetic rules
+
+```sql
+-- SOUNDEX examples
+SELECT SOUNDEX('Smith'),   -- S530
+       SOUNDEX('Smyth'),   -- S530 (same!)
+       SOUNDEX('Schmidt'); -- S253
+
+-- DIFFERENCE: 4 = most similar, 0 = least
+SELECT DIFFERENCE('Smith', 'Smyth'),    -- 4
+       DIFFERENCE('Smith', 'Brown'),    -- 1
+       DIFFERENCE('Robert', 'Rupert');  -- 3
+
+-- Find all customers whose name sounds like 'Johnson'
+SELECT CustomerID, Name
+FROM Customers
+WHERE DIFFERENCE(Name, 'Johnson') >= 3;
+```
+
+## TRANSLATE Function
+
+`TRANSLATE(string, from_chars, to_chars)` replaces each character in `from_chars` with the corresponding character at the same position in `to_chars` — a one-for-one character substitution across multiple characters in a single call.
+
+**Difference from REPLACE**: `REPLACE` substitutes one substring at a time and requires chaining for multiple replacements. `TRANSLATE` handles multiple single-character substitutions simultaneously, making it cleaner for data normalization.
+
+**Use case**: removing or standardizing special characters in phone numbers, addresses, or codes.
+
+```sql
+-- Replace multiple characters at once
+SELECT TRANSLATE('(555) 123-4567', '()-', '   ');  -- '555  123 4567'
+
+-- Normalize phone numbers
+SELECT TRANSLATE(TRIM(Phone), '()- .', '     ')
+FROM Customers;  -- removes formatting chars
+
+-- Compare to REPLACE (requires chaining)
+SELECT REPLACE(REPLACE(REPLACE('(555)-123', '(', ''), ')', ''), '-', '');
+-- TRANSLATE is cleaner: TRANSLATE('(555)-123', '()-', '   ')
+```
+
+## Advanced LIKE Patterns
+
+`LIKE` supports richer pattern syntax beyond `%` wildcards — useful for validating structured data formats directly in T-SQL.
+
+| Pattern | Meaning | Example |
+| :--- | :--- | :--- |
+| `%` | Any string (0+ chars) | `'S%'` matches Smith, SQL |
+| `_` | Any single character | `'S_ith'` matches Smith |
+| `[abc]` | Any single char in set | `'[SB]mith'` matches Smith, Bmith |
+| `[a-z]` | Any char in range | `'[A-Z]%'` matches uppercase start |
+| `[^abc]` | Any char NOT in set | `'[^0-9]%'` not starting with digit |
+
+Use the `ESCAPE` clause to treat `%`, `_`, or `[` as literal characters. Use `COLLATE` to control case sensitivity independently of the column's default collation.
+
+```sql
+-- Find product codes: exactly 3 uppercase letters + 4 digits
+SELECT ProductCode FROM Products
+WHERE ProductCode LIKE '[A-Z][A-Z][A-Z][0-9][0-9][0-9][0-9]';
+
+-- Escape the % character (searching for literal %)
+SELECT Name FROM Products
+WHERE Name LIKE '%50\%%' ESCAPE '\';  -- '50% off sale'
+
+-- Case-sensitive LIKE
+SELECT Name FROM Customers
+WHERE Name LIKE 'a%' COLLATE Latin1_General_CS_AS;
+```
+
+## Unicode and Collation in String Matching
+
+Collation controls how SQL Server compares and sorts character data — it affects `LIKE`, `=`, `ORDER BY`, and index usage.
+
+- **NVARCHAR vs VARCHAR**: use the `N` prefix for Unicode string literals when matching `NVARCHAR` columns (`N'Smith'`); omitting it can cause implicit conversion and index scan instead of seek
+- **Collation sensitivity suffixes**:
+  - `CI` = case insensitive (default in most databases), `CS` = case sensitive
+  - `AI` = accent insensitive, `AS` = accent sensitive
+- **Common collations**: `Latin1_General_CI_AS` (typical default), `Latin1_General_CS_AS` (case-sensitive)
+- **Index impact**: a `LIKE` predicate with a mismatched collation cannot use an index seek efficiently — always match the collation of the column
+
+```sql
+-- Same data, different collation behavior
+SELECT Name FROM Customers WHERE Name = N'José' COLLATE Latin1_General_CI_AI;  -- matches Jose, José
+SELECT Name FROM Customers WHERE Name = N'José' COLLATE Latin1_General_CS_AS;  -- exact match only
+```
+
 ## Choosing the Right Function
 
 | Scenario | Recommended Function |
@@ -153,6 +245,9 @@ WHERE JARO_WINKLER_DISTANCE(a.FullName, b.FullName) > 0.92;
 | Similarity scoring (%) | `EDIT_DISTANCE_SIMILARITY` |
 | Person name matching | `JARO_WINKLER_DISTANCE` |
 | Short identifier matching | `JARO_WINKLER_DISTANCE` |
+| Phonetic name matching | `SOUNDEX` / `DIFFERENCE` |
+| Normalize separator chars | `TRANSLATE` |
+| Structured format validation | `LIKE` with character classes |
 
 ## Use Cases
 
@@ -168,19 +263,50 @@ WHERE JARO_WINKLER_DISTANCE(a.FullName, b.FullName) > 0.92;
 | Regex functions not found | Not available in SQL Server; only in Fabric/Azure SQL | Check platform compatibility before using |
 | Slow fuzzy join | Cross-join of large tables | Filter to candidate pairs first using cheaper predicates |
 | Unexpected REGEXP_LIKE result | Case sensitivity | Use `i` flag for case-insensitive: `REGEXP_LIKE(col, pattern, 'i')` |
+| SOUNDEX returns wrong matches | Non-English names | Use `EDIT_DISTANCE` or `JARO_WINKLER_DISTANCE` instead |
+| LIKE scan instead of seek | Leading wildcard `'%text%'` | Use full-text search (`CONTAINS`) for substring searches on large tables |
+
+## Best Practices
+
+- Prefer `EDIT_DISTANCE_SIMILARITY` over raw `EDIT_DISTANCE` for threshold comparisons — the normalized 0–100 score is length-independent
+- Pre-filter candidate rows with a cheaper predicate (e.g., same first letter, same length range) before applying expensive fuzzy functions in a cross-join
+- Use `TRANSLATE` instead of chained `REPLACE` calls when normalizing multiple single-character delimiters — it is more readable and executes in one pass
+- Avoid leading-wildcard `LIKE '%text%'` on large tables; use full-text search (`CONTAINS`) for scalable substring matching
+- Always match the collation of string literals to the target column to ensure index seeks are used; specify `COLLATE` explicitly when in doubt
 
 ## Exam Tips
 
 - Regex and fuzzy functions are primarily tested in the context of **SQL databases in Microsoft Fabric**
 - `EDIT_DISTANCE` returns an absolute count; `EDIT_DISTANCE_SIMILARITY` returns a 0–100 percentage
 - `JARO_WINKLER_DISTANCE` returns 0.0–1.0 (not 0–100) — note the different scale
+- `SOUNDEX`/`DIFFERENCE` are standard T-SQL (not Fabric-only); `DIFFERENCE` score of 4 = most similar
+- `TRANSLATE` requires equal-length `from_chars` and `to_chars` strings — a length mismatch throws an error
+- Leading-wildcard `LIKE` always causes a full scan; the exam may test knowing that full-text search is the index-friendly alternative
 - Use these for **data preparation before generating embeddings** (Domain 3 connection)
 
 ## Key Takeaways
 
 - Regex functions provide POSIX-style pattern matching — more powerful than `LIKE`
 - Fuzzy functions quantify string similarity — key for deduplication and entity resolution
+- `SOUNDEX`/`DIFFERENCE` offer a lightweight phonetic match available in all SQL Server editions
+- `TRANSLATE` cleanly normalizes multi-character separators in a single function call
 - Combine regex (for format validation) with fuzzy matching (for similarity) in data quality pipelines
+
+## Practice Questions
+
+**Practice Question**
+
+A query uses `WHERE Name LIKE '%Smith%'` on a table with 1 million rows. The query is slow. Which alternative provides similar results while being more index-friendly?
+
+A. Use SOUNDEX(Name) = SOUNDEX('Smith')
+B. Use CHARINDEX('Smith', Name) > 0
+C. Create a full-text index and use CONTAINS(Name, '"Smith*"')
+D. Use TRANSLATE(Name, 'Smith', '     ') IS NULL
+
+> [!success]- Answer
+> **C — Create a full-text index and use CONTAINS(Name, '"Smith*"')**
+>
+> A leading wildcard `LIKE '%Smith%'` always causes a full table scan — no regular index can help. Full-text indexes invert the word-to-row mapping, enabling efficient word and prefix searches. SOUNDEX (A) handles phonetic matches but not substring matches, and is still a function-based scan. CHARINDEX (B) also causes a full scan. TRANSLATE (D) doesn't help find the substring.
 
 ## Related Topics
 
@@ -193,6 +319,8 @@ WHERE JARO_WINKLER_DISTANCE(a.FullName, b.FullName) > 0.92;
 - [REGEXP_LIKE (Transact-SQL)](https://learn.microsoft.com/en-us/sql/t-sql/functions/regexp-like-transact-sql)
 - [EDIT_DISTANCE (Transact-SQL)](https://learn.microsoft.com/en-us/sql/t-sql/functions/edit-distance-transact-sql)
 - [JARO_WINKLER_DISTANCE (Transact-SQL)](https://learn.microsoft.com/en-us/sql/t-sql/functions/jaro-winkler-distance-transact-sql)
+- [SOUNDEX (Transact-SQL)](https://learn.microsoft.com/en-us/sql/t-sql/functions/soundex-transact-sql)
+- [TRANSLATE (Transact-SQL)](https://learn.microsoft.com/en-us/sql/t-sql/functions/translate-transact-sql)
 
 ---
 

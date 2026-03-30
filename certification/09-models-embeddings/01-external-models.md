@@ -23,29 +23,32 @@ Choosing the right model for a task depends on several dimensions:
 | Dimension | Considerations | Examples |
 | :--- | :--- | :--- |
 | **Multimodal** | Can process images, audio, or video in addition to text | GPT-4o, GPT-4 Vision |
-| **Multilanguage** | Quality of non-English language understanding and generation | GPT-4, text-embedding-3-large |
-| **Structured output** | Reliable JSON/schema-formatted output (function calling) | GPT-4o, GPT-3.5-turbo |
-| **Embedding dimension** | Higher dims = more semantic precision; more storage | 1536 (ada-002), 3072 (3-large) |
+| **Multilanguage** | Quality of non-English language understanding and generation | GPT-4o, text-embedding-3-large |
+| **Structured output** | Reliable JSON/schema-formatted output (function calling) | GPT-4o, GPT-4o-mini |
+| **Embedding dimension** | Higher dims = more semantic precision; more storage | 1536 (3-small), 3072 (3-large) |
 | **Context window** | Max tokens in/out; affects chunk size and conversation length | 8k, 128k tokens |
-| **Latency** | Time per request; smaller models are faster | Ada < GPT-3.5 < GPT-4 |
-| **Cost** | Token-based pricing; smaller/older models are cheaper | ada-002 << gpt-4 |
+| **Latency** | Time per request; smaller models are faster | GPT-4o-mini < GPT-4o < o1 |
+| **Cost** | Token-based pricing; smaller/older models are cheaper | GPT-4o-mini << GPT-4o |
 
-### Common Models and Their Use Cases
+### Current Models and Their Use Cases
+
+> **Note:** `gpt-35-turbo` is deprecated and being retired. Use `gpt-4o-mini` as the recommended replacement for cost-sensitive, high-volume workloads.
 
 | Model | Type | Best For |
 | :--- | :--- | :--- |
-| `text-embedding-ada-002` | Embedding | General-purpose embeddings; low cost |
-| `text-embedding-3-small` | Embedding | Better accuracy than ada-002; efficient |
+| `text-embedding-3-small` | Embedding | Balanced accuracy and cost; 1536 dims |
 | `text-embedding-3-large` | Embedding | Highest quality embeddings; 3072 dims |
-| `gpt-35-turbo` | Chat completion | Low-latency Q&A, summarization, classification |
+| `text-embedding-ada-002` | Embedding | Legacy only; superseded by 3-small |
 | `gpt-4o` | Chat completion | Complex reasoning, multimodal, structured output |
-| `gpt-4o-mini` | Chat completion | Cost-effective, fast; good for most tasks |
+| `gpt-4o-mini` | Chat completion | Cost-effective, fast; replaces gpt-35-turbo |
+| `o1` | Reasoning | Multi-step reasoning, complex analysis |
+| `o3-mini` | Reasoning | Fast reasoning; math and code problems |
 
 ### Size vs. Accuracy Tradeoffs
 
 ```text
 Embedding models:
-text-embedding-ada-002   → 1536 dims, 1x cost, baseline accuracy
+text-embedding-ada-002   → 1536 dims, 1x cost, baseline accuracy (legacy)
 text-embedding-3-small   → 1536 dims, 0.5x cost, better accuracy
 text-embedding-3-large   → 3072 dims, 2x cost, best accuracy
 
@@ -53,10 +56,11 @@ Tradeoff: larger embedding models produce more discriminative vectors
 at the cost of storage (3072 floats × 4 bytes = 12KB per row) and
 slightly higher API latency.
 
-Chat models:
+Chat models (as of early 2026):
 gpt-4o-mini → fastest, lowest cost, sufficient for most RAG generation
 gpt-4o      → best quality, supports images, higher cost and latency
-gpt-35-turbo → legacy, very fast, limited context
+o1/o3-mini  → reasoning models, best for multi-step logic problems
+gpt-35-turbo → DEPRECATED — migrate to gpt-4o-mini
 ```
 
 ## CREATE EXTERNAL MODEL Syntax
@@ -89,6 +93,7 @@ WITH (
 ```
 
 Key parameters:
+
 - `LOCATION`: The full REST endpoint URL of the model deployment
 - `API_FORMAT`: `Azure_OpenAI` or `OpenAI` depending on the provider
 - `MODEL_TYPE`: `EMBEDDINGS` or `COMPLETIONS`
@@ -119,45 +124,60 @@ WITH (
 );
 ```
 
-## Calling External Models in T-SQL
+## External Model Permissions
 
-### Generating Embeddings with PREDICT
+Permissions follow an object-based model similar to stored procedures.
 
-```sql
--- Generate an embedding for a single text value
-SELECT PREDICT(MODEL = [MyEmbeddingModel],
-               DATA = (SELECT 'Azure SQL Database is a fully managed cloud database' AS input_text))
-AS embedding;
-
--- Generate embeddings for all products
-SELECT
-    ProductId,
-    ProductName,
-    Description,
-    PREDICT(MODEL = [MyEmbeddingModel],
-            DATA = (SELECT Description AS input_text)) AS DescriptionEmbedding
-FROM dbo.Products;
-```
-
-### Storing Generated Embeddings
+- **CREATE EXTERNAL MODEL**: requires `ALTER ANY EXTERNAL MODEL` permission or membership in `db_owner`
+- **Call via PREDICT**: requires `EXECUTE` permission on the specific external model object
+- **Schema separation**: create external models in a dedicated schema (e.g., `ai`) to simplify permission management
 
 ```sql
--- Add a vector column to store embeddings
-ALTER TABLE dbo.Products
-ADD DescriptionEmbedding VECTOR(1536);  -- 1536 dims for text-embedding-3-small
+-- Grant permission to use a specific external model
+GRANT EXECUTE ON EXTERNAL MODEL ai.EmbeddingModel TO DataAnalystRole;
 
--- Generate and store embeddings for all products
-UPDATE p
-SET DescriptionEmbedding = CAST(
-    PREDICT(MODEL = [MyEmbeddingModel],
-            DATA = (SELECT p2.Description AS input_text)
-           ) AS VECTOR(1536))
-FROM dbo.Products p
-CROSS APPLY (SELECT p.Description) p2(Description)
-WHERE p.DescriptionEmbedding IS NULL;
+-- Grant permission to create external models
+GRANT ALTER ANY EXTERNAL MODEL TO DatabaseDeveloper;
+
+-- Check what models exist and their endpoints
+SELECT name, location, credential_name, created_date
+FROM sys.external_models;
 ```
 
-### Calling Chat Completions via External Model
+## Calling Models with PREDICT
+
+`PREDICT` is the T-SQL function for invoking external models. Behavior depends on model type:
+
+- **Embedding models**: return a `VECTOR` value representing the semantic content of the input text
+- **Completion models**: return JSON containing the model's generated text response
+- **Batch prediction**: run `PREDICT` in an `UPDATE` or `SELECT` over a table to process many rows
+- **Single-row**: use `PREDICT` with a literal or variable for one-off calls
+
+```sql
+-- Generate embedding for a single text
+SELECT PREDICT(MODEL = ai.EmbeddingModel,
+               DATA = (SELECT 'What is vector search?' AS input)) AS embedding;
+
+-- Batch: generate embeddings for all documents
+UPDATE Documents
+SET Embedding = CAST(
+    PREDICT(MODEL = ai.EmbeddingModel,
+            DATA = (SELECT Content AS input))
+    AS VECTOR(1536))
+WHERE Embedding IS NULL;
+
+-- Chat completion via PREDICT
+DECLARE @response NVARCHAR(MAX);
+SELECT @response = CAST(
+    PREDICT(MODEL = ai.ChatModel,
+            DATA = (SELECT 'Explain indexing in 2 sentences.' AS input))
+    AS NVARCHAR(MAX));
+
+-- Parse the completion response
+SELECT JSON_VALUE(@response, '$.choices[0].message.content') AS Answer;
+```
+
+## Calling Chat Completions via External Model
 
 ```sql
 -- Format a prompt as JSON for the chat model
@@ -177,34 +197,66 @@ SELECT @result = PREDICT(
 SELECT JSON_VALUE(@result, '$.choices[0].message.content') AS Classification;
 ```
 
-## Permissions
+## Storing Generated Embeddings
 
 ```sql
--- Grant a user or role permission to use an external model
-GRANT EXECUTE ON EXTERNAL MODEL [MyEmbeddingModel] TO [DataScienceRole];
+-- Add a vector column to store embeddings
+ALTER TABLE dbo.Products
+ADD DescriptionEmbedding VECTOR(1536);  -- 1536 dims for text-embedding-3-small
 
--- Revoke access
-REVOKE EXECUTE ON EXTERNAL MODEL [MyEmbeddingModel] FROM [DataScienceRole];
+-- Generate and store embeddings for all products
+UPDATE p
+SET DescriptionEmbedding = CAST(
+    PREDICT(MODEL = [MyEmbeddingModel],
+            DATA = (SELECT p2.Description AS input_text)
+           ) AS VECTOR(1536))
+FROM dbo.Products p
+CROSS APPLY (SELECT p.Description) p2(Description)
+WHERE p.DescriptionEmbedding IS NULL;
 ```
 
-## Model Selection Decision Framework
+## Model Selection Decision Matrix
+
+Use this table to quickly choose the right model for a given workload:
+
+| Use Case | Recommended Model | Why |
+| :--- | :--- | :--- |
+| Embedding generation (balanced) | `text-embedding-3-small` | Optimized for vector similarity; low cost |
+| Embedding generation (highest quality) | `text-embedding-3-large` | Best accuracy; 3072-dimension output |
+| Complex reasoning / RAG answers | `gpt-4o` | High quality, multimodal, structured JSON |
+| High-volume, cost-sensitive chat | `gpt-4o-mini` | ~90% cheaper than GPT-4o; fast |
+| Multi-step reasoning / math | `o1` / `o3-mini` | Reasoning models built for logical problems |
+| Code generation | `gpt-4o` | Excellent code quality and explanation |
+| Low-latency classification | `gpt-4o-mini` | Faster inference; sufficient for simple tasks |
+
+Decision framework:
 
 ```text
 For embedding generation:
 ├── High accuracy needed? → text-embedding-3-large (3072 dims)
 ├── Balanced accuracy/cost? → text-embedding-3-small (1536 dims)
-└── Legacy/existing systems? → text-embedding-ada-002 (1536 dims)
+└── Legacy/existing systems only → text-embedding-ada-002 (1536 dims)
 
 For text generation (RAG):
 ├── Fastest, cheapest, good quality? → gpt-4o-mini
 ├── Best quality, structured JSON output? → gpt-4o
 ├── Need image analysis? → gpt-4o (multimodal)
-└── Very high volume, lowest cost? → gpt-35-turbo
+└── Complex multi-step reasoning? → o1 or o3-mini
 
 For classification or extraction:
 ├── Structured JSON output required? → gpt-4o or gpt-4o-mini (JSON mode)
-└── Simple binary/multi-class? → Fine-tuned gpt-35-turbo (if available)
+└── Simple binary/multi-class? → gpt-4o-mini (fast and cheap)
 ```
+
+## Model Deployment Management in Azure
+
+Model deployments are managed through Azure OpenAI Studio (or the Azure Portal):
+
+- **Deploying models**: create a named deployment (e.g., `my-gpt4o`) that maps to a specific model version; the deployment name appears in the `LOCATION` URL
+- **Model versioning**: choose auto-update (always latest patch) or pin to a specific version for reproducibility
+- **Quota management**: each deployment has a tokens-per-minute (TPM) limit; increasing quota requires a support request or using provisioned throughput
+- **Token limits**: set max TPM per deployment to control cost and prevent runaway usage in production workloads
+- **Monitoring via Azure Monitor**: track token consumption, request latency, error rates (4xx/5xx), and throttling events using built-in metrics and Log Analytics
 
 ## Use Cases
 
@@ -222,6 +274,15 @@ For classification or extraction:
 | `Dimension mismatch` | Embedding model returns different dims than VECTOR column | Match VECTOR(n) to the model's actual output dimensions |
 | `Rate limit exceeded` | Too many API calls/minute | Implement batching; increase Azure OpenAI quota |
 | `PREDICT syntax error` | Wrong column alias (`input_text` required for embeddings) | Use `input_text` as the alias for embedding input column |
+| `Permission denied on PREDICT` | User lacks EXECUTE on external model | `GRANT EXECUTE ON EXTERNAL MODEL model_name TO role` |
+
+## Best Practices
+
+- Store external model definitions in a dedicated schema (e.g., `ai`) and grant `EXECUTE` only to roles that need them — never rely on `db_owner` for routine access
+- Use `text-embedding-3-small` as the default embedding model; only upgrade to `text-embedding-3-large` when retrieval quality is measurably insufficient
+- Avoid calling `PREDICT` row-by-row in a cursor; batch updates with `WHERE Embedding IS NULL` to minimize API round-trips and stay within TPM limits
+- Pin model versions in production deployments to prevent unexpected behavior changes from auto-updates
+- Monitor Azure OpenAI token usage and latency via Azure Monitor; set alerts on throttling errors before they impact query performance
 
 ## Exam Tips
 
@@ -230,6 +291,8 @@ For classification or extraction:
 - `PREDICT` is the T-SQL function for calling external models — used for both embeddings and completions
 - Embedding dimension must match the `VECTOR(n)` column size — `text-embedding-3-small` = 1536, `text-embedding-3-large` = 3072
 - External models are database-scoped objects — viewable in `sys.external_models`
+- `EXECUTE` permission on the external model object is required to call `PREDICT` — `ALTER ANY EXTERNAL MODEL` is for creating/modifying, not calling
+- `gpt-35-turbo` is deprecated — exam questions may reference `gpt-4o-mini` as its replacement
 
 ## Key Takeaways
 
@@ -237,6 +300,23 @@ For classification or extraction:
 - `CREATE EXTERNAL MODEL` + `DATABASE SCOPED CREDENTIAL` is the setup pattern
 - `PREDICT(MODEL = ..., DATA = ...)` calls the model and returns results inline with SQL queries
 - Match the model type (`EMBEDDINGS` vs `COMPLETIONS`) to the use case
+- Use `EXECUTE` permission (not `ALTER ANY EXTERNAL MODEL`) to allow roles to call models via `PREDICT`
+
+## Practice Question
+
+**Practice Question**
+
+A database has an EXTERNAL MODEL configured for Azure OpenAI text-embedding-3-small. A user in the ReportingRole can query document tables but gets "permission denied" when calling PREDICT. What permission is needed?
+
+A. SELECT permission on sys.external_models
+B. EXECUTE permission on the EXTERNAL MODEL
+C. ALTER ANY EXTERNAL MODEL permission
+D. db_owner role membership
+
+> [!success]- Answer
+> **B — EXECUTE permission on the EXTERNAL MODEL**
+>
+> Calling an external model via PREDICT requires EXECUTE permission on the specific external model object — similar to needing EXECUTE on a stored procedure. SELECT on sys.external_models (A) only allows viewing model metadata. ALTER ANY EXTERNAL MODEL (C) allows creating/modifying models, not using them. db_owner (D) would work but is overly broad.
 
 ## Related Topics
 
