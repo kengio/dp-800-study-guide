@@ -12,7 +12,7 @@ tags:
 
 ## Overview
 
-SQL Database in Microsoft Fabric and Azure SQL support calling AI models directly from T-SQL using external model definitions. An external model is a reference to an endpoint (such as Azure OpenAI) that is registered in the database and callable via T-SQL functions. This enables embedding generation, text completion, classification, and other AI operations alongside SQL queries.
+SQL Database in Microsoft Fabric and Azure SQL support calling AI models directly from T-SQL using external model definitions. An **external model** is a reference to an endpoint (such as Azure OpenAI) that is registered in the database and callable via T-SQL functions. This enables embedding generation, text completion, classification, and other AI operations alongside SQL queries.
 
 > [!abstract]
 > - Covers calling external AI models (Azure OpenAI) from T-SQL using sp_invoke_external_rest_endpoint
@@ -23,6 +23,8 @@ SQL Database in Microsoft Fabric and Azure SQL support calling AI models directl
 > - `sp_invoke_external_rest_endpoint` takes `@url`, `@method`, `@headers`, `@payload`, `@credential` parameters
 > - The API key is stored in a `DATABASE SCOPED CREDENTIAL` with `SECRET` = the bearer token — never hard-coded
 > - Response is JSON; extract the embedding vector with `JSON_QUERY(response, '$.data[0].embedding')`
+
+---
 
 ## Evaluating Models
 
@@ -73,6 +75,8 @@ o1/o3-mini  → reasoning models, best for multi-step logic problems
 gpt-35-turbo → DEPRECATED — migrate to gpt-4o-mini
 ```
 
+---
+
 ## CREATE EXTERNAL MODEL Syntax
 
 In SQL Database in Fabric, register an external model to enable T-SQL calls:
@@ -109,6 +113,8 @@ Key parameters:
 - `MODEL_TYPE`: `EMBEDDINGS` or `COMPLETIONS`
 - `CREDENTIAL`: References the credential that holds the API key
 
+---
+
 ## Managing External Models
 
 ```sql
@@ -134,6 +140,8 @@ WITH (
 );
 ```
 
+---
+
 ## External Model Permissions
 
 Permissions follow an object-based model similar to stored procedures.
@@ -153,6 +161,8 @@ GRANT ALTER ANY EXTERNAL MODEL TO DatabaseDeveloper;
 SELECT name, location, credential_name, created_date
 FROM sys.external_models;
 ```
+
+---
 
 ## Calling Models with PREDICT
 
@@ -187,6 +197,8 @@ SELECT @response = CAST(
 SELECT JSON_VALUE(@response, '$.choices[0].message.content') AS Answer;
 ```
 
+---
+
 ## Calling Chat Completions via External Model
 
 ```sql
@@ -207,6 +219,8 @@ SELECT @result = PREDICT(
 SELECT JSON_VALUE(@result, '$.choices[0].message.content') AS Classification;
 ```
 
+---
+
 ## Storing Generated Embeddings
 
 ```sql
@@ -224,6 +238,8 @@ FROM dbo.Products p
 CROSS APPLY (SELECT p.Description) p2(Description)
 WHERE p.DescriptionEmbedding IS NULL;
 ```
+
+---
 
 ## Model Selection Decision Matrix
 
@@ -258,6 +274,8 @@ For classification or extraction:
 └── Simple binary/multi-class? → gpt-4o-mini (fast and cheap)
 ```
 
+---
+
 ## Model Deployment Management in Azure
 
 Model deployments are managed through Azure OpenAI Studio (or the Azure Portal):
@@ -268,12 +286,16 @@ Model deployments are managed through Azure OpenAI Studio (or the Azure Portal):
 - **Token limits**: set max TPM per deployment to control cost and prevent runaway usage in production workloads
 - **Monitoring via Azure Monitor**: track token consumption, request latency, error rates (4xx/5xx), and throttling events using built-in metrics and Log Analytics
 
+---
+
 ## Use Cases
 
 - **Product search**: Generate embeddings for product descriptions; store in vector column; enable semantic search
 - **Document classification**: Use a completions model to classify incoming documents without custom ML models
 - **Customer feedback analysis**: Batch-process feedback rows to generate sentiment scores using T-SQL
 - **RAG grounding**: Embed user queries at query time to find similar documents in the database
+
+---
 
 ## Common Issues & Errors
 
@@ -284,7 +306,9 @@ Model deployments are managed through Azure OpenAI Studio (or the Azure Portal):
 | `Dimension mismatch` | Embedding model returns different dims than VECTOR column | Match VECTOR(n) to the model's actual output dimensions |
 | `Rate limit exceeded` | Too many API calls/minute | Implement batching; increase Azure OpenAI quota |
 | `PREDICT syntax error` | Wrong column alias (`input_text` required for embeddings) | Use `input_text` as the alias for embedding input column |
-| `Permission denied on PREDICT` | User lacks EXECUTE on external model | `GRANT EXECUTE ON EXTERNAL MODEL model_name TO role` |
+| `Permission denied on PREDICT` | User lacks EXECUTE on external model | ==`GRANT EXECUTE ON EXTERNAL MODEL model_name TO role`== |
+
+---
 
 ## Best Practices
 
@@ -293,6 +317,8 @@ Model deployments are managed through Azure OpenAI Studio (or the Azure Portal):
 - Avoid calling `PREDICT` row-by-row in a cursor; batch updates with `WHERE Embedding IS NULL` to minimize API round-trips and stay within TPM limits
 - Pin model versions in production deployments to prevent unexpected behavior changes from auto-updates
 - Monitor Azure OpenAI token usage and latency via Azure Monitor; set alerts on throttling errors before they impact query performance
+
+---
 
 ## Exam Tips
 
@@ -304,6 +330,8 @@ Model deployments are managed through Azure OpenAI Studio (or the Azure Portal):
 - `EXECUTE` permission on the external model object is required to call `PREDICT` — `ALTER ANY EXTERNAL MODEL` is for creating/modifying, not calling
 - `gpt-35-turbo` is deprecated — exam questions may reference `gpt-4o-mini` as its replacement
 
+---
+
 ## Key Takeaways
 
 - External models register AI endpoints as database objects — callable via T-SQL without custom code
@@ -311,6 +339,8 @@ Model deployments are managed through Azure OpenAI Studio (or the Azure Portal):
 - `PREDICT(MODEL = ..., DATA = ...)` calls the model and returns results inline with SQL queries
 - Match the model type (`EMBEDDINGS` vs `COMPLETIONS`) to the use case
 - Use `EXECUTE` permission (not `ALTER ANY EXTERNAL MODEL`) to allow roles to call models via `PREDICT`
+
+---
 
 ## Practice Question
 
@@ -328,11 +358,15 @@ D. db_owner role membership
 >
 > Calling an external model via PREDICT requires EXECUTE permission on the specific external model object — similar to needing EXECUTE on a stored procedure. SELECT on sys.external_models (A) only allows viewing model metadata. ALTER ANY EXTERNAL MODEL (C) allows creating/modifying models, not using them. db_owner (D) would work but is overly broad.
 
+---
+
 ## Related Topics
 
 - [02-Embedding Maintenance](./02-embedding-maintenance.md)
 - [03-Chunking & Generation](./03-chunking-generation.md)
 - [02-Prompts & Responses](../11-rag/02-prompts-and-responses.md)
+
+---
 
 ## Official Documentation
 

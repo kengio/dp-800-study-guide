@@ -12,7 +12,7 @@ tags:
 
 ## Overview
 
-Embeddings stored in a vector column go stale when the source text changes. Maintaining embeddings means detecting when source data changes, re-generating embeddings for affected rows, and updating the vector column. Several approaches exist — each with different tradeoffs in complexity, latency, cost, and infrastructure requirements.
+**Embeddings** stored in a vector column go stale when the source text changes. Maintaining embeddings means detecting when source data changes, re-generating embeddings for affected rows, and updating the vector column. Several approaches exist — each with different tradeoffs in complexity, latency, cost, and infrastructure requirements.
 
 > [!abstract]
 > - Covers when and how to regenerate embeddings: model changes, schema changes, data updates, and dirty tracking
@@ -24,17 +24,21 @@ Embeddings stored in a vector column go stale when the source text changes. Main
 > - Dirty tracking: add an `EmbeddingDirty BIT DEFAULT 1` column; set to 0 after embedding; UPDATE sets back to 1 via trigger or app logic
 > - Batch refresh = regenerate all at once (simple, offline); incremental = process only dirty rows (complex, online)
 
+---
+
 ## Embedding Maintenance Methods Comparison
 
 | Method | Latency | Complexity | Infrastructure | Best For |
 | :--- | :--- | :--- | :--- | :--- |
-| Table Triggers | Near real-time | Low | None (in-DB) | Small tables, low write volume |
+| Table Triggers | Near real-time | Low | ==None (in-DB)== | Small tables, low write volume |
 | Change Tracking | Low (polling) | Medium | SQL Agent or scheduler | Moderate volume, batch-friendly |
 | CDC | Medium (polling) | Medium | SQL Agent (on-prem) | Audit trail needed with embeddings |
 | CES (Fabric) | Near real-time | Low | Fabric only | Fabric SQL, cloud-native |
 | Azure Functions SQL Trigger | Near real-time | Medium | Azure Functions | Any Azure SQL, event-driven |
 | Azure Logic Apps | Minutes | Low | Logic Apps | Low-code, low-volume |
 | Microsoft Foundry | Configurable | Low | Fabric/Foundry | Declarative AI pipeline |
+
+---
 
 ## Method 1: Table Triggers
 
@@ -69,6 +73,8 @@ END;
 - Adds latency to every INSERT/UPDATE (synchronous API call)
 - If the AI endpoint is unavailable, the write transaction fails
 - Not suitable for high-volume write tables (each row = one API call)
+
+---
 
 ## Method 2: Change Tracking (Batch Polling)
 
@@ -121,6 +127,8 @@ WHERE TableName = 'Products';
 - Resilient to AI endpoint failures (retry at next poll)
 - Requires a scheduler (SQL Agent, Azure Automation, App Service WebJob)
 
+---
+
 ## Method 3: CDC (Change Data Capture)
 
 CDC captures before/after values; useful when you need to know what changed before updating the embedding.
@@ -150,6 +158,8 @@ UPDATE dbo.EmbeddingCDCWatermark
 SET LastLSN = @to_lsn
 WHERE TableName = 'dbo_Products';
 ```
+
+---
 
 ## Method 4: Azure Functions with SQL Trigger Binding
 
@@ -190,6 +200,8 @@ public static async Task Run(
 - Resilient: Azure Functions handles retries on failure
 - Can process changes in batches (multiple rows per trigger invocation)
 
+---
+
 ## Method 5: CES (Change Event Streaming — Fabric)
 
 In Fabric SQL Database, CES streams changes to an Eventstream, which triggers a Data Pipeline or Notebook to re-generate embeddings.
@@ -226,6 +238,8 @@ for event in eventstream_batch:
     )
 ```
 
+---
+
 ## Method 6: Azure Logic Apps
 
 Logic Apps polls for changes on a schedule and calls the embedding API via an HTTP action.
@@ -256,6 +270,8 @@ BEGIN
 END;
 ```
 
+---
+
 ## Method 7: Microsoft Foundry
 
 Microsoft Foundry (AI Studio/AI Foundry in Fabric) provides a declarative AI pipeline:
@@ -269,6 +285,8 @@ Foundry Data Pipeline:
 ```
 
 This is the most managed option — no code required, built-in retry and monitoring.
+
+---
 
 ## Choosing an Approach
 
@@ -292,11 +310,15 @@ Prefer no-code/low-code?
 └── NO → Change Tracking with SQL Agent job
 ```
 
+---
+
 ## Use Cases
 
 - **Product catalog**: New products or description updates trigger embedding regeneration via Azure Functions
 - **Document library**: Daily batch job using Change Tracking re-embeds documents modified since last run
 - **Fabric data platform**: CES-driven pipeline automatically keeps Lakehouse embeddings in sync with SQL source
+
+---
 
 ## Common Issues & Errors
 
@@ -307,6 +329,8 @@ Prefer no-code/low-code?
 | Embedding drift undetected | Source text updated without regenerating embedding | Add `EmbeddingGeneratedAt` column and compare to `UpdatedAt` |
 | Azure Functions not firing | Change Tracking not enabled on table | SQL trigger binding auto-enables CT; verify `db_owner` permission |
 
+---
+
 ## Exam Tips
 
 - **Triggers**: Simplest but synchronous — adds AI API latency to every write; risky if endpoint is down
@@ -315,6 +339,8 @@ Prefer no-code/low-code?
 - **CES**: Fabric-native, zero-infrastructure — only available in SQL Database in Fabric
 - Always maintain a watermark (version or timestamp) to know which rows have been embedded
 
+---
+
 ## Key Takeaways
 
 - No single embedding maintenance method suits all scenarios — choose based on volume, latency, and infrastructure
@@ -322,11 +348,15 @@ Prefer no-code/low-code?
 - Asynchronous batch approaches (Change Tracking, CDC) are more resilient but have higher embedding latency
 - CES is the preferred Fabric-native approach when using SQL Database in Fabric
 
+---
+
 ## Related Topics
 
 - [01-External Models](./01-external-models.md)
 - [03-Chunking & Generation](./03-chunking-generation.md)
 - [04-Change & Event Handling](../08-azure-services-integration/04-change-event-handling.md)
+
+---
 
 ## Official Documentation
 
