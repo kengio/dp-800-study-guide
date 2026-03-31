@@ -51,4 +51,4 @@ Quick-reference guides for high-frequency exam topics. Each sheet is designed fo
 
 ---
 
-**[← Back to Resources](../README.md)**
+**[← Back to Resources](../dp-800-overview.md)**

@@ -359,4 +359,4 @@ D. The procedure runs only if the user has db_datareader role
 
 ---
 
-**[← Previous](./02-dynamic-data-masking-rls.md) | [↑ Back to Section](./README.md) | [Next →](./04-auditing.md)**
+**[← Previous](./02-dynamic-data-masking-rls.md) | [↑ Back to Section](./data-security-compliance.md) | [Next →](./04-auditing.md)**

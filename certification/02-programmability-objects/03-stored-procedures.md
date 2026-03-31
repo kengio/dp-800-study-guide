@@ -382,4 +382,4 @@ D. Use EXEC instead of sp_executesql
 
 ---
 
-**[← Previous](./02-functions.md) | [↑ Back to Section](./README.md) | [Next →](./04-triggers.md)**
+**[← Previous](./02-functions.md) | [↑ Back to Section](./programmability-objects.md) | [Next →](./04-triggers.md)**

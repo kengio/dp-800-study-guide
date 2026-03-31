@@ -369,4 +369,4 @@ D. Enable JSON path strict mode
 
 ---
 
-**[← Previous](./02-specialized-tables.md) | [↑ Back to Section](./README.md) | [Next →](./04-constraints-sequences.md)**
+**[← Previous](./02-specialized-tables.md) | [↑ Back to Section](./database-objects.md) | [Next →](./04-constraints-sequences.md)**

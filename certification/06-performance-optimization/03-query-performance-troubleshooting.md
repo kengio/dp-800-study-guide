@@ -438,4 +438,4 @@ D. Force a specific plan using sp_query_store_force_plan
 
 ---
 
-**[← Previous](./02-transaction-isolation-concurrency.md) | [↑ Back to Section](./README.md)**
+**[← Previous](./02-transaction-isolation-concurrency.md) | [↑ Back to Section](./performance-optimization.md)**

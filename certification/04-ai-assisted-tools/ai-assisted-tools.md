@@ -68,14 +68,14 @@ flowchart TD
 
 ## Related Resources
 
-- [03-Advanced T-SQL](../03-advanced-tsql/README.md)
-- [05-Data Security & Compliance](../05-data-security-compliance/README.md)
+- [03-Advanced T-SQL](../03-advanced-tsql/advanced-tsql.md)
+- [05-Data Security & Compliance](../05-data-security-compliance/data-security-compliance.md)
 - [Official: GitHub Copilot for SQL](https://learn.microsoft.com/en-us/azure/azure-sql/copilot/copilot-azure-sql-overview)
 
 ## Next Steps
 
-Proceed to [05-Data Security & Compliance](../05-data-security-compliance/README.md) to learn about encryption, masking, RLS, and auditing.
+Proceed to [05-Data Security & Compliance](../05-data-security-compliance/data-security-compliance.md) to learn about encryption, masking, RLS, and auditing.
 
 ---
 
-**[← Back to Advanced T-SQL](../03-advanced-tsql/README.md) | [↑ Back to Certification](../README.md)**
+**[← Back to Advanced T-SQL](../03-advanced-tsql/advanced-tsql.md) | [↑ Back to Certification](../dp-800-overview.md)**

@@ -344,4 +344,4 @@ PRINT 'Reference data load complete.';
 
 ---
 
-**[↑ Back to Section](./README.md) | [Next →](./02-sql-database-projects.md)**
+**[↑ Back to Section](./cicd-database-projects.md) | [Next →](./02-sql-database-projects.md)**

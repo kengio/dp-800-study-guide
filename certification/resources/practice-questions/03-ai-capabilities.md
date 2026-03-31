@@ -325,4 +325,4 @@ D. Encrypt the key using `ENCRYPTBYPASSPHRASE` and store it in a table
 
 ---
 
-**[← Back to Practice Questions](./README.md)**
+**[← Back to Practice Questions](./practice-questions.md)**

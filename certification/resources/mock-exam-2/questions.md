@@ -744,4 +744,4 @@ D. Use `CONTAINS(Category, 'Finance')` inside the VECTOR_SEARCH call
 
 ---
 
-**[← Back to Mock Exam 2](./README.md)**
+**[← Back to Mock Exam 2](./mock-exam-2.md)**

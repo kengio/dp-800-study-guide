@@ -320,4 +320,4 @@ D. Create a second clustered index on Status
 
 ---
 
-**[↑ Back to Section](./README.md) | [Next →](./02-specialized-tables.md)**
+**[↑ Back to Section](./database-objects.md) | [Next →](./02-specialized-tables.md)**

@@ -73,14 +73,14 @@ flowchart TD
 
 ## Related Resources
 
-- [01-Database Objects](../01-database-objects/README.md)
-- [03-Advanced T-SQL](../03-advanced-tsql/README.md)
+- [01-Database Objects](../01-database-objects/database-objects.md)
+- [03-Advanced T-SQL](../03-advanced-tsql/advanced-tsql.md)
 - [Official: Stored Procedures](https://learn.microsoft.com/en-us/sql/relational-databases/stored-procedures/stored-procedures-database-engine)
 
 ## Next Steps
 
-Proceed to [03-Advanced T-SQL](../03-advanced-tsql/README.md) to learn about CTEs, window functions, JSON, regex, and graph queries.
+Proceed to [03-Advanced T-SQL](../03-advanced-tsql/advanced-tsql.md) to learn about CTEs, window functions, JSON, regex, and graph queries.
 
 ---
 
-**[← Back to Database Objects](../01-database-objects/README.md) | [↑ Back to Certification](../README.md)**
+**[← Back to Database Objects](../01-database-objects/database-objects.md) | [↑ Back to Certification](../dp-800-overview.md)**

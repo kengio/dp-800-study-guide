@@ -293,4 +293,4 @@ CREATE TABLE [dbo].[Orders]
 
 ---
 
-**[← Previous](./02-sql-database-projects.md) | [↑ Back to Section](./README.md) | [Next →](./04-deployment-pipelines.md)**
+**[← Previous](./02-sql-database-projects.md) | [↑ Back to Section](./cicd-database-projects.md) | [Next →](./04-deployment-pipelines.md)**

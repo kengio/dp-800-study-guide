@@ -379,4 +379,4 @@ sqlpackage /Action:Publish \
 
 ---
 
-**[← Previous](./03-source-control-branching.md) | [↑ Back to Section](./README.md)**
+**[← Previous](./03-source-control-branching.md) | [↑ Back to Section](./cicd-database-projects.md)**

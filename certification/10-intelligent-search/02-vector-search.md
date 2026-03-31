@@ -356,4 +356,4 @@ ORDER BY vs.distance ASC;
 
 ---
 
-**[← Previous](./01-fulltext-search.md) | [↑ Back to Section](./README.md) | [Next →](./03-hybrid-search-rrf.md)**
+**[← Previous](./01-fulltext-search.md) | [↑ Back to Section](./intelligent-search.md) | [Next →](./03-hybrid-search-rrf.md)**

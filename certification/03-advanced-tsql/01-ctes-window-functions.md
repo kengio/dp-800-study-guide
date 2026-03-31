@@ -399,4 +399,4 @@ D. CTEs are limited to 100 rows by default
 
 ---
 
-**[↑ Back to Section](./README.md) | [Next →](./02-json-functions.md)**
+**[↑ Back to Section](./advanced-tsql.md) | [Next →](./02-json-functions.md)**

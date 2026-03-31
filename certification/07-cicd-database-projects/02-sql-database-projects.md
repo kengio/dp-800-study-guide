@@ -321,4 +321,4 @@ SDK-style projects support referencing shared objects as NuGet packages:
 
 ---
 
-**[← Previous](./01-testing-strategy.md) | [↑ Back to Section](./README.md) | [Next →](./03-source-control-branching.md)**
+**[← Previous](./01-testing-strategy.md) | [↑ Back to Section](./cicd-database-projects.md) | [Next →](./03-source-control-branching.md)**

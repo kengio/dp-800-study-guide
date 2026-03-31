@@ -360,4 +360,4 @@ D. Memory-optimized table with DURABILITY = SCHEMA_AND_DATA
 
 ---
 
-**[← Previous](./01-tables-indexes.md) | [↑ Back to Section](./README.md) | [Next →](./03-json-columns.md)**
+**[← Previous](./01-tables-indexes.md) | [↑ Back to Section](./database-objects.md) | [Next →](./03-json-columns.md)**

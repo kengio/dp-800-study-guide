@@ -381,4 +381,4 @@ SELECT JSON_VALUE(@response, '$.result.choices[0].message.content') AS Answer;
 
 ---
 
-**[← Back to Cheat Sheets](./README.md)**
+**[← Back to Cheat Sheets](./cheat-sheets.md)**

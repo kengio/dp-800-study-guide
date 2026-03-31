@@ -319,4 +319,4 @@ D. NOT IN cannot be used with subqueries
 
 ---
 
-**[← Back to Practice Questions](./README.md)**
+**[← Back to Practice Questions](./practice-questions.md)**

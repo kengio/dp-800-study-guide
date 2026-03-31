@@ -405,4 +405,4 @@ D. Increase the cost threshold for parallelism to 100
 
 ---
 
-**[↑ Back to Section](./README.md) | [Next →](./02-transaction-isolation-concurrency.md)**
+**[↑ Back to Section](./performance-optimization.md) | [Next →](./02-transaction-isolation-concurrency.md)**

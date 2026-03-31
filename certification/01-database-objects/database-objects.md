@@ -72,14 +72,14 @@ flowchart TD
 
 ## Related Resources
 
-- [02-Programmability Objects](../02-programmability-objects/README.md)
-- [03-Advanced T-SQL](../03-advanced-tsql/README.md)
+- [02-Programmability Objects](../02-programmability-objects/programmability-objects.md)
+- [03-Advanced T-SQL](../03-advanced-tsql/advanced-tsql.md)
 - [Official: SQL Server Tables](https://learn.microsoft.com/en-us/sql/relational-databases/tables/tables)
 
 ## Next Steps
 
-Proceed to [02-Programmability Objects](../02-programmability-objects/README.md) to learn about views, functions, stored procedures, and triggers.
+Proceed to [02-Programmability Objects](../02-programmability-objects/programmability-objects.md) to learn about views, functions, stored procedures, and triggers.
 
 ---
 
-**[↑ Back to Certification](../README.md)**
+**[↑ Back to Certification](../dp-800-overview.md)**

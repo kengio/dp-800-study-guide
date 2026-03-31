@@ -249,4 +249,4 @@ D. The underlying table has a columnstore index
 
 ---
 
-**[↑ Back to Section](./README.md) | [Next →](./02-functions.md)**
+**[↑ Back to Section](./programmability-objects.md) | [Next →](./02-functions.md)**

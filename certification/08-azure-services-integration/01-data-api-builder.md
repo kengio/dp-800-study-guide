@@ -436,4 +436,4 @@ az containerapp create \
 
 ---
 
-**[↑ Back to Section](./README.md) | [Next →](./02-rest-graphql-endpoints.md)**
+**[↑ Back to Section](./azure-services-integration.md) | [Next →](./02-rest-graphql-endpoints.md)**

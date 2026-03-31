@@ -295,4 +295,4 @@ A reference of key terms and concepts for the DP-800: Developing AI-Enabled Data
 
 ---
 
-**[← Back to Appendix](./README.md)**
+**[← Back to Appendix](./appendix.md)**

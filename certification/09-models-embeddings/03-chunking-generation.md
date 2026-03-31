@@ -376,4 +376,4 @@ WHERE TokenCount > 7500;  -- Leave headroom below 8192 limit
 
 ---
 
-**[← Previous](./02-embedding-maintenance.md) | [↑ Back to Section](./README.md)**
+**[← Previous](./02-embedding-maintenance.md) | [↑ Back to Section](./models-embeddings.md)**

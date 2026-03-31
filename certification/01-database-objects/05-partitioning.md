@@ -296,7 +296,7 @@ D. ALTER PARTITION FUNCTION MERGE RANGE on the oldest boundary
 ## Related Topics
 
 - [01-Tables & Indexes](./01-tables-indexes.md)
-- [06-Performance Optimization](../06-performance-optimization/README.md)
+- [06-Performance Optimization](../06-performance-optimization/performance-optimization.md)
 
 ---
 
@@ -307,4 +307,4 @@ D. ALTER PARTITION FUNCTION MERGE RANGE on the oldest boundary
 
 ---
 
-**[← Previous](./04-constraints-sequences.md) | [↑ Back to Section](./README.md)**
+**[← Previous](./04-constraints-sequences.md) | [↑ Back to Section](./database-objects.md)**

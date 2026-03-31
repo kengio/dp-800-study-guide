@@ -357,4 +357,4 @@ SELECT lcid, name FROM sys.fulltext_languages ORDER BY name;
 
 ---
 
-**[↑ Back to Section](./README.md) | [Next →](./02-vector-search.md)**
+**[↑ Back to Section](./intelligent-search.md) | [Next →](./02-vector-search.md)**

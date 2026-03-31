@@ -438,4 +438,4 @@ D. Add instructions as code comments in each SQL file
 
 ---
 
-**[← Previous](./01-ai-security-impact.md) | [↑ Back to Section](./README.md) | [Next →](./03-mcp-server-endpoints.md)**
+**[← Previous](./01-ai-security-impact.md) | [↑ Back to Section](./ai-assisted-tools.md) | [Next →](./03-mcp-server-endpoints.md)**

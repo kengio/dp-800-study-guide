@@ -367,4 +367,4 @@ Prefer no-code/low-code?
 
 ---
 
-**[← Previous](./01-external-models.md) | [↑ Back to Section](./README.md) | [Next →](./03-chunking-generation.md)**
+**[← Previous](./01-external-models.md) | [↑ Back to Section](./models-embeddings.md) | [Next →](./03-chunking-generation.md)**

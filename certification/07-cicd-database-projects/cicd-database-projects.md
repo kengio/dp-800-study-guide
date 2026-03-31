@@ -74,14 +74,14 @@ flowchart TD
 
 ## Related Resources
 
-- [06-Performance Optimization](../06-performance-optimization/README.md)
-- [08-Azure Services Integration](../08-azure-services-integration/README.md)
+- [06-Performance Optimization](../06-performance-optimization/performance-optimization.md)
+- [08-Azure Services Integration](../08-azure-services-integration/azure-services-integration.md)
 - [Official: SQL Database Projects](https://learn.microsoft.com/en-us/azure-data-studio/extensions/sql-database-project-extension)
 
 ## Next Steps
 
-Proceed to [08-Azure Services Integration](../08-azure-services-integration/README.md) to learn about Data API Builder, REST/GraphQL endpoints, and change event handling.
+Proceed to [08-Azure Services Integration](../08-azure-services-integration/azure-services-integration.md) to learn about Data API Builder, REST/GraphQL endpoints, and change event handling.
 
 ---
 
-**[← Back to Performance Optimization](../06-performance-optimization/README.md) | [↑ Back to Certification](../README.md)**
+**[← Back to Performance Optimization](../06-performance-optimization/performance-optimization.md) | [↑ Back to Certification](../dp-800-overview.md)**

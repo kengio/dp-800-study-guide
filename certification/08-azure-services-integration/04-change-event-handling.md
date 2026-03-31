@@ -374,4 +374,4 @@ END;
 
 ---
 
-**[← Previous](./03-monitoring.md) | [↑ Back to Section](./README.md)**
+**[← Previous](./03-monitoring.md) | [↑ Back to Section](./azure-services-integration.md)**

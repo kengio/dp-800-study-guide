@@ -467,4 +467,4 @@ EXEC dbo.usp_RAGQuery
 
 ---
 
-**[← Back to Code Examples](./README.md) | [↑ Back to Certification](../../../README.md)**
+**[← Back to Code Examples](./tsql-code-examples.md) | [↑ Back to Certification](../../../dp-800-overview.md)**

@@ -77,14 +77,14 @@ flowchart TD
 
 ## Related Resources
 
-- [02-Programmability Objects](../02-programmability-objects/README.md)
-- [04-AI-Assisted Tools](../04-ai-assisted-tools/README.md)
-- [Code Examples — T-SQL](../resources/code-examples/tsql/README.md)
+- [02-Programmability Objects](../02-programmability-objects/programmability-objects.md)
+- [04-AI-Assisted Tools](../04-ai-assisted-tools/ai-assisted-tools.md)
+- [Code Examples — T-SQL](../resources/code-examples/tsql/tsql-code-examples.md)
 
 ## Next Steps
 
-Proceed to [04-AI-Assisted Tools](../04-ai-assisted-tools/README.md) to learn about GitHub Copilot, MCP servers, and AI-assisted development.
+Proceed to [04-AI-Assisted Tools](../04-ai-assisted-tools/ai-assisted-tools.md) to learn about GitHub Copilot, MCP servers, and AI-assisted development.
 
 ---
 
-**[← Back to Programmability Objects](../02-programmability-objects/README.md) | [↑ Back to Certification](../README.md)**
+**[← Back to Programmability Objects](../02-programmability-objects/programmability-objects.md) | [↑ Back to Certification](../dp-800-overview.md)**

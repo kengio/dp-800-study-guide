@@ -368,4 +368,4 @@ D. Use TRANSLATE(Name, 'Smith', '     ') IS NULL
 
 ---
 
-**[← Previous](./02-json-functions.md) | [↑ Back to Section](./README.md) | [Next →](./04-graph-queries.md)**
+**[← Previous](./02-json-functions.md) | [↑ Back to Section](./advanced-tsql.md) | [Next →](./04-graph-queries.md)**

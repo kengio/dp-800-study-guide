@@ -82,4 +82,4 @@ tags:
 
 ---
 
-**[← Back to Resources](./README.md)**
+**[← Back to Resources](./exam-resources.md)**

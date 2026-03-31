@@ -353,4 +353,4 @@ D. The TVF is missing a clustered index on its return table variable
 
 ---
 
-**[← Previous](./01-views.md) | [↑ Back to Section](./README.md) | [Next →](./03-stored-procedures.md)**
+**[← Previous](./01-views.md) | [↑ Back to Section](./programmability-objects.md) | [Next →](./03-stored-procedures.md)**

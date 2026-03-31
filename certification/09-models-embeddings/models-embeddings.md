@@ -73,14 +73,14 @@ flowchart TD
 
 ## Related Resources
 
-- [08-Azure Services Integration](../08-azure-services-integration/README.md)
-- [10-Intelligent Search](../10-intelligent-search/README.md)
+- [08-Azure Services Integration](../08-azure-services-integration/azure-services-integration.md)
+- [10-Intelligent Search](../10-intelligent-search/intelligent-search.md)
 - [Official: AI in Azure SQL](https://learn.microsoft.com/en-us/azure/azure-sql/database/ai-artificial-intelligence-intelligent-insights-overview)
 
 ## Next Steps
 
-Proceed to [10-Intelligent Search](../10-intelligent-search/README.md) to learn about full-text, vector, and hybrid search.
+Proceed to [10-Intelligent Search](../10-intelligent-search/intelligent-search.md) to learn about full-text, vector, and hybrid search.
 
 ---
 
-**[← Back to Azure Services Integration](../08-azure-services-integration/README.md) | [↑ Back to Certification](../README.md)**
+**[← Back to Azure Services Integration](../08-azure-services-integration/azure-services-integration.md) | [↑ Back to Certification](../dp-800-overview.md)**

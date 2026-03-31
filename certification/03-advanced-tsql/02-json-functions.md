@@ -427,4 +427,4 @@ D. The string 'null'
 
 ---
 
-**[← Previous](./01-ctes-window-functions.md) | [↑ Back to Section](./README.md) | [Next →](./03-regex-fuzzy-matching.md)**
+**[← Previous](./01-ctes-window-functions.md) | [↑ Back to Section](./advanced-tsql.md) | [Next →](./03-regex-fuzzy-matching.md)**
