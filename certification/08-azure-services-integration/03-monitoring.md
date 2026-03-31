@@ -337,11 +337,12 @@ AzureDiagnostics
 
 ## Exam Tips
 
-- **Diagnostic Settings** must be configured to route logs to Log Analytics — no data flows without this step
-- **Query Performance Insight** requires Query Store to be `ON` in `READ_WRITE` mode
-- KQL `AzureDiagnostics` table contains all diagnostic log data — filter by `Category` to find specific log types
-- `AzureMetrics` table contains metric data (CPU, DTU, storage) — use for time-series analysis
-- **Intelligent Insights** automatically detects anomalies — more automated than manual KQL alerting
+> [!tip] Exam Tips
+> - **Diagnostic Settings** must be configured to route logs to Log Analytics — no data flows without this step
+> - **Query Performance Insight** requires Query Store to be `ON` in `READ_WRITE` mode
+> - KQL `AzureDiagnostics` table contains all diagnostic log data — filter by `Category` to find specific log types
+> - `AzureMetrics` table contains metric data (CPU, DTU, storage) — use for time-series analysis
+> - **Intelligent Insights** automatically detects anomalies — more automated than manual KQL alerting
 
 ---
 

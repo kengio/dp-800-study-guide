@@ -382,12 +382,13 @@ EXEC sp_updatestats;
 
 ## Exam Tips
 
-- **Key Lookup** = missing INCLUDE columns in non-clustered index (adds a second lookup to clustered index)
-- Query Store `FORCE_LAST_GOOD_PLAN` is an automatic tuning feature; manual `sp_query_store_force_plan` is manual
-- `sys.dm_db_missing_index_details` provides index recommendations — not always accurate, use as a hint
-- Stale statistics → bad cardinality estimates → bad plan choices → update with `UPDATE STATISTICS` or auto-update
-- Plan guides require **exact query text match** — even a single space difference causes the guide to be skipped
-- `OPTION(RECOMPILE)` eliminates parameter sniffing but prevents plan caching; use on infrequent, skewed queries only
+> [!tip] Exam Tips
+> - **Key Lookup** = missing INCLUDE columns in non-clustered index (adds a second lookup to clustered index)
+> - Query Store `FORCE_LAST_GOOD_PLAN` is an automatic tuning feature; manual `sp_query_store_force_plan` is manual
+> - `sys.dm_db_missing_index_details` provides index recommendations — not always accurate, use as a hint
+> - Stale statistics → bad cardinality estimates → bad plan choices → update with `UPDATE STATISTICS` or auto-update
+> - Plan guides require **exact query text match** — even a single space difference causes the guide to be skipped
+> - `OPTION(RECOMPILE)` eliminates parameter sniffing but prevents plan caching; use on infrequent, skewed queries only
 
 ---
 

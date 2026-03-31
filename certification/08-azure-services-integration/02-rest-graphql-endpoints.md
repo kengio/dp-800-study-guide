@@ -438,11 +438,12 @@ GraphQL pagination response:
 
 ## Exam Tips
 
-- **PUT vs PATCH**: PUT replaces the entire row; PATCH updates only specified fields — important behavioral difference
-- **GraphQL `operation`** for stored procedures: `"query"` for reads, `"mutation"` for writes
-- Caching applies to GET/query operations only — mutations always hit the database
-- `allow-introspection: false` is a production security best practice — prevents schema enumeration
-- Cursor-based pagination (`$after`) is DAB's default — not offset (`$skip`) — handles large datasets without count queries
+> [!tip] Exam Tips
+> - **PUT vs PATCH**: PUT replaces the entire row; PATCH updates only specified fields — important behavioral difference
+> - **GraphQL `operation`** for stored procedures: `"query"` for reads, `"mutation"` for writes
+> - Caching applies to GET/query operations only — mutations always hit the database
+> - `allow-introspection: false` is a production security best practice — prevents schema enumeration
+> - Cursor-based pagination (`$after`) is DAB's default — not offset (`$skip`) — handles large datasets without count queries
 
 ---
 

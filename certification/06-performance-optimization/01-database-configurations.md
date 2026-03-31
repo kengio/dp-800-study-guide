@@ -350,13 +350,14 @@ OPTION(USE HINT('ENABLE_QUERY_OPTIMIZER_HOTFIXES'));
 
 ## Exam Tips
 
-- **RCSI** (Read Committed Snapshot Isolation) eliminates reader/writer blocking — enable for OLTP
-- Compatibility level 160 enables the latest optimizer features — test before changing in production
-- Azure SQL Business Critical has a **built-in read-only replica** at no extra cost
-- Automatic tuning `FORCE_LAST_GOOD_PLAN` automatically reverts to previous plan on regression
-- **Query Store is the recommended tool** for investigating plan regressions after a compatibility level upgrade — not reverting the level
-- **Memory grant feedback** (compat level 140+) self-corrects over-/under-grants automatically — prefer it over manual grant hints for stable workloads
-- `OPTION(MAXDOP 1)` is a valid query-level override and is often the right choice for long-running reports on busy OLTP systems
+> [!tip] Exam Tips
+> - **RCSI** (Read Committed Snapshot Isolation) eliminates reader/writer blocking — enable for OLTP
+> - Compatibility level 160 enables the latest optimizer features — test before changing in production
+> - Azure SQL Business Critical has a **built-in read-only replica** at no extra cost
+> - Automatic tuning `FORCE_LAST_GOOD_PLAN` automatically reverts to previous plan on regression
+> - **Query Store is the recommended tool** for investigating plan regressions after a compatibility level upgrade — not reverting the level
+> - **Memory grant feedback** (compat level 140+) self-corrects over-/under-grants automatically — prefer it over manual grant hints for stable workloads
+> - `OPTION(MAXDOP 1)` is a valid query-level override and is often the right choice for long-running reports on busy OLTP systems
 
 ---
 

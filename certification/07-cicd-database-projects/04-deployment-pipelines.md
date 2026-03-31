@@ -345,11 +345,12 @@ sqlpackage /Action:Publish \
 
 ## Exam Tips
 
-- **Secrets management**: Connection strings in pipelines should always come from Azure Key Vault or service connections — never hardcoded
-- **Approval environments**: Azure DevOps Environments with approval policies are the mechanism for requiring human sign-off before deployment
-- **`/p:BlockOnPossibleDataLoss=true`** is the critical safety flag for production — fail early rather than lose data
-- **Schema drift** detection uses `sqlpackage /Action:DeployReport` to compare current DB against the dacpac
-- Branch policies (required build, required reviewers) are configured on the branch in Azure DevOps, not in the pipeline YAML
+> [!tip] Exam Tips
+> - **Secrets management**: Connection strings in pipelines should always come from Azure Key Vault or service connections — never hardcoded
+> - **Approval environments**: Azure DevOps Environments with approval policies are the mechanism for requiring human sign-off before deployment
+> - **`/p:BlockOnPossibleDataLoss=true`** is the critical safety flag for production — fail early rather than lose data
+> - **Schema drift** detection uses `sqlpackage /Action:DeployReport` to compare current DB against the dacpac
+> - Branch policies (required build, required reviewers) are configured on the branch in Azure DevOps, not in the pipeline YAML
 
 ---
 

@@ -215,10 +215,11 @@ SELECT * FROM sys.security_predicates;
 
 ## Exam Tips
 
-- DDM masks values but **doesn't prevent access** — determined users can infer data
-- RLS uses inline TVFs with `SCHEMABINDING` — always use `WITH SCHEMABINDING`
-- `SESSION_CONTEXT` is the recommended pattern for passing tenant context to RLS
-- RLS `FILTER` predicates are applied to SELECT/UPDATE/DELETE; `BLOCK` predicates prevent writes
+> [!tip] Exam Tips
+> - DDM masks values but **doesn't prevent access** — determined users can infer data
+> - RLS uses inline TVFs with `SCHEMABINDING` — always use `WITH SCHEMABINDING`
+> - `SESSION_CONTEXT` is the recommended pattern for passing tenant context to RLS
+> - RLS `FILTER` predicates are applied to SELECT/UPDATE/DELETE; `BLOCK` predicates prevent writes
 
 ---
 

@@ -321,11 +321,12 @@ ORDER BY vs.distance ASC;
 
 ## Exam Tips
 
-- `VECTOR_DISTANCE('cosine', ...)` returns a **distance** (lower = more similar) — not a similarity score
-- `VECTOR_SEARCH` uses the DiskANN index (ANN); `VECTOR_DISTANCE` in ORDER BY is always ENN (exact)
-- The vector index metric (`cosine`, `euclidean`, `dot`) must match the metric used in `VECTOR_SEARCH`
-- `VECTOR(1536)` stores 1536 × 4 bytes = 6KB per row — factor this into storage planning
-- `VECTOR_NORMALIZE` with `'norm2'` normalizes to unit length — required before using dot product as cosine similarity
+> [!tip] Exam Tips
+> - `VECTOR_DISTANCE('cosine', ...)` returns a **distance** (lower = more similar) — not a similarity score
+> - `VECTOR_SEARCH` uses the DiskANN index (ANN); `VECTOR_DISTANCE` in ORDER BY is always ENN (exact)
+> - The vector index metric (`cosine`, `euclidean`, `dot`) must match the metric used in `VECTOR_SEARCH`
+> - `VECTOR(1536)` stores 1536 × 4 bytes = 6KB per row — factor this into storage planning
+> - `VECTOR_NORMALIZE` with `'norm2'` normalizes to unit length — required before using dot product as cosine similarity
 
 ---
 

@@ -305,11 +305,12 @@ ORDER BY ValidFrom;
 
 ## Exam Tips
 
-- Azure SQL auditing destination options: **Storage account**, **Log Analytics**, **Event Hub**
-- Server-level audit action groups capture broad categories; table-level captures specific objects
-- `ON_FAILURE = SHUTDOWN` stops the SQL Server if auditing fails (high security); `CONTINUE` is more forgiving
-- `BATCH_COMPLETED_GROUP` is the only action group that captures full SQL statement text — key for SELECT auditing
-- Temporal tables capture data history (WHAT changed) but NOT access events (WHO accessed); SQL Audit captures access
+> [!tip] Exam Tips
+> - Azure SQL auditing destination options: **Storage account**, **Log Analytics**, **Event Hub**
+> - Server-level audit action groups capture broad categories; table-level captures specific objects
+> - `ON_FAILURE = SHUTDOWN` stops the SQL Server if auditing fails (high security); `CONTINUE` is more forgiving
+> - `BATCH_COMPLETED_GROUP` is the only action group that captures full SQL statement text — key for SELECT auditing
+> - Temporal tables capture data history (WHAT changed) but NOT access events (WHO accessed); SQL Audit captures access
 
 ---
 

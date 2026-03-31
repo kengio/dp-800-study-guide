@@ -300,11 +300,12 @@ Larger k → more uniform distribution across ranks
 
 ## Exam Tips
 
-- RRF uses **ranks**, not raw scores — this makes it scale-invariant and robust to different scoring systems
-- `k=60` is the standard RRF constant; lower k weights top ranks more heavily
-- `FULL OUTER JOIN` is essential — a document may appear in only one of the two result sets
-- Hybrid search improves **recall** (finds more relevant items) compared to using only one approach
-- Vector search handles semantic similarity; full-text handles exact keywords — neither alone is optimal for production search
+> [!tip] Exam Tips
+> - RRF uses **ranks**, not raw scores — this makes it scale-invariant and robust to different scoring systems
+> - `k=60` is the standard RRF constant; lower k weights top ranks more heavily
+> - `FULL OUTER JOIN` is essential — a document may appear in only one of the two result sets
+> - Hybrid search improves **recall** (finds more relevant items) compared to using only one approach
+> - Vector search handles semantic similarity; full-text handles exact keywords — neither alone is optimal for production search
 
 ---
 

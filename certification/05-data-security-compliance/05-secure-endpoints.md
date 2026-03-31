@@ -302,12 +302,13 @@ Microsoft Defender for SQL provides two capabilities under a single plan:
 
 ## Exam Tips
 
-- `DATABASE SCOPED CREDENTIAL` with `IDENTITY = 'Managed Identity'` is the correct syntax for passwordless model calls
-- DAB `permissions` array maps roles to allowed CRUD actions per entity
-- Disable GraphQL introspection in production to prevent schema discovery
-- Private Endpoint = private IP in your VNet; Service Endpoint = optimized route but still public IP
-- `sp_set_database_firewall_rule` targets a single database; server-level rules apply to all databases on the logical server
-- `CREATE USER [name] FROM EXTERNAL PROVIDER` is required before a Managed Identity can log in to a specific database
+> [!tip] Exam Tips
+> - `DATABASE SCOPED CREDENTIAL` with `IDENTITY = 'Managed Identity'` is the correct syntax for passwordless model calls
+> - DAB `permissions` array maps roles to allowed CRUD actions per entity
+> - Disable GraphQL introspection in production to prevent schema discovery
+> - Private Endpoint = private IP in your VNet; Service Endpoint = optimized route but still public IP
+> - `sp_set_database_firewall_rule` targets a single database; server-level rules apply to all databases on the logical server
+> - `CREATE USER [name] FROM EXTERNAL PROVIDER` is required before a Managed Identity can log in to a specific database
 
 ---
 

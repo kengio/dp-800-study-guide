@@ -300,13 +300,14 @@ CREATE PROCEDURE dbo.sp_GetHRData AS SELECT * FROM hr.Employees;
 
 ## Exam Tips
 
-- `DENY` always wins — it overrides GRANT even when inherited through a role
-- Managed Identity authentication uses `FROM EXTERNAL PROVIDER` syntax in SQL
-- Always use **Managed Identity** over connection string credentials for Azure services
-- `fn_my_permissions` shows effective permissions for the current user
-- Ownership chaining skips permission checks only when **consecutive objects share the same owner** — a different owner breaks the chain
-- `EXECUTE AS OWNER` is the standard fix for cross-owner chain breaks
-- Contained database users require `SET CONTAINMENT = PARTIAL` on on-premises SQL Server; Azure SQL uses partial containment by default
+> [!tip] Exam Tips
+> - `DENY` always wins — it overrides GRANT even when inherited through a role
+> - Managed Identity authentication uses `FROM EXTERNAL PROVIDER` syntax in SQL
+> - Always use **Managed Identity** over connection string credentials for Azure services
+> - `fn_my_permissions` shows effective permissions for the current user
+> - Ownership chaining skips permission checks only when **consecutive objects share the same owner** — a different owner breaks the chain
+> - `EXECUTE AS OWNER` is the standard fix for cross-owner chain breaks
+> - Contained database users require `SET CONTAINMENT = PARTIAL` on on-premises SQL Server; Azure SQL uses partial containment by default
 
 ---
 

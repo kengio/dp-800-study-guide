@@ -416,12 +416,13 @@ END;
 
 ## Exam Tips
 
-- `sp_invoke_external_rest_endpoint` is the T-SQL bridge to external REST APIs including Azure OpenAI
-- The response JSON structure has two levels: `$.response.status` (HTTP metadata) and `$.result` (API payload)
-- `DATABASE SCOPED CREDENTIAL` with `IDENTITY = 'HTTPEndpointHeaders'` injects headers (like API keys) automatically
-- `FOR JSON PATH` converts query results to JSON for embedding in prompts
-- `JSON_VALUE` extracts scalars; `JSON_QUERY` extracts objects/arrays; `OPENJSON` parses arrays into rows
-- Always check the HTTP status code before parsing the response body — errors have different JSON structure
+> [!tip] Exam Tips
+> - `sp_invoke_external_rest_endpoint` is the T-SQL bridge to external REST APIs including Azure OpenAI
+> - The response JSON structure has two levels: `$.response.status` (HTTP metadata) and `$.result` (API payload)
+> - `DATABASE SCOPED CREDENTIAL` with `IDENTITY = 'HTTPEndpointHeaders'` injects headers (like API keys) automatically
+> - `FOR JSON PATH` converts query results to JSON for embedding in prompts
+> - `JSON_VALUE` extracts scalars; `JSON_QUERY` extracts objects/arrays; `OPENJSON` parses arrays into rows
+> - Always check the HTTP status code before parsing the response body — errors have different JSON structure
 
 ---
 

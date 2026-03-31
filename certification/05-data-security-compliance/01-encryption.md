@@ -340,13 +340,14 @@ CLOSE SYMMETRIC KEY MySymKey;
 
 ## Exam Tips
 
-- **Always Encrypted**: encryption happens client-side; SQL Server only sees ciphertext
-- **DETERMINISTIC** allows `=` comparisons; **RANDOMIZED** allows no comparisons without a secure enclave
-- **Secure enclaves** unlock range queries and LIKE on RANDOMIZED encrypted columns
-- TDE protects files on disk — does NOT protect against a user with `SELECT` permission
-- Always Encrypted requires the Column Master Key to be accessible from the client
-- Losing the TDE certificate means losing access to all backups encrypted under it
-- CMK rotation is metadata-only; CEK rotation requires re-encrypting actual column data
+> [!tip] Exam Tips
+> - **Always Encrypted**: encryption happens client-side; SQL Server only sees ciphertext
+> - **DETERMINISTIC** allows `=` comparisons; **RANDOMIZED** allows no comparisons without a secure enclave
+> - **Secure enclaves** unlock range queries and LIKE on RANDOMIZED encrypted columns
+> - TDE protects files on disk — does NOT protect against a user with `SELECT` permission
+> - Always Encrypted requires the Column Master Key to be accessible from the client
+> - Losing the TDE certificate means losing access to all backups encrypted under it
+> - CMK rotation is metadata-only; CEK rotation requires re-encrypting actual column data
 
 ---
 

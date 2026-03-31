@@ -403,11 +403,12 @@ az containerapp create \
 
 ## Exam Tips
 
-- DAB config uses `@env('VAR_NAME')` for connection strings — never hardcode credentials
-- Entities map to tables, views, or stored procedures — the `type` field controls this
-- REST methods are configured per-entity; stored procedures default to `post` for mutations
-- `mappings` rename database column names to API field names without changing the database
-- Relationships in DAB enable nested GraphQL queries — defined by source/target fields and cardinality
+> [!tip] Exam Tips
+> - DAB config uses `@env('VAR_NAME')` for connection strings — never hardcode credentials
+> - Entities map to tables, views, or stored procedures — the `type` field controls this
+> - REST methods are configured per-entity; stored procedures default to `post` for mutations
+> - `mappings` rename database column names to API field names without changing the database
+> - Relationships in DAB enable nested GraphQL queries — defined by source/target fields and cardinality
 
 ---
 

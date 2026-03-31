@@ -287,11 +287,12 @@ SDK-style projects support referencing shared objects as NuGet packages:
 
 ## Exam Tips
 
-- SDK-style projects use `<Project Sdk="Microsoft.Build.Sql/...">` — all `.sql` files are automatically included
-- The dacpac represents the **desired state** — deployment is always a diff, never a full recreate
-- `BlockOnPossibleDataLoss=true` is the safety net for production deployments — it prevents accidental data loss
-- Pre-deployment scripts handle data migrations that must happen before schema changes (e.g., moving data before dropping a column)
-- Post-deployment scripts handle reference data loads and are always run after the dacpac schema changes complete
+> [!tip] Exam Tips
+> - SDK-style projects use `<Project Sdk="Microsoft.Build.Sql/...">` — all `.sql` files are automatically included
+> - The dacpac represents the **desired state** — deployment is always a diff, never a full recreate
+> - `BlockOnPossibleDataLoss=true` is the safety net for production deployments — it prevents accidental data loss
+> - Pre-deployment scripts handle data migrations that must happen before schema changes (e.g., moving data before dropping a column)
+> - Post-deployment scripts handle reference data loads and are always run after the dacpac schema changes complete
 
 ---
 

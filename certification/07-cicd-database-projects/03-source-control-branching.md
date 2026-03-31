@@ -259,11 +259,12 @@ CREATE TABLE [dbo].[Orders]
 
 ## Exam Tips
 
-- Branch policies in Azure DevOps (require reviewers, require build success) enforce quality gates — know how to configure them
-- CODEOWNERS files automatically add reviewers based on file paths — critical for database change governance
-- `main` branch should always reflect production-deployable state — use feature/release branches for in-progress work
-- Schema conflicts are best avoided by one-object-per-file conventions and short-lived branches
-- Pull request builds should run `dotnet build` to validate the dacpac compiles before allowing merge
+> [!tip] Exam Tips
+> - Branch policies in Azure DevOps (require reviewers, require build success) enforce quality gates — know how to configure them
+> - CODEOWNERS files automatically add reviewers based on file paths — critical for database change governance
+> - `main` branch should always reflect production-deployable state — use feature/release branches for in-progress work
+> - Schema conflicts are best avoided by one-object-per-file conventions and short-lived branches
+> - Pull request builds should run `dotnet build` to validate the dacpac compiles before allowing merge
 
 ---
 

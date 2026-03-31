@@ -313,11 +313,12 @@ Advantages: Managed search service with built-in RRF; scales independently of da
 
 ## Exam Tips
 
-- RAG = **Retrieve → Augment → Generate** — know each step and what SQL object is involved at each step
-- Grounding prevents hallucination — the LLM is constrained to provided context
-- Structured data uses direct SQL queries; unstructured uses vector/FTS search
-- The system message in the prompt is where you instruct the LLM to "only answer from provided context"
-- Multi-turn conversations require storing history — include recent turns in the prompt
+> [!tip] Exam Tips
+> - RAG = **Retrieve → Augment → Generate** — know each step and what SQL object is involved at each step
+> - Grounding prevents hallucination — the LLM is constrained to provided context
+> - Structured data uses direct SQL queries; unstructured uses vector/FTS search
+> - The system message in the prompt is where you instruct the LLM to "only answer from provided context"
+> - Multi-turn conversations require storing history — include recent turns in the prompt
 
 ---
 

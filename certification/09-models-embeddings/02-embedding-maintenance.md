@@ -333,11 +333,12 @@ Prefer no-code/low-code?
 
 ## Exam Tips
 
-- **Triggers**: Simplest but synchronous — adds AI API latency to every write; risky if endpoint is down
-- **Change Tracking**: Best for batch scenarios — decouple embedding from write path
-- **Azure Functions SQL trigger**: Event-driven alternative to polling — uses Change Tracking internally
-- **CES**: Fabric-native, zero-infrastructure — only available in SQL Database in Fabric
-- Always maintain a watermark (version or timestamp) to know which rows have been embedded
+> [!tip] Exam Tips
+> - **Triggers**: Simplest but synchronous — adds AI API latency to every write; risky if endpoint is down
+> - **Change Tracking**: Best for batch scenarios — decouple embedding from write path
+> - **Azure Functions SQL trigger**: Event-driven alternative to polling — uses Change Tracking internally
+> - **CES**: Fabric-native, zero-infrastructure — only available in SQL Database in Fabric
+> - Always maintain a watermark (version or timestamp) to know which rows have been embedded
 
 ---
 

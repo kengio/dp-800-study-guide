@@ -310,11 +310,12 @@ PRINT 'Reference data load complete.';
 
 ## Exam Tips
 
-- tSQLt tests are stored procedures inside a schema with the `tSQLt.TestClass` extended property — no separate test runner binary
-- `FakeTable` removes ALL constraints by default; use `ApplyConstraint` to restore specific ones for constraint testing
-- `MERGE` is the recommended pattern for reference data because it is idempotent (safe to run repeatedly)
-- Post-deployment scripts in dacpac projects run after all schema changes are applied — the right place for reference data loads
-- `tSQLt.AssertEqualsTable` compares entire result sets — use for output of stored procedures returning rowsets
+> [!tip] Exam Tips
+> - tSQLt tests are stored procedures inside a schema with the `tSQLt.TestClass` extended property — no separate test runner binary
+> - `FakeTable` removes ALL constraints by default; use `ApplyConstraint` to restore specific ones for constraint testing
+> - `MERGE` is the recommended pattern for reference data because it is idempotent (safe to run repeatedly)
+> - Post-deployment scripts in dacpac projects run after all schema changes are applied — the right place for reference data loads
+> - `tSQLt.AssertEqualsTable` compares entire result sets — use for output of stored procedures returning rowsets
 
 ---
 

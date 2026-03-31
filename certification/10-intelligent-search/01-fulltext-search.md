@@ -322,12 +322,13 @@ SELECT lcid, name FROM sys.fulltext_languages ORDER BY name;
 
 ## Exam Tips
 
-- `CONTAINS` returns a boolean match — use in WHERE clause; `CONTAINSTABLE` returns ranked results — use as a table
-- `FREETEXT` is for natural language; `CONTAINS` is for precise control (prefix, proximity, boolean)
-- **Stop words** can suppress expected results — if "product" is in the stop list, searching for "product" returns nothing
-- `CHANGE_TRACKING = AUTO` keeps the FTS index current; `MANUAL` requires explicit repopulation
-- `FORMSOF(INFLECTIONAL, ...)` — great for verb forms (search "run" finds "running", "ran", "runs")
-- `RANK` from CONTAINSTABLE/FREETEXTTABLE is 1–1000 — useful for relevance-based ordering
+> [!tip] Exam Tips
+> - `CONTAINS` returns a boolean match — use in WHERE clause; `CONTAINSTABLE` returns ranked results — use as a table
+> - `FREETEXT` is for natural language; `CONTAINS` is for precise control (prefix, proximity, boolean)
+> - **Stop words** can suppress expected results — if "product" is in the stop list, searching for "product" returns nothing
+> - `CHANGE_TRACKING = AUTO` keeps the FTS index current; `MANUAL` requires explicit repopulation
+> - `FORMSOF(INFLECTIONAL, ...)` — great for verb forms (search "run" finds "running", "ran", "runs")
+> - `RANK` from CONTAINSTABLE/FREETEXTTABLE is 1–1000 — useful for relevance-based ordering
 
 ---
 

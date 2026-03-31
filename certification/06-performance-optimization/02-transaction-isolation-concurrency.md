@@ -331,13 +331,14 @@ CROSS APPLY XmlData.nodes('//RingBufferTarget/event[@name="xml_deadlock_report"]
 
 ## Exam Tips
 
-- **RCSI** is enabled at the database level and affects all `READ COMMITTED` queries automatically — no application change needed
-- **Snapshot Isolation** requires `SET TRANSACTION ISOLATION LEVEL SNAPSHOT` in the application
-- Deadlocks (error 1205) require a retry mechanism — SQL Server automatically chooses the victim
-- `WITH (NOLOCK)` is `READ UNCOMMITTED` — can return dirty data, duplicates, or miss rows
-- **ROWVERSION** detects write conflicts without holding any locks — `@@ROWCOUNT = 0` after the update means a conflict occurred
-- **RCSI** is statement-level (each statement sees latest committed data); **Snapshot** is transaction-level (entire transaction sees same snapshot)
-- Lock escalation threshold is ~5,000 locks per object; `LOCK_ESCALATION = AUTO` is the safest option for partitioned tables
+> [!tip] Exam Tips
+> - **RCSI** is enabled at the database level and affects all `READ COMMITTED` queries automatically — no application change needed
+> - **Snapshot Isolation** requires `SET TRANSACTION ISOLATION LEVEL SNAPSHOT` in the application
+> - Deadlocks (error 1205) require a retry mechanism — SQL Server automatically chooses the victim
+> - `WITH (NOLOCK)` is `READ UNCOMMITTED` — can return dirty data, duplicates, or miss rows
+> - **ROWVERSION** detects write conflicts without holding any locks — `@@ROWCOUNT = 0` after the update means a conflict occurred
+> - **RCSI** is statement-level (each statement sees latest committed data); **Snapshot** is transaction-level (entire transaction sees same snapshot)
+> - Lock escalation threshold is ~5,000 locks per object; `LOCK_ESCALATION = AUTO` is the safest option for partitioned tables
 
 ---
 

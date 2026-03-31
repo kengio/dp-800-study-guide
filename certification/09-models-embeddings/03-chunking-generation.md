@@ -341,11 +341,12 @@ WHERE TokenCount > 7500;  -- Leave headroom below 8192 limit
 
 ## Exam Tips
 
-- Embedding models have a **token limit** — chunk text before embedding; ~4 chars per token for English
-- **Overlapping chunks** improve recall at chunk boundaries — use when retrieval quality matters more than cost
-- `VECTOR(1536)` stores 1536 floats × 4 bytes = 6KB per row — plan storage accordingly
-- Always store the `ChunkText` alongside the embedding — it's needed to assemble the context for the LLM
-- `PREDICT(MODEL = ..., DATA = (SELECT text AS input_text))` — the alias `input_text` is required for embedding models
+> [!tip] Exam Tips
+> - Embedding models have a **token limit** — chunk text before embedding; ~4 chars per token for English
+> - **Overlapping chunks** improve recall at chunk boundaries — use when retrieval quality matters more than cost
+> - `VECTOR(1536)` stores 1536 floats × 4 bytes = 6KB per row — plan storage accordingly
+> - Always store the `ChunkText` alongside the embedding — it's needed to assemble the context for the LLM
+> - `PREDICT(MODEL = ..., DATA = (SELECT text AS input_text))` — the alias `input_text` is required for embedding models
 
 ---
 

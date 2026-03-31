@@ -338,12 +338,13 @@ END;
 
 ## Exam Tips
 
-- **CDC**: Captures before AND after values; requires SQL Agent (on-prem) or runs automatically (Azure SQL)
-- **Change Tracking**: Only tracks that a row changed; no before image; lighter weight; requires join to get current values
-- **Azure Functions SQL trigger**: Uses Change Tracking under the hood — enables it automatically on the source table
-- **CES**: Fabric-native; no infrastructure setup required; pushes events rather than requiring polling
-- `SYS_CHANGE_OPERATION` values: `I` = Insert, `U` = Update, `D` = Delete
-- CDC `__$operation` values: `1` = Delete, `2` = Insert, `3` = Update (before), `4` = Update (after)
+> [!tip] Exam Tips
+> - **CDC**: Captures before AND after values; requires SQL Agent (on-prem) or runs automatically (Azure SQL)
+> - **Change Tracking**: Only tracks that a row changed; no before image; lighter weight; requires join to get current values
+> - **Azure Functions SQL trigger**: Uses Change Tracking under the hood — enables it automatically on the source table
+> - **CES**: Fabric-native; no infrastructure setup required; pushes events rather than requiring polling
+> - `SYS_CHANGE_OPERATION` values: `I` = Insert, `U` = Update, `D` = Delete
+> - CDC `__$operation` values: `1` = Delete, `2` = Insert, `3` = Update (before), `4` = Update (after)
 
 ---
 

@@ -322,13 +322,14 @@ Model deployments are managed through Azure OpenAI Studio (or the Azure Portal):
 
 ## Exam Tips
 
-- `CREATE EXTERNAL MODEL` requires a `DATABASE SCOPED CREDENTIAL` — the API key is stored in the credential, not the model definition
-- `MODEL_TYPE = EMBEDDINGS` vs `COMPLETIONS` — different model types have different calling conventions
-- `PREDICT` is the T-SQL function for calling external models — used for both embeddings and completions
-- Embedding dimension must match the `VECTOR(n)` column size — `text-embedding-3-small` = 1536, `text-embedding-3-large` = 3072
-- External models are database-scoped objects — viewable in `sys.external_models`
-- `EXECUTE` permission on the external model object is required to call `PREDICT` — `ALTER ANY EXTERNAL MODEL` is for creating/modifying, not calling
-- `gpt-35-turbo` is deprecated — exam questions may reference `gpt-4o-mini` as its replacement
+> [!tip] Exam Tips
+> - `CREATE EXTERNAL MODEL` requires a `DATABASE SCOPED CREDENTIAL` — the API key is stored in the credential, not the model definition
+> - `MODEL_TYPE = EMBEDDINGS` vs `COMPLETIONS` — different model types have different calling conventions
+> - `PREDICT` is the T-SQL function for calling external models — used for both embeddings and completions
+> - Embedding dimension must match the `VECTOR(n)` column size — `text-embedding-3-small` = 1536, `text-embedding-3-large` = 3072
+> - External models are database-scoped objects — viewable in `sys.external_models`
+> - `EXECUTE` permission on the external model object is required to call `PREDICT` — `ALTER ANY EXTERNAL MODEL` is for creating/modifying, not calling
+> - `gpt-35-turbo` is deprecated — exam questions may reference `gpt-4o-mini` as its replacement
 
 ---
 
