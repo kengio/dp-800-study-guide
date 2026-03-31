@@ -13,7 +13,7 @@ tags:
 
 ## Overview
 
-Data API Builder (DAB) is an open-source tool from Microsoft that automatically generates REST and GraphQL APIs from database objects (tables, views, stored procedures) without writing any API code. DAB reads a configuration file (`dab-config.json`) that defines data sources, entity mappings, security, and behavior — then exposes the configured endpoints.
+**Data API Builder** (DAB) is an open-source tool from Microsoft that automatically generates REST and GraphQL APIs from database objects (tables, views, stored procedures) without writing any API code. DAB reads a configuration file (`dab-config.json`) that defines data sources, entity mappings, security, and behavior — then exposes the configured endpoints.
 
 DAB supports Azure SQL, SQL Server, Azure Cosmos DB, and MySQL/PostgreSQL, and can be deployed as a container or hosted in Azure Static Web Apps or Azure App Service.
 
@@ -102,6 +102,8 @@ The `dab-config.json` file controls everything DAB does:
 }
 ```
 
+---
+
 ## Data Sources
 
 DAB supports a single primary data source per runtime instance:
@@ -127,6 +129,8 @@ Server=myserver.database.windows.net;Database=MyDB;Authentication=Active Directo
 
 > [!warning] Common Mistake
 > DAB is not a custom API layer you write — it is a runtime that reads a config file and serves endpoints. If the exam asks "what do you write to expose a SQL table as a REST endpoint using DAB," the answer is a config file entry, not code.
+
+---
 
 ## Entity Configuration
 
@@ -201,6 +205,8 @@ Server=myserver.database.windows.net;Database=MyDB;Authentication=Active Directo
 }
 ```
 
+---
+
 ## Relationships
 
 DAB can express relationships between entities for GraphQL nested queries:
@@ -243,6 +249,8 @@ query {
   }
 }
 ```
+
+---
 
 ## Pagination, Caching, and Filtering
 
@@ -303,6 +311,8 @@ GET /api/Order?$select=OrderId,CustomerId,Status
 GET /api/Product?$search=laptop
 ```
 
+---
+
 ## DAB CLI Commands
 
 ```bash
@@ -333,6 +343,8 @@ dab start --config dab-config.json
 # Validate configuration
 dab validate --config dab-config.json
 ```
+
+---
 
 ## Deployment
 
@@ -366,12 +378,16 @@ az containerapp create \
   --env-vars "DATABASE_CONNECTION_STRING=secretref:connection-string"
 ```
 
+---
+
 ## Use Cases
 
 - **Rapid API development**: Expose an Azure SQL database as a REST/GraphQL API with zero custom code
 - **Fabric SQL database**: Enable web and mobile apps to query SQL Database in Fabric via a standard API
 - **Static Web Apps backend**: DAB as a managed data API backend for SPA applications
 - **Stored procedure exposure**: Expose complex business logic as API operations
+
+---
 
 ## Common Issues & Errors
 
@@ -380,8 +396,10 @@ az containerapp create \
 | `Anonymous access denied` | Permission not set for anonymous role | Add `"role": "anonymous", "actions": ["read"]` to entity permissions |
 | `Key field not found` | `key-fields` doesn't match column name | Verify column name matches exactly; check `mappings` if renamed |
 | `Stored procedure parameter type mismatch` | Wrong type in `parameters` config | Use `"number"` for INT, `"string"` for VARCHAR |
-| Connection string in config file | Security risk | Use `@env('VAR_NAME')` to reference environment variables |
+| Connection string in config file | Security risk | ==Use `@env('VAR_NAME')` to reference environment variables== |
 | GraphQL introspection disabled in prod | `allow-introspection: false` | Set to `true` only in dev; keep `false` in production for security |
+
+---
 
 ## Exam Tips
 
@@ -391,6 +409,8 @@ az containerapp create \
 - `mappings` rename database column names to API field names without changing the database
 - Relationships in DAB enable nested GraphQL queries — defined by source/target fields and cardinality
 
+---
+
 ## Key Takeaways
 
 - DAB generates REST and GraphQL APIs from SQL objects using a single JSON config file
@@ -398,10 +418,14 @@ az containerapp create \
 - The DAB CLI (`dab init`, `dab add`, `dab start`) is the primary development workflow
 - DAB supports pagination, filtering, caching, and relationships out of the box
 
+---
+
 ## Related Topics
 
 - [02-REST & GraphQL Endpoints](./02-rest-graphql-endpoints.md)
 - [03-Monitoring](./03-monitoring.md)
+
+---
 
 ## Official Documentation
 

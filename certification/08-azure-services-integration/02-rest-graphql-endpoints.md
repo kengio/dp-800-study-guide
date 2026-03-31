@@ -61,6 +61,8 @@ Data API Builder exposes both REST and GraphQL endpoints from the same configura
 
 The entity's REST path defaults to the entity name. Override with `path`.
 
+---
+
 ## REST HTTP Methods
 
 | Method | Operation | URL Pattern | Body |
@@ -68,7 +70,7 @@ The entity's REST path defaults to the entity name. Override with `path`.
 | GET | Read one or many | `/api/Order` or `/api/Order/42` | None |
 | POST | Create | `/api/Order` | JSON of new row |
 | PUT | Replace (full update) | `/api/Order/42` | Complete JSON |
-| PATCH | Partial update | `/api/Order/42` | Changed fields only |
+| PATCH | ==Partial update== | `/api/Order/42` | Changed fields only |
 | DELETE | Delete | `/api/Order/42` | None |
 
 ### GET — Querying Data
@@ -177,6 +179,8 @@ POST /api/CreateOrder
 Content-Type: application/json
 { "CustomerId": 42, "ProductId": 7, "Quantity": 3 }
 ```
+
+---
 
 ## GraphQL Endpoint Configuration
 
@@ -341,6 +345,8 @@ mutation {
 }
 ```
 
+---
+
 ## Caching Settings
 
 ```json
@@ -368,6 +374,8 @@ mutation {
 ```
 
 Caching is in-memory within the DAB process — suitable for read-heavy, slowly-changing reference data (products, categories). Disable for frequently updated transactional data (orders, inventory).
+
+---
 
 ## Pagination
 
@@ -405,12 +413,16 @@ GraphQL pagination response:
 }
 ```
 
+---
+
 ## Use Cases
 
 - **REST for mobile/web clients**: Standard HTTP verbs with OData filtering for straightforward CRUD operations
 - **GraphQL for complex queries**: Fetch nested related data in a single request instead of multiple REST calls
 - **Stored procedures for business logic**: Expose complex multi-step operations (create order with inventory check) as single API calls
 - **Caching for reference data**: Cache product catalog or lookup tables for 5–10 minutes to reduce database load
+
+---
 
 ## Common Issues & Errors
 
@@ -420,7 +432,9 @@ GraphQL pagination response:
 | GraphQL `null` for nested relationship | Relationship not configured | Add `relationships` section to entity config |
 | `403 Forbidden` | Role not granted action | Verify `permissions` in entity config includes the user's role |
 | PUT returns 404 | PK value not in request body | PUT requires PK in URL; body provides the full new state |
-| Stored proc `GET` method not working | SP defaults to `post` | Explicitly set `"methods": ["get"]` for read-only SPs |
+| Stored proc `GET` method not working | SP defaults to `post` | ==Explicitly set `"methods": ["get"]` for read-only SPs== |
+
+---
 
 ## Exam Tips
 
@@ -430,6 +444,8 @@ GraphQL pagination response:
 - `allow-introspection: false` is a production security best practice — prevents schema enumeration
 - Cursor-based pagination (`$after`) is DAB's default — not offset (`$skip`) — handles large datasets without count queries
 
+---
+
 ## Key Takeaways
 
 - REST uses OData-style `$filter`, `$select`, `$orderby`, `$first`, `$after` query parameters
@@ -437,11 +453,15 @@ GraphQL pagination response:
 - Stored procedures are exposed as REST endpoints or GraphQL mutations with explicit parameter typing
 - Relationships enable nested GraphQL queries — a major advantage over REST for complex data shapes
 
+---
+
 ## Related Topics
 
 - [01-Data API Builder](./01-data-api-builder.md)
 - [03-Monitoring](./03-monitoring.md)
 - [04-Change & Event Handling](./04-change-event-handling.md)
+
+---
 
 ## Official Documentation
 

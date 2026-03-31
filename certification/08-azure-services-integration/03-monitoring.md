@@ -63,9 +63,11 @@ Azure SQL exposes these metrics via Azure Monitor (viewable in Metrics blade):
 | `storage_percent` | Database size vs max | > 85% |
 | `connection_successful` | Successful connections/sec | Monitor for drops |
 | `connection_failed` | Failed connections/sec | > 0 is concerning |
-| `deadlock` | Deadlocks/sec | > 0 requires investigation |
+| `deadlock` | Deadlocks/sec | ==> 0 requires investigation== |
 | `workers_percent` | Worker threads used | > 80% |
 | `sessions_percent` | Sessions used vs max | > 80% |
+
+---
 
 ## Log Analytics and KQL
 
@@ -147,6 +149,8 @@ AzureDiagnostics
 | order by duration_d desc
 ```
 
+---
+
 ## Application Insights Integration
 
 Application Insights captures application-level telemetry including SQL dependency calls made from application code.
@@ -208,6 +212,8 @@ dependencies
 | render timechart
 ```
 
+---
+
 ## Query Performance Insight
 
 Query Performance Insight (QPI) in the Azure portal is a visual interface over Query Store data:
@@ -244,6 +250,8 @@ ALTER DATABASE MyDB SET QUERY_STORE = ON (
 SELECT name, is_query_store_on FROM sys.databases WHERE name = 'MyDB';
 ```
 
+---
+
 ## Setting Up Alerts
 
 ```text
@@ -277,6 +285,8 @@ az monitor metrics alert create \
   --description "Alert when CPU exceeds 80% for 5 minutes"
 ```
 
+---
+
 ## Intelligent Insights
 
 Intelligent Insights uses built-in intelligence to detect performance anomalies:
@@ -303,6 +313,8 @@ AzureDiagnostics
 | order by TimeGenerated desc
 ```
 
+---
+
 ## Use Cases
 
 - **Proactive alerting**: CPU/storage alerts notify DBA team before users experience slowdowns
@@ -310,14 +322,18 @@ AzureDiagnostics
 - **Log Analytics KQL**: Correlate deadlocks, blocks, and timeouts across time windows
 - **Application Insights**: Trace end-to-end request latency including database time in application code
 
+---
+
 ## Common Issues & Errors
 
 | Issue | Cause | Fix |
 | :--- | :--- | :--- |
-| No data in Log Analytics | Diagnostic settings not enabled | Enable diagnostic settings and wait 15 minutes for data to flow |
+| No data in Log Analytics | Diagnostic settings not enabled | ==Enable diagnostic settings and wait 15 minutes for data to flow== |
 | QPI shows no data | Query Store disabled or in READ_ONLY | Enable Query Store: `ALTER DATABASE ... SET QUERY_STORE = ON` |
 | KQL returns 0 rows | Wrong category name or time range | Check category spelling; expand time range |
 | Metrics blade empty | Data not yet available | Metrics have ~1 minute latency; logs have ~5 minute latency |
+
+---
 
 ## Exam Tips
 
@@ -327,6 +343,8 @@ AzureDiagnostics
 - `AzureMetrics` table contains metric data (CPU, DTU, storage) — use for time-series analysis
 - **Intelligent Insights** automatically detects anomalies — more automated than manual KQL alerting
 
+---
+
 ## Key Takeaways
 
 - Azure Monitor collects metrics and logs; Log Analytics stores them; KQL queries them
@@ -334,11 +352,15 @@ AzureDiagnostics
 - Query Performance Insight is the fastest way to find top resource consumers in Azure SQL
 - Application Insights tracks SQL as dependency calls — connects database time to user-facing latency
 
+---
+
 ## Related Topics
 
 - [01-Data API Builder](./01-data-api-builder.md)
 - [04-Change & Event Handling](./04-change-event-handling.md)
 - [03-Query Performance Troubleshooting](../06-performance-optimization/03-query-performance-troubleshooting.md)
+
+---
 
 ## Official Documentation
 

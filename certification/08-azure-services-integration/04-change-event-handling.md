@@ -118,9 +118,11 @@ SET LastLSN = @current_lsn
 WHERE TableName = 'dbo_Orders';
 ```
 
+---
+
 ## Change Tracking
 
-Change Tracking is lighter weight than CDC — it only records which rows changed and in what direction, not the before/after values. Good for synchronization scenarios where you only need to know "what changed since my last sync."
+**Change Tracking** is lighter weight than CDC — it only records which rows changed and in what direction, not the before/after values. Good for synchronization scenarios where you only need to know "what changed since my last sync."
 
 ### Enabling Change Tracking
 
@@ -165,7 +167,7 @@ SET @sync_version = CHANGE_TRACKING_CURRENT_VERSION();
 
 | Feature | Change Tracking | CDC |
 | :--- | :--- | :--- |
-| Before image (old values) | No | Yes |
+| Before image (old values) | No | ==Yes== |
 | After image (new values) | No (join to table) | Yes |
 | Column-level granularity | Which columns (optional) | Full row |
 | Storage overhead | Low | Medium |
@@ -174,6 +176,8 @@ SET @sync_version = CHANGE_TRACKING_CURRENT_VERSION();
 
 > [!warning] Common Mistake
 > CDC and Change Tracking are often confused. CDC = captures the actual data values before and after change (heavier, requires Agent). CT = captures only that a change happened to a row (lightweight, no Agent). If the scenario requires knowing the old value of a column, the answer is CDC, not CT.
+
+---
 
 ## Azure Functions SQL Trigger Binding
 
@@ -226,6 +230,8 @@ public static async Task Run(
 
 The SQL trigger binding automatically enables Change Tracking on the target table and creates internal tracking infrastructure.
 
+---
+
 ## Change Event Streaming (CES) in Microsoft Fabric
 
 CES is a Fabric-native feature for SQL Database in Fabric that streams change events to downstream Fabric workloads (Eventstream, Lakehouse, Warehouse) without any polling or CDC configuration.
@@ -244,6 +250,8 @@ CES works in near-real-time and delivers change events with:
 - Table name, operation type (Insert/Update/Delete)
 - Changed row values (after image)
 - LSN and timestamp
+
+---
 
 ## Azure Logic Apps for Change Handling
 
@@ -304,6 +312,8 @@ BEGIN
 END;
 ```
 
+---
+
 ## Use Cases
 
 - **CDC for data warehouse ETL**: Capture all row changes for incremental loading into Synapse or Fabric Lakehouse
@@ -312,15 +322,19 @@ END;
 - **CES in Fabric**: Stream SQL changes to Lakehouse for near-real-time analytics without infrastructure management
 - **Logic Apps polling**: Low-code integration with change data for alerting and notification workflows
 
+---
+
 ## Common Issues & Errors
 
 | Issue | Cause | Fix |
 | :--- | :--- | :--- |
-| CDC capture job not running | SQL Agent not running (on-prem/MI) | Start SQL Agent; on Azure SQL, CDC cleanup runs automatically |
+| CDC capture job not running | SQL Agent not running (on-prem/MI) | ==Start SQL Agent; on Azure SQL, CDC cleanup runs automatically== |
 | `@from_lsn` returns NULL | CDC not enabled or no data yet | Verify `sp_cdc_enable_db` and `sp_cdc_enable_table` ran successfully |
 | Change Tracking retention exceeded | Sync version too old | Use `CHANGE_TRACKING_MIN_VALID_VERSION()` to validate; do full resync if needed |
 | SQL trigger function not firing | Change Tracking not enabled | SQL trigger binding auto-enables it; check connection string permissions |
 | CES not available | Not a Fabric SQL Database | CES is specific to SQL Database in Microsoft Fabric |
+
+---
 
 ## Exam Tips
 
@@ -331,6 +345,8 @@ END;
 - `SYS_CHANGE_OPERATION` values: `I` = Insert, `U` = Update, `D` = Delete
 - CDC `__$operation` values: `1` = Delete, `2` = Insert, `3` = Update (before), `4` = Update (after)
 
+---
+
 ## Key Takeaways
 
 - CDC provides full before/after audit trail; Change Tracking provides lightweight sync capability
@@ -338,11 +354,15 @@ END;
 - CES in Fabric is the cloud-native zero-configuration approach for Fabric workloads
 - LSN-based watermarking is the standard pattern for incremental CDC-based ETL
 
+---
+
 ## Related Topics
 
 - [03-Monitoring](./03-monitoring.md)
 - [02-Embedding Maintenance](../09-models-embeddings/02-embedding-maintenance.md)
 - [02-Transaction Isolation & Concurrency](../06-performance-optimization/02-transaction-isolation-concurrency.md)
+
+---
 
 ## Official Documentation
 
