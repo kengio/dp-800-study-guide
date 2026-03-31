@@ -16,6 +16,16 @@ tags:
 
 Vector search finds rows whose vector embeddings are mathematically similar to a query vector. This enables semantic search — finding conceptually related content even when exact keywords don't match. SQL Database in Fabric and Azure SQL support native vector search with the `VECTOR` data type, `VECTOR_DISTANCE` function, and `VECTOR_SEARCH` function with approximate nearest neighbor (ANN) indexing via DiskANN.
 
+> [!abstract]
+> - Covers the VECTOR data type, VECTOR_DISTANCE (exact search), VECTOR_SEARCH (approximate search), and DiskANN indexing
+> - Vector search enables semantic similarity queries — finding conceptually related content, not just keyword matches
+> - Key exam topics: ENN vs ANN distinction, DiskANN metric restrictions, VECTOR_NORMALIZE requirement
+
+> [!tip] What the Exam Tests
+> - `VECTOR_DISTANCE('cosine', v1, v2)` = **exact** nearest neighbor (ENN) — compares all rows; use when accuracy > speed
+> - `VECTOR_SEARCH(TABLE, VECTOR(col), JSON_ARRAY(query_vector), top_n)` = **approximate** (ANN) via DiskANN — faster at scale
+> - **DiskANN** supports only `cosine` and `dot` metrics — **euclidean is NOT supported** for ANN indexes
+
 ## VECTOR Data Type
 
 ```sql

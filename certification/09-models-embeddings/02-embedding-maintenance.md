@@ -14,6 +14,16 @@ tags:
 
 Embeddings stored in a vector column go stale when the source text changes. Maintaining embeddings means detecting when source data changes, re-generating embeddings for affected rows, and updating the vector column. Several approaches exist — each with different tradeoffs in complexity, latency, cost, and infrastructure requirements.
 
+> [!abstract]
+> - Covers when and how to regenerate embeddings: model changes, schema changes, data updates, and dirty tracking
+> - Embeddings are point-in-time snapshots of text meaning — they go stale when the underlying text or model changes
+> - Key exam topics: model version incompatibility, dirty tracking with a flag column, batch vs incremental refresh
+
+> [!tip] What the Exam Tests
+> - Changing embedding models requires **regenerating ALL embeddings** — vectors from different models are in different dimensional spaces and cannot be mixed
+> - Dirty tracking: add an `EmbeddingDirty BIT DEFAULT 1` column; set to 0 after embedding; UPDATE sets back to 1 via trigger or app logic
+> - Batch refresh = regenerate all at once (simple, offline); incremental = process only dirty rows (complex, online)
+
 ## Embedding Maintenance Methods Comparison
 
 | Method | Latency | Complexity | Infrastructure | Best For |

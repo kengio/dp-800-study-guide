@@ -15,6 +15,16 @@ tags:
 
 `sp_invoke_external_rest_endpoint` is the T-SQL stored procedure for calling HTTP endpoints from within SQL Server and SQL Database in Fabric. It enables calling Azure OpenAI (or any REST API) directly from T-SQL, making it possible to build a complete RAG pipeline without leaving SQL. This topic covers the full workflow: retrieving context, converting to JSON, constructing prompts, calling the model, and parsing responses.
 
+> [!abstract]
+> - Covers prompt engineering for RAG: system message, user message, context injection, and response parameters
+> - Well-structured prompts produce better, more grounded responses from the LLM
+> - Key exam topics: system vs user message roles, where to inject retrieved context, temperature and top_p effects
+
+> [!tip] What the Exam Tests
+> - **System message**: sets the model's persona, instructions, and constraints ("Answer only from provided context")
+> - **Context injection**: retrieved chunks go in the system message or as part of the user message — not as a separate API parameter
+> - **Temperature**: 0 = deterministic (best for factual answers); 1 = creative/random; use low temperature for RAG to reduce hallucination risk
+
 ## sp_invoke_external_rest_endpoint Syntax
 
 ```sql
