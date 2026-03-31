@@ -18,11 +18,12 @@ tags:
 
 1. **Topic files** (`01-topic-name.md`) — core study material with SQL examples, comparison tables, and practice questions. Start here.
 2. **Section READMEs** — overview flowcharts and topic indexes. Use to orient before diving into a section.
-3. **Cheat sheets** (`resources/cheat-sheets/`) — compact quick-reference for exam day and review. Use after studying a section to reinforce.
+3. **Cheat sheets** (`resources/cheat-sheets/`) — compact quick-reference for exam day and review. Each ends with a `## Gotchas & Traps` section and a `## Before the Exam, I Can…` checklist. Use after studying a section to reinforce.
 4. **Practice questions** (`resources/practice-questions/`) — 15–20 questions per domain (Domain 2 has 20; Domains 1 and 3 have 15 each), with explanations. Use to test knowledge after each domain.
 5. **Mock exams** (`resources/mock-exam/`, `resources/mock-exam-2/`) — full 45-question timed exams. Take after completing all domains.
+6. **Final Review** (`resources/final-review.md`) — 20-minute exam-morning scan: highest-probability facts across all three domains and 10 last-minute traps. Read the morning of the exam.
 
-> Study path: topic files → cheat sheets → practice questions → mock exams
+> Study path: topic files → cheat sheets → practice questions → mock exams → **final-review.md** (exam morning)
 
 ## Exam Overview
 
@@ -82,7 +83,8 @@ pie title Exam Domain Distribution
 | [Exam Tips](resources/exam-tips.md) | Strategies and exam format guide |
 | [Official Links](resources/official-links.md) | Microsoft documentation and registration |
 | [Code Examples](resources/code-examples/tsql/README.md) | Standalone T-SQL code example files |
-| [Cheat Sheets](resources/cheat-sheets/README.md) | Quick-reference guides for exam topics |
+| [Cheat Sheets](resources/cheat-sheets/README.md) | Quick-reference guides for exam topics (each includes Gotchas & Traps + Before the Exam checklist) |
+| [Final Review](resources/final-review.md) | 20-minute exam-morning scan: top facts and last-minute traps for all three domains |
 | [Appendix](resources/appendix/README.md) | Glossary, comparison tables, error messages |
 
 ## Study Progress Tracker
