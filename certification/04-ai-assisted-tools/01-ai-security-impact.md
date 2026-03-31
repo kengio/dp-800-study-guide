@@ -25,6 +25,8 @@ Using AI-assisted development tools (GitHub Copilot, Copilot in Fabric) introduc
 > - AI-generated SQL should always be **reviewed before execution** — never auto-execute against production
 > - Sending sensitive data to external AI models (PII, financial records) creates data **residency and compliance risks**
 
+---
+
 ## Key Security Risks
 
 ### Data Exposure
@@ -35,12 +37,12 @@ When you use AI tools, your code and context are sent to the AI model provider:
 |:---|:---|:---|
 | **Code/schema exposure** | Table names, column names, business logic sent in prompts | Enable enterprise data protection; review what's shared |
 | **Credential leakage** | Connection strings or API keys in code files | Use environment variables; scan repos with secret detection |
-| **PII in prompts** | Sample data containing personal information in context | Use synthetic data for development; avoid real data in prompts |
+| **PII in prompts** | Sample data containing personal information in context | ==Use synthetic data for development; avoid real data in prompts== |
 | **Intellectual property** | Proprietary business logic sent to external model | Review organizational AI use policies |
 
 ### Prompt Injection
 
-Prompt injection occurs when untrusted input in the context manipulates the AI's behavior:
+**Prompt injection** occurs when untrusted input in the context manipulates the AI's behavior:
 
 > [!warning] Common Mistake
 > The exam treats AI security as a real threat category, not just theoretical. Questions will describe scenarios (e.g., "user input is passed directly to an LLM which generates a SQL query") and ask you to identify the risk — the answer is prompt injection combined with unauthorized data access.
@@ -80,6 +82,8 @@ IF @TableName IN ('Orders', 'Products', 'Customers')
 - Overly permissive permissions
 - Hardcoded credentials
 
+---
+
 ## GitHub Copilot Enterprise Data Protection
 
 For GitHub Copilot Business/Enterprise:
@@ -87,6 +91,8 @@ For GitHub Copilot Business/Enterprise:
 - Code snippets are not retained to train future models
 - Organization-level policies control which features are available
 - Audit logs track Copilot usage across the organization
+
+---
 
 ## Interpreting Security Impact in Practice
 
@@ -108,6 +114,8 @@ For GitHub Copilot Business/Enterprise:
 # Settings > Copilot > Content exclusion
 ```
 
+---
+
 ## Responsible AI Principles for Database Development
 
 Microsoft defines six Responsible AI principles. When applying AI coding tools to database work, each principle has concrete implications:
@@ -116,7 +124,7 @@ Microsoft defines six Responsible AI principles. When applying AI coding tools t
 |:---|:---|:---|
 | **Fairness** | AI systems treat all people equitably | Avoid AI-generated queries that filter or score data in ways that create biased outcomes (e.g., loan eligibility by ZIP code) |
 | **Reliability & Safety** | AI behaves as intended, even in unexpected conditions | Validate AI-generated SQL thoroughly; test edge cases; never auto-execute in production |
-| **Privacy & Security** | Protect personal data; resist attacks | Classify sensitive columns before AI sessions; use Managed Identity; restrict schema context shared with AI tools |
+| **Privacy & Security** | Protect personal data; resist attacks | ==Classify sensitive columns before AI sessions; use Managed Identity; restrict schema context shared with AI tools== |
 | **Inclusiveness** | AI should benefit all people | Ensure AI-assisted features work across user roles; don't design AI queries that exclude accessibility needs |
 | **Transparency** | AI systems should be understandable | Document which code was AI-generated; tag AI-generated queries in comments or audit logs |
 | **Accountability** | People are responsible for AI systems | Establish code review gates for AI-generated SQL; maintain audit trails for AI tool usage |
@@ -126,6 +134,8 @@ Microsoft defines six Responsible AI principles. When applying AI coding tools t
 - Does this query access more data than the minimum needed? (Privacy & Security)
 - Could this output differ unexpectedly under different data distributions? (Reliability)
 - Can I explain what this code does to a reviewer? (Transparency)
+
+---
 
 ## Data Classification Before AI Enablement
 
@@ -190,6 +200,8 @@ Azure SQL Database integrates with Microsoft Purview to apply sensitivity labels
 - Are surfaced in Microsoft Defender for Cloud recommendations
 
 **Workflow:** Classify columns in Azure Portal (SQL Database > Data Discovery & Classification) or via T-SQL `ADD SENSITIVITY CLASSIFICATION`, then configure Copilot content exclusions or dev environment policies to avoid exposing classified schema files.
+
+---
 
 ## Audit Logging for AI Tool Usage
 
@@ -263,6 +275,8 @@ ALTER EVENT SESSION [TrackAIGeneratedSQL] ON SERVER STATE = START;
 GO
 ```
 
+---
+
 ## Model Output Validation Patterns
 
 ### Why validation is mandatory
@@ -282,7 +296,7 @@ Before executing any AI-generated SQL in production:
 |:---|:---|
 | Parameterized queries | No string concatenation of user-supplied values into SQL |
 | Least privilege | Procedure runs under a low-privilege login; no `sysadmin` or `db_owner` needed |
-| Object name validation | Dynamic object names validated against an allowlist or `QUOTENAME()` used |
+| Object name validation | ==Dynamic object names validated against an allowlist or `QUOTENAME()` used== |
 | No hardcoded credentials | No passwords, API keys, or connection strings in code |
 | `EXECUTE AS` scope | If used, principal is scoped to minimum required permissions |
 | Schema binding | Functions/views use `WITH SCHEMABINDING` where appropriate |
@@ -316,11 +330,15 @@ GO
 
 **Key rule:** Never use `EXECUTE AS OWNER` for AI-generated code without first reviewing what the owner can access. Owner-level execution bypasses row-level security and column permissions.
 
+---
+
 ## Use Cases
 
 - **Code review assistance**: Copilot explains existing code — review what schema is exposed
 - **Schema-aware completions**: Copilot reads your database objects — ensure no PII in dev schemas
 - **Query generation from comments**: Natural language → SQL — always review before execution
+
+---
 
 ## Common Issues & Errors
 
@@ -332,6 +350,8 @@ GO
 | AI references classified columns | Sensitive schema in editor context | Exclude classified files from Copilot; classify columns before AI sessions |
 | No traceability of AI code | Cannot audit what AI generated | Tag AI-generated code with standard comments; enable audit logging |
 
+---
+
 ## Best Practices
 
 - Classify all sensitive columns with `ADD SENSITIVITY CLASSIFICATION` before enabling AI tools on a repository; this creates a discoverable record and enables masking before AI sessions begin.
@@ -340,14 +360,19 @@ GO
 - Tag AI-generated code with a standardized comment prefix (e.g., `-- AI-GENERATED:`) so audit logs and code search can identify and track its presence over time.
 - Apply the least-privilege principle when testing AI-generated queries: execute under a restricted sandbox user to surface any over-privileged access before production deployment.
 
+---
+
 ## Exam Tips
 
-- The exam tests your ability to **identify** security risks, not just implement features
-- Key risk categories: data exposure, credential leakage, prompt injection, insecure code generation
-- **Managed Identity** is the recommended approach for passwordless service authentication
-- Content exclusion in GitHub settings prevents Copilot from accessing specific files
-- Know the six Responsible AI principles and be able to match them to database development scenarios
-- `sys.sensitivity_classifications` is the catalog view for Purview data classification labels in Azure SQL
+> [!tip] Exam Tips
+> - The exam tests your ability to **identify** security risks, not just implement features
+> - Key risk categories: data exposure, credential leakage, prompt injection, insecure code generation
+> - **Managed Identity** is the recommended approach for passwordless service authentication
+> - Content exclusion in GitHub settings prevents Copilot from accessing specific files
+> - Know the six Responsible AI principles and be able to match them to database development scenarios
+> - `sys.sensitivity_classifications` is the catalog view for Purview data classification labels in Azure SQL
+
+---
 
 ## Key Takeaways
 
@@ -357,6 +382,8 @@ GO
 - Prompt injection is a real attack vector in AI-enabled database solutions
 - Classify sensitive columns before AI tool sessions and tag AI-generated code for auditability
 - Validate AI output in a sandboxed execution context before promoting to production
+
+---
 
 ## Practice Questions
 
@@ -374,10 +401,14 @@ D. Use EXECUTE AS OWNER in all generated procedures
 >
 > Classifying and masking sensitive data BEFORE AI tool sessions limits what the AI can "see" and suggest. Manual review (C) is always good practice but doesn't prevent the AI from referencing sensitive columns in its suggestions. Disabling Copilot (A) is overly restrictive.
 
+---
+
 ## Related Topics
 
 - [02-GitHub Copilot Setup](./02-github-copilot-setup.md)
 - [03-Permissions & Access](../05-data-security-compliance/03-permissions-access.md)
+
+---
 
 ## Official Documentation
 

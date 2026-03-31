@@ -13,7 +13,7 @@ tags:
 
 ## Overview
 
-The Model Context Protocol (MCP) is an open standard that allows AI tools (like GitHub Copilot) to connect to external data sources. For DP-800, the key endpoints are the Microsoft SQL Server MCP server and the Fabric lakehouse MCP server.
+The **Model Context Protocol** (MCP) is an open standard that allows AI tools (like GitHub Copilot) to connect to external data sources. For DP-800, the key endpoints are the Microsoft SQL Server MCP server and the Fabric lakehouse MCP server.
 
 > [!abstract]
 > - Covers MCP (Model Context Protocol): what it is, how MCP servers expose tools/resources, and connection methods
@@ -24,6 +24,8 @@ The Model Context Protocol (MCP) is an open standard that allows AI tools (like 
 > - **MCP = Model Context Protocol** — an open protocol for AI models to call external tools and access resources
 > - An MCP server **exposes tools** (callable actions) and **resources** (data the model can read)
 > - Connection types: `stdio` (local process) and `HTTP+SSE` (remote server) — the exam may ask which suits which scenario
+
+---
 
 ## What is MCP?
 
@@ -40,6 +42,8 @@ flowchart LR
     MCPServer -->|Query| Lakehouse[Fabric Lakehouse]
     MCPServer -->|Returns schema/data| IDE
 ```
+
+---
 
 ## Connecting to MCP Server Endpoints
 
@@ -98,6 +102,8 @@ The Fabric lakehouse MCP server exposes lakehouse tables and files to Copilot:
 }
 ```
 
+---
+
 ## Configuring MCP in a Copilot Chat Session
 
 ### Enabling Tools
@@ -126,6 +132,8 @@ When connected via MCP, Copilot has access to:
 - Stored procedure and function definitions
 - View definitions
 - Real-time query execution (if read access is configured)
+
+---
 
 ## MCP Tool Configuration Examples
 
@@ -176,6 +184,8 @@ Some tools use a top-level `mcpServers` key (e.g., Claude Desktop format):
 
 VS Code uses `.vscode/mcp.json` with a `servers` key; other clients (Claude Desktop, Cursor) use `mcpServers`. The tool definitions themselves are identical regardless of config format.
 
+---
+
 ## MCP Server Lifecycle
 
 ### Startup and Shutdown
@@ -186,7 +196,7 @@ MCP servers are **process-based** for stdio transport: the AI tool spawns the se
 
 | Transport | Description | Use Case |
 | :--- | :--- | :--- |
-| **stdio** | JSON-RPC over standard input/output | Local dev, CLI-launched servers |
+| **stdio** | JSON-RPC over standard input/output | ==Local dev, CLI-launched servers== |
 | **SSE** | Server-Sent Events over HTTP | Remote servers, multi-client scenarios |
 
 stdio is the most common for local database MCP servers. SSE (Server-Sent Events) is used when the MCP server is hosted remotely (e.g., the Fabric lakehouse MCP endpoint).
@@ -225,6 +235,8 @@ sequenceDiagram
     C->>C: incorporates schema into response
 ```
 
+---
+
 ## Database-Specific MCP Servers
 
 ### SQL Server / Azure SQL MCP Server
@@ -250,6 +262,8 @@ sequenceDiagram
 ### Security Consideration
 
 MCP servers execute with the **permissions of the connection string user**. If the service account has `db_owner` or `sysadmin`, the AI assistant (and anyone who can prompt it) can perform DDL and DML operations. Always use a least-privilege read-only account for MCP servers, particularly against shared or production databases.
+
+---
 
 ## Error Handling in MCP Tools
 
@@ -278,7 +292,7 @@ MCP servers should return structured error objects rather than raw exceptions. A
 | Error | Cause | Resolution |
 | :--- | :--- | :--- |
 | `CONNECTION_TIMEOUT` | Firewall blocking, server cold start | Check firewall rules; retry |
-| `PERMISSION_DENIED` | Account lacks required permission | Grant `SELECT` or `VIEW DEFINITION` |
+| `PERMISSION_DENIED` | Account lacks required permission | ==Grant `SELECT` or `VIEW DEFINITION`== |
 | `INVALID_TOOL_INPUT` | Query fails JSON Schema validation | Check tool input schema |
 | `SERVER_NOT_FOUND` | Wrong package name or npx cache issue | Verify package name; clear npx cache |
 | `AUTH_FAILURE` | Expired token or wrong credentials | Refresh token or update connection string |
@@ -287,6 +301,8 @@ MCP servers should return structured error objects rather than raw exceptions. A
 
 MCP server implementations should catch database exceptions and re-throw them as structured MCP error responses. Raw stack traces passed back to the AI tool are unhelpful and may leak internal information.
 
+---
+
 ## MCP vs REST APIs for Database Access
 
 | Aspect | MCP Server | REST API / DAB |
@@ -294,10 +310,12 @@ MCP server implementations should catch database exceptions and re-throw them as
 | Audience | AI coding assistants | Applications / web clients |
 | Protocol | JSON-RPC over stdio/SSE | HTTP |
 | Authentication | Via config/env vars | OAuth, API keys |
-| Schema discovery | Built-in tool for schema | Manual or Swagger |
+| Schema discovery | ==Built-in tool for schema== | Manual or Swagger |
 | Best for | AI-assisted development | Production app backends |
 
 MCP and REST/DAB are complementary: MCP is for the **development phase** (helping developers write code), while DAB and REST APIs serve **runtime application requests**.
+
+---
 
 ## Securing MCP Endpoints
 
@@ -333,6 +351,8 @@ Azure SQL → Networking:
 - Use Azure AD authentication (disable SQL auth)
 ```
 
+---
+
 ## MCP vs Direct Database Connection
 
 | Aspect | MCP | Direct Connection |
@@ -343,6 +363,8 @@ Azure SQL → Networking:
 | Audit | Through Azure Monitor | Through SQL Audit |
 | Scope | Development/IDE use | Production queries |
 
+---
+
 ## Use Cases
 
 - **Schema-aware completions**: Copilot suggests correct column names and types
@@ -350,12 +372,16 @@ Azure SQL → Networking:
 - **Stored procedure analysis**: Copilot reads existing procedures and suggests improvements
 - **Data exploration**: Copilot explains what data exists and how tables relate
 
+---
+
 ## Common Issues & Errors
 
 - **MCP server not starting**: Verify `npx` is installed and the package name is correct
 - **Schema not loading**: Check that the service account has `VIEW DEFINITION` permission
 - **Stale schema cache**: Restart the MCP tool session to force a fresh schema pull
 - **Fabric token expiry**: SSE-based connections use short-lived tokens — configure token refresh
+
+---
 
 ## Best Practices
 
@@ -365,14 +391,19 @@ Azure SQL → Networking:
 - Store sensitive connection strings in **OS-level environment variables** referenced via `${env:VAR}`, not in committed config files
 - **Audit MCP activity** through Azure Monitor or SQL Audit logs to detect unexpected query patterns
 
+---
+
 ## Exam Tips
 
-- MCP configuration goes in `.vscode/mcp.json` for VS Code / Azure Data Studio
-- Use **Managed Identity** authentication for MCP connections (not username/password)
-- MCP gives Copilot **read access to schema** — configure least-privilege accordingly
-- Tool options in a chat session can be toggled on/off per session
-- stdio transport is for **local** MCP servers; SSE is for **remote/hosted** endpoints
-- MCP servers run with the **permissions of the connection string user** — this is a key security exam point
+> [!tip] Exam Tips
+> - MCP configuration goes in `.vscode/mcp.json` for VS Code / Azure Data Studio
+> - Use **Managed Identity** authentication for MCP connections (not username/password)
+> - MCP gives Copilot **read access to schema** — configure least-privilege accordingly
+> - Tool options in a chat session can be toggled on/off per session
+> - stdio transport is for **local** MCP servers; SSE is for **remote/hosted** endpoints
+> - MCP servers run with the **permissions of the connection string user** — this is a key security exam point
+
+---
 
 ## Key Takeaways
 
@@ -381,6 +412,8 @@ Azure SQL → Networking:
 - Always use Managed Identity or service principals — never hardcoded credentials
 - Grant only the minimum permissions the MCP service account needs
 - MCP is for AI-assisted **development**, not for production application data access
+
+---
 
 ## Practice Questions
 
@@ -398,11 +431,15 @@ D. GitHub Copilot does not support MCP servers for database access
 >
 > MCP servers execute with the credentials configured in the connection string. If the AI assistant calls a "run query" tool with a high-privilege account, it could execute arbitrary DDL or DML. Best practice: use a read-only or least-privilege account for MCP servers, especially against production databases. Environment variables (C) are the RECOMMENDED way to store credentials in MCP config.
 
+---
+
 ## Related Topics
 
 - [02-GitHub Copilot Setup](./02-github-copilot-setup.md)
 - [03-Permissions & Access](../05-data-security-compliance/03-permissions-access.md)
 - [05-Secure Endpoints](../05-data-security-compliance/05-secure-endpoints.md)
+
+---
 
 ## Official Documentation
 
