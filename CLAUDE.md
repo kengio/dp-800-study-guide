@@ -106,7 +106,7 @@ where `topic-index.md` is the folder's named index file (e.g., `./database-objec
 - Part 1 files: end with only forward link to Part 2
 - Part 2 files: full three-way nav
 
-## README Standards
+## Index File Standards
 
 ### Certification Index (`certification/dp-800-overview.md`)
 

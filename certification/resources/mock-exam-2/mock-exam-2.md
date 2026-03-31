@@ -48,4 +48,4 @@ tags:
 ## Links
 
 - **[Start the exam → questions.md](./questions.md)**
-- **[← Back to Resources](../dp-800-overview.md)**
+- **[← Back to Resources](../exam-resources.md)**

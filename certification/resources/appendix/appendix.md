@@ -30,4 +30,4 @@ Reference materials for DP-800 exam preparation and troubleshooting.
 
 ---
 
-**[← Back to Resources](../dp-800-overview.md)**
+**[← Back to Resources](../exam-resources.md)**

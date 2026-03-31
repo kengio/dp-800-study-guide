@@ -38,13 +38,13 @@ DP-800 tests expertise in designing and developing AI-enabled database solutions
 
 | Resource | Description |
 | :--- | :--- |
-| [Start Studying →](./certification/README.md) | Main index with all 11 study sections and progress tracker |
-| [Cheat Sheets](./certification/resources/cheat-sheets/README.md) | Quick-reference guides for exam day |
-| [Practice Questions](./certification/resources/practice-questions/README.md) | Domain-specific questions with explanations |
-| [Mock Exam 1](./certification/resources/mock-exam/README.md) | Full 45-question timed practice exam |
-| [Mock Exam 2](./certification/resources/mock-exam-2/README.md) | Second full 45-question practice exam |
+| [Start Studying →](./certification/dp-800-overview.md) | Main index with all 11 study sections and progress tracker |
+| [Cheat Sheets](./certification/resources/cheat-sheets/cheat-sheets.md) | Quick-reference guides for exam day |
+| [Practice Questions](./certification/resources/practice-questions/practice-questions.md) | Domain-specific questions with explanations |
+| [Mock Exam 1](./certification/resources/mock-exam/mock-exam-1.md) | Full 45-question timed practice exam |
+| [Mock Exam 2](./certification/resources/mock-exam-2/mock-exam-2.md) | Second full 45-question practice exam |
 | [Exam Tips](./certification/resources/exam-tips.md) | Time management, common traps, and strategy |
-| [Appendix](./certification/resources/appendix/README.md) | Glossary, comparison tables, error reference |
+| [Appendix](./certification/resources/appendix/appendix.md) | Glossary, comparison tables, error reference |
 
 ## Official Resources
 

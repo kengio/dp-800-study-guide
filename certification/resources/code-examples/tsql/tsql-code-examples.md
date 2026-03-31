@@ -30,4 +30,4 @@ These examples complement the study notes in `certification/` and are particular
 
 ---
 
-**[← Back to Resources](../../dp-800-overview.md) | [↑ Back to Certification](../../../dp-800-overview.md)**
+**[← Back to Resources](../../exam-resources.md) | [↑ Back to Certification](../../../dp-800-overview.md)**
