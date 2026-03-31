@@ -24,6 +24,8 @@ Hybrid search combines full-text search (keyword matching) with vector search (s
 > - RRF is a **rank-combination algorithm** — it combines the ranks of results from multiple sources, not their raw scores
 > - Hybrid search outperforms single-method when queries mix exact keywords and semantic meaning
 
+---
+
 ## When to Use Each Search Type
 
 | Scenario | Best Approach |
@@ -34,6 +36,8 @@ Hybrid search combines full-text search (keyword matching) with vector search (s
 | Known acronym expansion | Full-text (FORMSOF) |
 | Multi-lingual search | Vector (embeddings handle translation) |
 | High-recall requirement (don't miss relevant) | Hybrid |
+
+---
 
 ## Reciprocal Rank Fusion Algorithm
 
@@ -55,6 +59,8 @@ Where `k` is a constant (typically 60) that reduces the impact of very high rank
 | Product D | 100 | 2 | 1/(60+100) + 1/(60+2) = 0.0063 + 0.0161 = **0.0224** |
 
 Documents appearing in both lists score higher than those in only one list. The `k=60` constant prevents a rank-1 result in one list from completely dominating if it scores poorly in the other.
+
+---
 
 ## Implementing Hybrid Search with RRF in T-SQL
 
@@ -132,6 +138,8 @@ END;
 EXEC dbo.HybridSearch @query_text = 'comfortable wireless headphones for work', @top_n = 10;
 ```
 
+---
+
 ## Simplified RRF Without Vector Index
 
 For smaller tables where full vector scan is acceptable:
@@ -176,6 +184,8 @@ FROM RRF r
 JOIN dbo.Products p ON p.ProductId = r.ProductId
 ORDER BY r.RRFScore DESC;
 ```
+
+---
 
 ## Evaluating Search Performance
 
@@ -240,11 +250,13 @@ SELECT DATEDIFF(MILLISECOND, @start, SYSDATETIME()) AS LatencyMs;
 
 | Lever | Impact |
 | :--- | :--- |
-| Vector index (DiskANN) | Major — milliseconds vs seconds for ANN |
+| Vector index (DiskANN) | ==Major — milliseconds vs seconds for ANN== |
 | FTS index | Major — instant vs full table scan |
 | Reduce TOP_N in VECTOR_SEARCH | Minor — fewer candidates |
 | Reduce FTS result limit | Minor — faster FTS evaluation |
 | Pre-normalize embeddings | Minor — skip VECTOR_NORMALIZE at query time |
+
+---
 
 ## Tuning RRF — Adjusting k
 
@@ -263,6 +275,8 @@ EXEC dbo.HybridSearch @query_text = 'wireless headphones', @top_n = 10, @rrf_k =
 Smaller k → top-ranked results get more weight
 Larger k → more uniform distribution across ranks
 
+---
+
 ## Use Cases
 
 - **E-commerce product search**: Users type short, keyword-rich queries but may use different terminology than product descriptions — hybrid handles both
@@ -270,15 +284,19 @@ Larger k → more uniform distribution across ranks
 - **Customer support**: Hybrid search finds the best FAQ match even when the user's phrasing differs from the FAQ question
 - **RAG document retrieval**: Ensures both keyword matches and semantically similar chunks are considered
 
+---
+
 ## Common Issues & Errors
 
 | Issue | Cause | Fix |
 | :--- | :--- | :--- |
-| One list always dominates | k too small; one list much larger | Increase k; ensure both lists return similar numbers of candidates |
+| One list always dominates | k too small; one list much larger | ==Increase k; ensure both lists return similar numbers of candidates== |
 | FTS returns nothing | Stop words removed all query terms | Add fallback: if FTS empty, use vector-only |
 | NULL RRFScore | FULL OUTER JOIN with no FTS result | Use `ISNULL(..., 0)` around RRF score components |
 | Slow hybrid search | No vector index | Create DiskANN index; use `VECTOR_SEARCH` |
 | Poor recall | TOP_N too small in each search | Increase candidate pool (e.g., TOP_N = 100) before final top-10 |
+
+---
 
 ## Exam Tips
 
@@ -288,6 +306,8 @@ Larger k → more uniform distribution across ranks
 - Hybrid search improves **recall** (finds more relevant items) compared to using only one approach
 - Vector search handles semantic similarity; full-text handles exact keywords — neither alone is optimal for production search
 
+---
+
 ## Key Takeaways
 
 - Hybrid search = full-text search + vector search, merged with RRF
@@ -295,11 +315,15 @@ Larger k → more uniform distribution across ranks
 - Use `FULL OUTER JOIN` to merge the two lists so documents appearing in only one list are still included
 - Measure recall, precision, and latency to evaluate and tune the hybrid search pipeline
 
+---
+
 ## Related Topics
 
 - [01-Full-Text Search](./01-fulltext-search.md)
 - [02-Vector Search](./02-vector-search.md)
 - [01-RAG Use Cases](../11-rag/01-rag-use-cases.md)
+
+---
 
 ## Official Documentation
 

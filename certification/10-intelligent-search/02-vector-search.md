@@ -26,6 +26,8 @@ Vector search finds rows whose vector embeddings are mathematically similar to a
 > - `VECTOR_SEARCH(TABLE, VECTOR(col), JSON_ARRAY(query_vector), top_n)` = **approximate** (ANN) via DiskANN — faster at scale
 > - **DiskANN** supports only `cosine` and `dot` metrics — **euclidean is NOT supported** for ANN indexes
 
+---
+
 ## VECTOR Data Type
 
 ```sql
@@ -46,6 +48,8 @@ VALUES (1, 'Wireless Headphones',
     CAST('[0.023, -0.041, 0.018, ...]' AS VECTOR(1536)));
 ```
 
+---
+
 ## VECTOR_NORMALIZE
 
 Normalize a vector to unit length (L2 norm = 1). Required before using dot product as a cosine similarity approximation:
@@ -64,6 +68,8 @@ WHERE DescriptionVector IS NOT NULL;
 
 `'norm2'` = L2 (Euclidean) norm. After normalization, dot product distance equals cosine similarity.
 
+---
+
 ## VECTORPROPERTY
 
 Inspect properties of a vector value:
@@ -81,6 +87,8 @@ FROM dbo.Products
 WHERE ProductId = 1;
 -- Returns: float32
 ```
+
+---
 
 ## VECTOR_DISTANCE — Distance Metrics
 
@@ -135,11 +143,13 @@ ORDER BY DotDistance ASC;
 
 | Metric | Formula | Range | Best For |
 | :--- | :--- | :--- | :--- |
-| `cosine` | 1 - cos(θ) | 0 to 2 | Text embeddings, direction-based similarity |
+| `cosine` | 1 - cos(θ) | 0 to 2 | ==Text embeddings, direction-based similarity== |
 | `euclidean` | √Σ(a-b)² | 0 to ∞ | Spatial/geometric data, normalized vectors |
 | `dot` | 1 - Σ(aᵢ×bᵢ) | -∞ to +∞ | When vectors are already L2-normalized |
 
 **Rule of thumb:** Use `cosine` for text embeddings — it is invariant to vector magnitude, which varies by document length.
+
+---
 
 ## VECTOR_SEARCH — Approximate Nearest Neighbor
 
@@ -166,9 +176,11 @@ FETCH FIRST 10 ROWS ONLY;
 
 The `TOP_N` parameter controls how many candidates the ANN index returns — a higher value increases recall at the cost of performance.
 
+---
+
 ## Vector Index (DiskANN)
 
-DiskANN (Disk-based Approximate Nearest Neighbor) is the vector index type in Azure SQL and Fabric SQL:
+**DiskANN** (Disk-based Approximate Nearest Neighbor) is the vector index type in Azure SQL and Fabric SQL:
 
 ```sql
 -- Create a DiskANN vector index on the DescriptionVector column
@@ -200,6 +212,8 @@ AND name = 'IX_Products_DescriptionVector';
 ### When the Optimizer Uses the Vector Index
 
 The vector index is used automatically by `VECTOR_SEARCH` — it is not used by `VECTOR_DISTANCE` in a regular `ORDER BY` clause (which always does exact/ENN search).
+
+---
 
 ## ANN vs ENN
 
@@ -234,6 +248,8 @@ FROM VECTOR_SEARCH(
 ORDER BY vs.distance;
 ```
 
+---
+
 ## Converting Similarity to Distance
 
 `VECTOR_DISTANCE('cosine', ...)` returns a **distance** (0 = identical, 2 = opposite). To express as similarity score (0 to 1):
@@ -245,6 +261,8 @@ SELECT
 FROM dbo.Products
 ORDER BY CosineSimilarity DESC;
 ```
+
+---
 
 ## Full Search Pattern with Query Embedding
 
@@ -278,12 +296,16 @@ FROM VECTOR_SEARCH(
 ORDER BY vs.distance ASC;
 ```
 
+---
+
 ## Use Cases
 
 - **Semantic product search**: "comfortable headphones for long meetings" finds noise-cancelling headphones even if the query words don't appear in product descriptions
 - **Document retrieval (RAG)**: Find document chunks most relevant to a user question before generating an LLM response
 - **Similar item recommendations**: "Customers who viewed X might also like Y" — find products with similar description embeddings
 - **Duplicate detection**: Find near-duplicate rows where descriptions are semantically equivalent
+
+---
 
 ## Common Issues & Errors
 
@@ -292,8 +314,10 @@ ORDER BY vs.distance ASC;
 | `Cannot use VECTOR_DISTANCE on NULL` | NULL vector in column | Add `WHERE DescriptionVector IS NOT NULL` |
 | Dimension mismatch error | Query vector dimension ≠ column dimension | Ensure query embedding uses the same model as stored embeddings |
 | ANN results differ from ENN | Expected — ANN is approximate | Increase `TOP_N` in VECTOR_SEARCH for higher recall |
-| Vector index not used | Using `VECTOR_DISTANCE` in ORDER BY, not `VECTOR_SEARCH` | Use `VECTOR_SEARCH` function to leverage the index |
+| Vector index not used | Using `VECTOR_DISTANCE` in ORDER BY, not `VECTOR_SEARCH` | ==Use `VECTOR_SEARCH` function to leverage the index== |
 | Poor search results | Embeddings not normalized, using dot product | Either normalize vectors or use `cosine` metric |
+
+---
 
 ## Exam Tips
 
@@ -303,6 +327,8 @@ ORDER BY vs.distance ASC;
 - `VECTOR(1536)` stores 1536 × 4 bytes = 6KB per row — factor this into storage planning
 - `VECTOR_NORMALIZE` with `'norm2'` normalizes to unit length — required before using dot product as cosine similarity
 
+---
+
 ## Key Takeaways
 
 - `VECTOR` data type stores fixed-dimension floating-point arrays
@@ -310,11 +336,15 @@ ORDER BY vs.distance ASC;
 - Create a DiskANN index on the vector column to enable fast ANN search
 - Use cosine distance for text embeddings; it is robust to differences in vector magnitude
 
+---
+
 ## Related Topics
 
 - [01-Full-Text Search](./01-fulltext-search.md)
 - [03-Hybrid Search & RRF](./03-hybrid-search-rrf.md)
 - [03-Chunking & Generation](../09-models-embeddings/03-chunking-generation.md)
+
+---
 
 ## Official Documentation
 
