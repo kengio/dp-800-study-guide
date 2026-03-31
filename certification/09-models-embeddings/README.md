@@ -14,6 +14,32 @@ status: draft
 
 Evaluating and managing external AI models, designing embedding strategies, and generating embeddings for use in SQL databases.
 
+---
+
+## Quick Recall
+
+```mermaid
+mindmap
+  root((Models and Embeddings))
+    External Models
+      sp_invoke_external_rest_endpoint
+      DATABASE SCOPED CREDENTIAL
+      JSON response parsing
+    Embedding Dimensions
+      ada-002 = 1536
+      3-small = 1536
+      3-large = 3072
+    Maintenance
+      Regenerate all on model change
+      Dirty tracking with flag column
+      Batch vs incremental
+    Chunking
+      Fixed-size vs semantic
+      Overlap prevents boundary loss
+```
+
+---
+
 ## Topics Overview
 
 ```mermaid

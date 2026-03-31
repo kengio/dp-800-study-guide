@@ -14,6 +14,33 @@ status: draft
 
 Building robust deployment pipelines for SQL database solutions using SQL Database Projects (SDK-style), source control in GitHub, and automated testing strategies.
 
+---
+
+## Quick Recall
+
+```mermaid
+mindmap
+  root((CI/CD))
+    SQL DB Projects
+      .sqlproj - project file
+      dacpac - schema artifact
+      bacpac - schema + data
+    SqlPackage Actions
+      Publish - deploy dacpac
+      Extract - create dacpac
+      Export - create bacpac
+    Pipeline Stages
+      Build
+      Test tSQLt
+      Deploy staging
+      Deploy production
+    Testing
+      tSQLt - rollback isolation
+      FakeTable - test doubles
+```
+
+---
+
 ## Topics Overview
 
 ```mermaid

@@ -14,6 +14,32 @@ status: draft
 
 Core database design skills covering tables, indexes, constraints, and partitioning across SQL Server, Azure SQL, and Microsoft Fabric SQL databases.
 
+---
+
+## Quick Recall
+
+```mermaid
+mindmap
+  root((Database Objects))
+    Indexes
+      Clustered B-tree - OLTP
+      Clustered Columnstore - Analytics
+      Non-clustered - Both
+    Specialized Tables
+      Temporal - History tracking
+      Ledger - Tamper evidence
+      Memory-optimized - In-memory OLTP
+    Constraints
+      PK / FK / CHECK / DEFAULT / UNIQUE
+      SEQUENCE - independent counter
+    Partitioning
+      Function - value ranges
+      Scheme - filegroup mapping
+      Switching - instant bulk ops
+```
+
+---
+
 ## Topics Overview
 
 ```mermaid

@@ -16,6 +16,31 @@ status: draft
 
 Integrating SQL databases with Azure services including Data API Builder (DAB), REST/GraphQL endpoints, monitoring with Azure Monitor, and change event handling.
 
+---
+
+## Quick Recall
+
+```mermaid
+mindmap
+  root((Azure Integration))
+    DAB
+      Config file only no code
+      REST /api/Entity
+      GraphQL /graphql
+    Monitoring
+      Azure Monitor metrics
+      DMVs - engine diagnostics
+      Query Store - plan regression
+    Change Tracking
+      CDC - before/after values needs Agent
+      CT - row changed only no Agent
+    Network
+      Private endpoint - private IP
+      Service endpoint - routing only
+```
+
+---
+
 ## Topics Overview
 
 ```mermaid

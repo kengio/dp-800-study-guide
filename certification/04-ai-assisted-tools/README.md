@@ -14,6 +14,29 @@ status: draft
 
 Using GitHub Copilot and Microsoft Copilot in Fabric to accelerate SQL development — including configuration, security implications, and MCP server connectivity.
 
+---
+
+## Quick Recall
+
+```mermaid
+mindmap
+  root((AI Tools))
+    Security
+      Prompt injection
+      Data exposure risk
+      Review AI-generated SQL
+    GitHub Copilot
+      Inline suggestions
+      Chat slash commands
+      Suggests does not execute
+    MCP
+      Model Context Protocol
+      Tools + Resources
+      stdio or HTTP+SSE
+```
+
+---
+
 ## Topics Overview
 
 ```mermaid

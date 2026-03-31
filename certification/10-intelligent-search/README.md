@@ -15,6 +15,29 @@ status: draft
 
 Choosing and implementing the right search strategy — full-text, semantic vector, or hybrid — and evaluating vector index types, ANN vs ENN, and reciprocal rank fusion.
 
+---
+
+## Quick Recall
+
+```mermaid
+mindmap
+  root((Intelligent Search))
+    Full-Text Search
+      CONTAINS - precision
+      FREETEXT - recall
+      Requires full-text index
+    Vector Search
+      VECTOR_DISTANCE - exact ENN
+      VECTOR_SEARCH - approx ANN
+      DiskANN cosine + dot only
+    Hybrid Search
+      FTS + Vector combined
+      RRF = 1/(k + rank)
+      k=60 default
+```
+
+---
+
 ## Topics Overview
 
 ```mermaid
