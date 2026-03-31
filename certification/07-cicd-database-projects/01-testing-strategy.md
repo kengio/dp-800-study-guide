@@ -28,7 +28,7 @@ A robust testing strategy for database projects combines unit tests (isolated, f
 
 ## tSQLt Unit Testing Framework
 
-tSQLt is a T-SQL unit testing framework that runs entirely inside SQL Server. Tests are organized into schemas (test classes), and each test is a stored procedure beginning with the word "test".
+**tSQLt** is a T-SQL unit testing framework that runs entirely inside SQL Server. Tests are organized into schemas (test classes), and each test is a stored procedure beginning with the word "test".
 
 ### Installing tSQLt
 
@@ -163,6 +163,8 @@ EXEC tSQLt.SetTestResultFormatter 'tSQLt.XmlResultFormatter';
 EXEC tSQLt.RunAll;
 ```
 
+---
+
 ## Integration Tests
 
 Integration tests verify that components work together correctly, including referential integrity, triggers, and multi-step workflows.
@@ -211,6 +213,8 @@ BEGIN
     ROLLBACK TRANSACTION; -- Always rollback in tests
 END;
 ```
+
+---
 
 ## Static / Reference Data Management
 
@@ -281,6 +285,8 @@ PRINT 'Loading reference data...';
 PRINT 'Reference data load complete.';
 ```
 
+---
+
 ## Use Cases
 
 - **Unit tests with tSQLt**: Test stored procedures, functions, and views in isolation before deploying to shared environments
@@ -288,15 +294,19 @@ PRINT 'Reference data load complete.';
 - **Integration tests**: Validate end-to-end workflows in a staging environment before production deployment
 - **MERGE for reference data**: Deploy lookup table data idempotently as part of CI/CD pipelines
 
+---
+
 ## Common Issues & Errors
 
 | Issue | Cause | Fix |
 | :--- | :--- | :--- |
-| `CLR not enabled` | tSQLt requires CLR | `EXEC sp_configure 'clr enabled', 1; RECONFIGURE;` |
+| `CLR not enabled` | tSQLt requires CLR | ==`EXEC sp_configure 'clr enabled', 1; RECONFIGURE;`== |
 | `TRUSTWORTHY must be ON` | tSQLt assembly requirement | `ALTER DATABASE db SET TRUSTWORTHY ON` |
 | Test fails with FK violation | FakeTable not used | Add `EXEC tSQLt.FakeTable` for dependency tables |
 | MERGE deletes unexpected rows | `WHEN NOT MATCHED BY SOURCE THEN DELETE` | Remove the DELETE clause if partial updates are intended |
 | Test data leaks between tests | Missing ROLLBACK | Wrap integration tests in `BEGIN TRAN / ROLLBACK` |
+
+---
 
 ## Exam Tips
 
@@ -306,6 +316,8 @@ PRINT 'Reference data load complete.';
 - Post-deployment scripts in dacpac projects run after all schema changes are applied — the right place for reference data loads
 - `tSQLt.AssertEqualsTable` compares entire result sets — use for output of stored procedures returning rowsets
 
+---
+
 ## Key Takeaways
 
 - Unit tests isolate database objects using `FakeTable` and `SpyProcedure` — test logic, not data
@@ -313,11 +325,15 @@ PRINT 'Reference data load complete.';
 - Static/reference data belongs in source control as idempotent MERGE scripts
 - Post-deployment scripts in SQL Database Projects are the standard deployment location for reference data
 
+---
+
 ## Related Topics
 
 - [02-SQL Database Projects](./02-sql-database-projects.md)
 - [03-Source Control & Branching](./03-source-control-branching.md)
 - [04-Deployment Pipelines](./04-deployment-pipelines.md)
+
+---
 
 ## Official Documentation
 
