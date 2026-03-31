@@ -25,6 +25,8 @@ SQL Server (and especially SQL databases in Microsoft Fabric) provide regex func
 > - `FREETEXT` = **recall** — natural language, broader match, no exact syntax control
 > - Both `CONTAINS` and `FREETEXT` require a **full-text index** on the column — they will not work on a regular index
 
+---
+
 ## Regex Functions
 
 Regex functions follow POSIX-style regular expressions.
@@ -99,13 +101,15 @@ FROM REGEXP_SPLIT_TO_TABLE('a,b,,c', ',+');
 -- Returns rows: 'a', 'b', 'c'
 ```
 
+---
+
 ## Fuzzy String Matching Functions
 
 Fuzzy matching quantifies string similarity — useful for deduplication, data matching, and AI-assisted entity resolution.
 
 ### EDIT_DISTANCE (Levenshtein Distance)
 
-Returns the minimum number of single-character edits (insertions, deletions, substitutions) to transform one string to another.
+**Edit distance** returns the minimum number of single-character edits (insertions, deletions, substitutions) to transform one string to another.
 
 ```sql
 SELECT EDIT_DISTANCE('kitten', 'sitting');  -- Returns: 3
@@ -155,6 +159,8 @@ WHERE JARO_WINKLER_DISTANCE(a.FullName, b.FullName) > 0.92;
 > [!warning] Common Mistake
 > CONTAINS and FREETEXT are not interchangeable. If the question asks for "natural language search that finds synonyms and inflections," use FREETEXT. If it asks for "exact phrase or proximity search," use CONTAINS. Both need a full-text index — forgetting this requirement is a common wrong answer.
 
+---
+
 ## SOUNDEX and DIFFERENCE Functions
 
 SOUNDEX and DIFFERENCE are built-in T-SQL functions available in SQL Server and Azure SQL — not limited to Fabric — making them broadly applicable for phonetic matching.
@@ -181,6 +187,8 @@ FROM Customers
 WHERE DIFFERENCE(Name, 'Johnson') >= 3;
 ```
 
+---
+
 ## TRANSLATE Function
 
 `TRANSLATE(string, from_chars, to_chars)` replaces each character in `from_chars` with the corresponding character at the same position in `to_chars` — a one-for-one character substitution across multiple characters in a single call.
@@ -202,6 +210,8 @@ SELECT REPLACE(REPLACE(REPLACE('(555)-123', '(', ''), ')', ''), '-', '');
 -- TRANSLATE is cleaner: TRANSLATE('(555)-123', '()-', '   ')
 ```
 
+---
+
 ## Advanced LIKE Patterns
 
 `LIKE` supports richer pattern syntax beyond `%` wildcards — useful for validating structured data formats directly in T-SQL.
@@ -211,7 +221,7 @@ SELECT REPLACE(REPLACE(REPLACE('(555)-123', '(', ''), ')', ''), '-', '');
 | `%` | Any string (0+ chars) | `'S%'` matches Smith, SQL |
 | `_` | Any single character | `'S_ith'` matches Smith |
 | `[abc]` | Any single char in set | `'[SB]mith'` matches Smith, Bmith |
-| `[a-z]` | Any char in range | `'[A-Z]%'` matches uppercase start |
+| `[a-z]` | Any char in range | ==`'[A-Z]%'` matches uppercase start== |
 | `[^abc]` | Any char NOT in set | `'[^0-9]%'` not starting with digit |
 
 Use the `ESCAPE` clause to treat `%`, `_`, or `[` as literal characters. Use `COLLATE` to control case sensitivity independently of the column's default collation.
@@ -230,6 +240,8 @@ SELECT Name FROM Customers
 WHERE Name LIKE 'a%' COLLATE Latin1_General_CS_AS;
 ```
 
+---
+
 ## Unicode and Collation in String Matching
 
 Collation controls how SQL Server compares and sorts character data — it affects `LIKE`, `=`, `ORDER BY`, and index usage.
@@ -247,6 +259,8 @@ SELECT Name FROM Customers WHERE Name = N'José' COLLATE Latin1_General_CI_AI;  
 SELECT Name FROM Customers WHERE Name = N'José' COLLATE Latin1_General_CS_AS;  -- exact match only
 ```
 
+---
+
 ## Choosing the Right Function
 
 | Scenario | Recommended Function |
@@ -255,12 +269,14 @@ SELECT Name FROM Customers WHERE Name = N'José' COLLATE Latin1_General_CS_AS;  
 | Extract numbers from text | `REGEXP_SUBSTR` |
 | Clean/normalize data | `REGEXP_REPLACE` |
 | Typo detection | `EDIT_DISTANCE` (absolute count) |
-| Similarity scoring (%) | `EDIT_DISTANCE_SIMILARITY` |
+| Similarity scoring (%) | ==`EDIT_DISTANCE_SIMILARITY`== |
 | Person name matching | `JARO_WINKLER_DISTANCE` |
 | Short identifier matching | `JARO_WINKLER_DISTANCE` |
 | Phonetic name matching | `SOUNDEX` / `DIFFERENCE` |
 | Normalize separator chars | `TRANSLATE` |
 | Structured format validation | `LIKE` with character classes |
+
+---
 
 ## Use Cases
 
@@ -268,6 +284,8 @@ SELECT Name FROM Customers WHERE Name = N'José' COLLATE Latin1_General_CS_AS;  
 - **Deduplication**: Find potential duplicate records before merging
 - **Entity resolution**: Match records across datasets without common keys
 - **AI data preparation**: Clean and normalize text before generating embeddings
+
+---
 
 ## Common Issues & Errors
 
@@ -277,7 +295,9 @@ SELECT Name FROM Customers WHERE Name = N'José' COLLATE Latin1_General_CS_AS;  
 | Slow fuzzy join | Cross-join of large tables | Filter to candidate pairs first using cheaper predicates |
 | Unexpected REGEXP_LIKE result | Case sensitivity | Use `i` flag for case-insensitive: `REGEXP_LIKE(col, pattern, 'i')` |
 | SOUNDEX returns wrong matches | Non-English names | Use `EDIT_DISTANCE` or `JARO_WINKLER_DISTANCE` instead |
-| LIKE scan instead of seek | Leading wildcard `'%text%'` | Use full-text search (`CONTAINS`) for substring searches on large tables |
+| LIKE scan instead of seek | Leading wildcard `'%text%'` | ==Use full-text search (`CONTAINS`) for substring searches on large tables== |
+
+---
 
 ## Best Practices
 
@@ -287,15 +307,20 @@ SELECT Name FROM Customers WHERE Name = N'José' COLLATE Latin1_General_CS_AS;  
 - Avoid leading-wildcard `LIKE '%text%'` on large tables; use full-text search (`CONTAINS`) for scalable substring matching
 - Always match the collation of string literals to the target column to ensure index seeks are used; specify `COLLATE` explicitly when in doubt
 
+---
+
 ## Exam Tips
 
-- Regex and fuzzy functions are primarily tested in the context of **SQL databases in Microsoft Fabric**
-- `EDIT_DISTANCE` returns an absolute count; `EDIT_DISTANCE_SIMILARITY` returns a 0–100 percentage
-- `JARO_WINKLER_DISTANCE` returns 0.0–1.0 (not 0–100) — note the different scale
-- `SOUNDEX`/`DIFFERENCE` are standard T-SQL (not Fabric-only); `DIFFERENCE` score of 4 = most similar
-- `TRANSLATE` requires equal-length `from_chars` and `to_chars` strings — a length mismatch throws an error
-- Leading-wildcard `LIKE` always causes a full scan; the exam may test knowing that full-text search is the index-friendly alternative
-- Use these for **data preparation before generating embeddings** (Domain 3 connection)
+> [!tip] Exam Tips
+> - Regex and fuzzy functions are primarily tested in the context of **SQL databases in Microsoft Fabric**
+> - `EDIT_DISTANCE` returns an absolute count; `EDIT_DISTANCE_SIMILARITY` returns a 0–100 percentage
+> - `JARO_WINKLER_DISTANCE` returns 0.0–1.0 (not 0–100) — note the different scale
+> - `SOUNDEX`/`DIFFERENCE` are standard T-SQL (not Fabric-only); `DIFFERENCE` score of 4 = most similar
+> - `TRANSLATE` requires equal-length `from_chars` and `to_chars` strings — a length mismatch throws an error
+> - Leading-wildcard `LIKE` always causes a full scan; the exam may test knowing that full-text search is the index-friendly alternative
+> - Use these for **data preparation before generating embeddings** (Domain 3 connection)
+
+---
 
 ## Key Takeaways
 
@@ -304,6 +329,8 @@ SELECT Name FROM Customers WHERE Name = N'José' COLLATE Latin1_General_CS_AS;  
 - `SOUNDEX`/`DIFFERENCE` offer a lightweight phonetic match available in all SQL Server editions
 - `TRANSLATE` cleanly normalizes multi-character separators in a single function call
 - Combine regex (for format validation) with fuzzy matching (for similarity) in data quality pipelines
+
+---
 
 ## Practice Questions
 
@@ -321,11 +348,15 @@ D. Use TRANSLATE(Name, 'Smith', '     ') IS NULL
 >
 > A leading wildcard `LIKE '%Smith%'` always causes a full table scan — no regular index can help. Full-text indexes invert the word-to-row mapping, enabling efficient word and prefix searches. SOUNDEX (A) handles phonetic matches but not substring matches, and is still a function-based scan. CHARINDEX (B) also causes a full scan. TRANSLATE (D) doesn't help find the substring.
 
+---
+
 ## Related Topics
 
 - [02-JSON Functions](./02-json-functions.md)
 - [04-Graph Queries](./04-graph-queries.md)
 - [03-Chunking & Generation](../09-models-embeddings/03-chunking-generation.md)
+
+---
 
 ## Official Documentation
 

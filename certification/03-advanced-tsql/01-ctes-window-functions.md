@@ -25,6 +25,8 @@ Common Table Expressions (CTEs) provide named temporary result sets for readable
 > - Recursive CTE: **anchor member** (runs once) `UNION ALL` **recursive member** (runs until no rows). Must have `MAXRECURSION` to prevent infinite loop
 > - `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` = running total; `RANGE` uses logical range (can include ties)
 
+---
+
 ## Common Table Expressions (CTEs)
 
 ### Basic CTE
@@ -64,7 +66,7 @@ ORDER BY tc.Revenue DESC;
 
 ### Recursive CTE
 
-Recursive CTEs process hierarchical or graph data (org charts, bill of materials).
+**Recursive CTEs** process hierarchical or graph data (org charts, bill of materials).
 
 ```sql
 WITH EmployeeHierarchy AS (
@@ -90,6 +92,8 @@ ORDER BY Level, Name;
 
 - Default recursion limit: 100 (override with `OPTION (MAXRECURSION n)`)
 - Always include a WHERE clause to terminate recursion
+
+---
 
 ## CTE Non-Materialization Behavior
 
@@ -123,6 +127,8 @@ WHERE o.OrderCount > (SELECT AVG(OrderCount) FROM #OrderCounts);
 - CTE is referenced more than once with expensive aggregation/joins
 - Statistics are needed on the intermediate result (optimizer can use temp table stats)
 
+---
+
 ## Recursive CTE Depth Limit
 
 The default maximum recursion depth is **100**. Use `OPTION(MAXRECURSION n)` to override; `0` means unlimited (use with caution — infinite loops will run until cancelled).
@@ -147,6 +153,8 @@ SELECT * FROM OrgHierarchy
 ORDER BY Level, Name
 OPTION(MAXRECURSION 50);  -- Safety: limit to 50 levels
 ```
+
+---
 
 ## Window Functions
 
@@ -234,13 +242,15 @@ OVER (ORDER BY Date ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING) -- current
 OVER (PARTITION BY Dept ORDER BY Salary)                -- partition only
 ```
 
+---
+
 ## PERCENT_RANK and CUME_DIST
 
 Both functions produce a value between 0.0 and 1.0 and are useful for percentile-based analysis, salary banding, and outlier detection.
 
 | Function | Formula | Range |
 | :--- | :--- | :--- |
-| `PERCENT_RANK()` | (rank - 1) / (total rows - 1) | 0.0 (lowest) to 1.0 (highest) |
+| `PERCENT_RANK()` | (rank - 1) / (total rows - 1) | ==0.0 (lowest) to 1.0 (highest)== |
 | `CUME_DIST()` | rows with value ≤ current / total rows | 1/n (lowest) to 1.0 (highest) |
 
 Key difference: `PERCENT_RANK` uses the row's rank position; `CUME_DIST` counts how many rows have a value less than or equal to the current row.
@@ -262,6 +272,8 @@ WITH RankedSalaries AS (
 SELECT * FROM RankedSalaries WHERE PctRank >= 0.90;
 ```
 
+---
+
 ## FIRST_VALUE and LAST_VALUE Pitfall
 
 `FIRST_VALUE` works correctly with the default frame. `LAST_VALUE` does **not** — the default frame is `RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`, which stops at the current row, so `LAST_VALUE` returns the current row's value rather than the partition's last.
@@ -279,6 +291,8 @@ SELECT OrderID, OrderDate, TotalAmount,
        ) AS LastOrderAmount
 FROM Orders;
 ```
+
+---
 
 ## Common Patterns
 
@@ -298,6 +312,8 @@ WITH Ranked AS (
 SELECT * FROM Ranked WHERE dr <= 3;
 ```
 
+---
+
 ## Use Cases
 
 - **CTEs**: Break complex queries into readable named steps; recursive hierarchies
@@ -306,14 +322,18 @@ SELECT * FROM Ranked WHERE dr <= 3;
 - **Running totals**: Cumulative sums for financial reporting
 - **PERCENT_RANK / CUME_DIST**: Salary banding, top-N percent filtering, outlier detection
 
+---
+
 ## Common Issues & Errors
 
 | Issue | Cause | Resolution |
 | :--- | :--- | :--- |
 | Infinite recursion in CTE | Missing/incorrect termination condition | Add `WHERE` in recursive member; use `MAXRECURSION` |
-| Wrong running total | Missing `ROWS UNBOUNDED PRECEDING` | Default frame is `RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` — can cause unexpected results with ties |
+| Wrong running total | Missing `ROWS UNBOUNDED PRECEDING` | ==Default frame is `RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` — can cause unexpected results with ties== |
 | `LAST_VALUE` returns current row | Default frame ends at current row | Add `ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING` |
 | CTE runs slower when referenced twice | No materialization; query runs CTE logic multiple times | Replace with `#temp table` to force materialization |
+
+---
 
 ## Best Practices
 
@@ -323,15 +343,20 @@ SELECT * FROM Ranked WHERE dr <= 3;
 - Prefer `DENSE_RANK()` over `RANK()` when gaps in rank values would confuse downstream logic.
 - Add `ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING` whenever using `LAST_VALUE` to get the true last value in the partition.
 
+---
+
 ## Exam Tips
 
-- `RANK()` leaves gaps after ties; `DENSE_RANK()` does not; `ROW_NUMBER()` has no ties
-- Default window frame is `RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` — be explicit with `ROWS`
-- Recursive CTEs need both an anchor member and a recursive member joined with `UNION ALL`
-- CTEs are **not materialized** — referencing a CTE twice may execute the underlying query twice
-- `LAST_VALUE` with default frame returns the current row's value, not the partition's last value
-- `PERCENT_RANK` returns 0.0 for the lowest row; `CUME_DIST` never returns 0.0
-- `OPTION(MAXRECURSION 0)` removes the recursion limit — dangerous on unbounded hierarchies
+> [!tip] Exam Tips
+> - `RANK()` leaves gaps after ties; `DENSE_RANK()` does not; `ROW_NUMBER()` has no ties
+> - Default window frame is `RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` — be explicit with `ROWS`
+> - Recursive CTEs need both an anchor member and a recursive member joined with `UNION ALL`
+> - CTEs are **not materialized** — referencing a CTE twice may execute the underlying query twice
+> - `LAST_VALUE` with default frame returns the current row's value, not the partition's last value
+> - `PERCENT_RANK` returns 0.0 for the lowest row; `CUME_DIST` never returns 0.0
+> - `OPTION(MAXRECURSION 0)` removes the recursion limit — dangerous on unbounded hierarchies
+
+---
 
 ## Key Takeaways
 
@@ -339,6 +364,8 @@ SELECT * FROM Ranked WHERE dr <= 3;
 - Window functions calculate over a window without reducing row count
 - `PARTITION BY` in window functions is independent of `GROUP BY`
 - CTE non-materialization is a performance trap when the same CTE is referenced multiple times
+
+---
 
 ## Practice Questions
 
@@ -356,10 +383,14 @@ D. CTEs are limited to 100 rows by default
 >
 > SQL Server CTEs are expanded inline — they are not cached or materialized like temp tables. When a CTE is referenced multiple times in the same query, the underlying logic may execute multiple times. For expensive CTEs referenced more than once, use a `#temp table` or table variable to materialize the results first. Option D is wrong (MAXRECURSION 100 only applies to recursive CTEs).
 
+---
+
 ## Related Topics
 
 - [02-JSON Functions](./02-json-functions.md)
 - [05-Correlated Queries & Error Handling](./05-correlated-queries-error-handling.md)
+
+---
 
 ## Official Documentation
 
