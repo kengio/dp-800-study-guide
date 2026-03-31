@@ -106,23 +106,93 @@ WHERE MATCH(p1-(f)->p2-(l)->r)
   AND r.Cuisine = 'Japanese';
 ```
 
-## Shortest Path
+## SHORTEST_PATH
 
-SQL Server supports `SHORTEST_PATH` for finding paths between nodes:
+`SHORTEST_PATH` finds the minimum-hop path between nodes using a recursive graph traversal pattern. The `FOR PATH` keyword is required on edge and intermediate node aliases inside the pattern.
+
+Key functions used with `SHORTEST_PATH`:
+
+- `LAST_NODE()` — returns the last node reached in the traversal path
+- `STRING_AGG(...) WITHIN GROUP (GRAPH PATH)` — concatenates node values along the path in traversal order
+- `COUNT(...) WITHIN GROUP (GRAPH PATH)` — counts hops or nodes along the path
+- Quantifier `+` means one or more hops; `{1,N}` bounds the depth
 
 ```sql
--- Find shortest path from Alice to any person (up to 5 hops)
+-- Find shortest path from person to any connection (social network)
 SELECT
-    src.Name AS Source,
-    STRING_AGG(via.Name, '->') WITHIN GROUP (GRAPH PATH) AS Path,
-    LAST_VALUE(via.Name) WITHIN GROUP (GRAPH PATH) AS Destination,
-    COUNT(via.PersonId) WITHIN GROUP (GRAPH PATH) AS Hops
+    Person1.Name AS Source,
+    LAST_NODE(Person2).Name AS Destination,
+    COUNT(FriendOf.$edge_id) AS HopsCount,
+    STRING_AGG(Person2.Name, '->') WITHIN GROUP (GRAPH PATH) AS Path
 FROM
-    dbo.Person AS src,
-    dbo.friendOf FOR PATH AS f,
-    dbo.Person FOR PATH AS via
-WHERE MATCH(SHORTEST_PATH(src(-(f)->via){1,5}))
-  AND src.Name = 'Alice';
+    Person AS Person1,
+    friendOf FOR PATH AS FriendOf,
+    Person FOR PATH AS Person2
+WHERE
+    MATCH(SHORTEST_PATH(Person1(-(FriendOf)->Person2)+))
+    AND Person1.Name = 'Alice';
+```
+
+## Edge Constraints
+
+Edge constraints enforce which node types are permitted on each side of an edge, preventing invalid connections at the schema level.
+
+- Defined with `CONSTRAINT ... CONNECTION (NodeType TO NodeType)`
+- Multiple connection pairs can be listed on a single edge table
+- `ON DELETE CASCADE` removes edge rows automatically when a referenced node is deleted
+
+```sql
+-- Edge with constraints: only Person nodes can connect via FriendOf
+CREATE TABLE FriendOf (
+    CONSTRAINT EC_FriendOf CONNECTION (Person TO Person) ON DELETE CASCADE
+) AS EDGE;
+
+-- Multiple connection types on one edge table
+CREATE TABLE Manages (
+    CONSTRAINT EC_Manages CONNECTION (Person TO Person, Person TO Team)
+) AS EDGE;
+```
+
+## Graph Queries with JSON
+
+Node tables can store flexible or variable properties in a JSON column, enabling schema-on-read patterns while still supporting graph traversal via `MATCH`.
+
+- Combine `JSON_VALUE` / `JSON_QUERY` with `MATCH` in the same query
+- JSON columns are queried in the `SELECT` list or `WHERE` clause just like regular columns
+- Useful when node types have heterogeneous attribute sets
+
+```sql
+-- Node table with JSON properties
+CREATE TABLE Product (
+    ProductID INT PRIMARY KEY,
+    Name NVARCHAR(200),
+    Attributes NVARCHAR(MAX)  -- JSON column
+) AS NODE;
+
+-- Query graph with JSON property filter
+SELECT p.Name, JSON_VALUE(p.Attributes, '$.category') AS Category
+FROM Product p, RecommendedWith r, Product p2
+WHERE MATCH(p-(r)->p2)
+AND JSON_VALUE(p.Attributes, '$.category') = 'Electronics';
+```
+
+## Performance Considerations for Graph Queries
+
+Graph tables behave like regular tables for indexing and statistics — apply standard tuning principles in addition to graph-specific guidance.
+
+- **Node tables:** index `$node_id` (system-maintained) and the business key used in `WHERE` filters
+- **Edge tables:** index `$from_id` and `$to_id` pseudo-columns to accelerate traversal in both directions
+- **SHORTEST_PATH on dense graphs:** always bound depth with `{1,N}` to avoid full-graph scans; unbounded `+` can be expensive
+- **Statistics:** auto-update statistics apply to node and edge tables the same as heap/B-tree tables
+- **Execution plans:** `MATCH` is translated into JOINs internally — `EXPLAIN` / actual execution plans show regular hash or nested-loop joins, not graph-specific operators
+
+```sql
+-- Index on edge endpoints for traversal performance
+CREATE INDEX IX_FriendOf_From ON FriendOf($from_id);
+CREATE INDEX IX_FriendOf_To ON FriendOf($to_id);
+
+-- Index on node business key
+CREATE INDEX IX_Person_Name ON Person(Name);
 ```
 
 ## Use Cases
@@ -140,19 +210,34 @@ WHERE MATCH(SHORTEST_PATH(src(-(f)->via){1,5}))
 | `MATCH` fails | Graph tables not in FROM clause | All nodes and edges used in MATCH must be in the FROM clause |
 | Edge insert fails | Wrong `$node_id` value | Always use subquery `(SELECT $node_id FROM ...)` to reference nodes |
 | Multiple MATCH patterns | Separate MATCH calls connected by AND | Use `AND MATCH(...)` for additional patterns |
+| SHORTEST_PATH returns no rows | Source node has no outbound edges | Verify edge direction and that `FOR PATH` aliases are used correctly |
+| Edge constraint violation | Inserting edge between disallowed node types | Check `CONNECTION` constraint definition; ensure source/target match allowed types |
+
+## Best Practices
+
+- Define edge constraints (`CONNECTION`) on all edge tables to enforce referential integrity at the schema level rather than in application code.
+- Always index `$from_id` and `$to_id` on edge tables; without these indexes, traversal degrades to full table scans as graph size grows.
+- Bound `SHORTEST_PATH` depth with `{1,N}` in production queries — unbounded `+` on dense graphs can cause runaway execution times.
+- Use `FOR PATH` aliases only inside `SHORTEST_PATH`; do not mix `FOR PATH` aliases with regular node aliases in the same `MATCH` clause.
+- Treat graph tables as first-class relational tables: apply column statistics, filtered indexes, and partitioning where appropriate.
 
 ## Exam Tips
 
 - `MATCH` can only be used with graph tables (defined `AS NODE` or `AS EDGE`)
 - Arrow direction in `MATCH` corresponds to `$from_id` → `$to_id` in the edge table
 - `SHORTEST_PATH` requires the `FOR PATH` keyword on edge and node aliases
+- `LAST_NODE()` returns the final node in a `SHORTEST_PATH` traversal — use it to get the destination
+- `STRING_AGG(...) WITHIN GROUP (GRAPH PATH)` orders path values in traversal sequence
 - Graph tables can have additional user-defined columns just like regular tables
+- Edge constraints use `CONSTRAINT ... CONNECTION (NodeType TO NodeType)` syntax — know this for schema design questions
 
 ## Key Takeaways
 
 - Node tables have `$node_id`; edge tables have `$edge_id`, `$from_id`, `$to_id`
 - `MATCH` enables declarative graph traversal without recursive CTEs
-- `SHORTEST_PATH` finds the minimum hop path between nodes
+- `SHORTEST_PATH` finds the minimum hop path between nodes; requires `FOR PATH` aliases
+- Edge constraints enforce valid node-type pairings at the DDL level
+- Index `$from_id` and `$to_id` on edge tables for performant traversal
 
 ## Related Topics
 
@@ -164,6 +249,22 @@ WHERE MATCH(SHORTEST_PATH(src(-(f)->via){1,5}))
 - [SQL Graph Architecture](https://learn.microsoft.com/en-us/sql/relational-databases/graphs/sql-graph-architecture)
 - [MATCH (SQL Graph)](https://learn.microsoft.com/en-us/sql/t-sql/queries/match-sql-graph)
 - [SHORTEST_PATH (SQL Graph)](https://learn.microsoft.com/en-us/sql/t-sql/queries/shortest-path-sql-graph)
+
+---
+
+**Practice Question**
+
+You need to find all people within 3 hops of a specific person in a social graph. Which T-SQL feature enables this query?
+
+A. Recursive CTE with a UNION ALL and hop counter
+B. MATCH with SHORTEST_PATH using a + quantifier
+C. A self-join with a JOIN depth of 3
+D. OPENJSON to traverse a graph stored in JSON
+
+> [!success]- Answer
+> **B — MATCH with SHORTEST_PATH using a + quantifier**
+>
+> SHORTEST_PATH in graph queries uses the + quantifier (one or more hops) or {1,3} for bounded hops to traverse edges recursively. While recursive CTEs (A) can also traverse hierarchies, MATCH with SHORTEST_PATH is the native graph API for SQL Graph tables. OPENJSON (D) works for JSON-encoded trees but not SQL Graph node/edge tables.
 
 ---
 

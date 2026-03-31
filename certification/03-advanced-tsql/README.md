@@ -51,7 +51,7 @@ flowchart TD
 
 - [02-Programmability Objects](../02-programmability-objects/README.md)
 - [04-AI-Assisted Tools](../04-ai-assisted-tools/README.md)
-- [Code Examples — T-SQL](../../code-examples/tsql/README.md)
+- [Code Examples — T-SQL](../resources/code-examples/tsql/README.md)
 
 ## Next Steps
 

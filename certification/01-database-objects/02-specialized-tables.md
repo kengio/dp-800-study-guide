@@ -40,10 +40,39 @@ CREATE TABLE dbo.SessionCache (
 ```
 
 **Key characteristics:**
+
 - No page latches or locks — uses optimistic multi-version concurrency (MVCC)
 - Indexes: HASH (for equality) or RANGE (BW-tree, for range scans)
 - `DURABILITY`: `SCHEMA_AND_DATA` (persisted) or `SCHEMA_ONLY` (lost on restart)
 - Natively compiled stored procedures for maximum throughput
+
+## Memory-Optimized Table Durability Options
+
+The `DURABILITY` option controls whether data survives a server restart.
+
+| Durability | Survives Restart | Transaction Log | Best For |
+| :--- | :--- | :--- | :--- |
+| `SCHEMA_AND_DATA` | Yes (data + structure) | Yes — fully logged | Orders, financial data, anything requiring persistence |
+| `SCHEMA_ONLY` | Structure only (data lost) | No logging | Session state, caches, temp aggregations |
+
+```sql
+-- SCHEMA_AND_DATA: durable (default) — data persists through restart
+CREATE TABLE dbo.HotOrders (
+    OrderID     INT             NOT NULL PRIMARY KEY NONCLUSTERED,
+    CustomerID  INT             NOT NULL,
+    TotalAmount DECIMAL(18,2)   NOT NULL,
+    INDEX IX_HotOrders_Customer NONCLUSTERED (CustomerID)
+) WITH (MEMORY_OPTIMIZED = ON, DURABILITY = SCHEMA_AND_DATA);
+
+-- SCHEMA_ONLY: data lost on restart, fastest writes — no transaction log overhead
+CREATE TABLE dbo.SessionState (
+    SessionID   NVARCHAR(100)   NOT NULL PRIMARY KEY NONCLUSTERED,
+    CachedData  NVARCHAR(MAX)   NOT NULL,
+    ExpiresAt   DATETIME2       NOT NULL
+) WITH (MEMORY_OPTIMIZED = ON, DURABILITY = SCHEMA_ONLY);
+```
+
+**Memory-optimized table variables** (declared with `DECLARE @t <type>`) are always in-memory with no durability option — they are scoped to the batch and never persisted.
 
 ## Temporal Tables (System-Versioned)
 
@@ -74,6 +103,7 @@ ORDER BY ValidFrom;
 ```
 
 **Temporal query clauses:**
+
 | Clause | Returns |
 | :--- | :--- |
 | `AS OF <date>` | Row state at exactly that point in time |
@@ -81,6 +111,42 @@ ORDER BY ValidFrom;
 | `BETWEEN <start> AND <end>` | Inclusive of the end boundary |
 | `CONTAINED IN (<start>, <end>)` | Rows that started AND ended within the range |
 | `ALL` | All current and historical rows |
+
+## Temporal Table — Versioning Queries
+
+Each `FOR SYSTEM_TIME` clause has distinct boundary semantics — these differences are exam-tested.
+
+**AS OF** — Point-in-time snapshot. Returns the row version that was active at the exact moment specified.
+
+**FROM...TO** — Open interval (exclusive on both ends). Returns any row whose active period overlapped with `[start, end)`.
+
+**BETWEEN...AND** — Closed interval (inclusive end). Returns rows active during `[start, end]` — includes rows active exactly at the end boundary.
+
+**CONTAINED IN** — Returns only rows whose entire lifetime (start AND end) falls within the specified window. Useful for finding records created and deleted within a period.
+
+**ALL** — Returns every row from both the current table and the history table. Ideal for full audit trails.
+
+```sql
+-- Point-in-time snapshot: row state as it existed at exactly midnight Jan 1
+SELECT * FROM dbo.Employees
+FOR SYSTEM_TIME AS OF '2024-01-01T00:00:00';
+
+-- All changes within a period (exclusive boundaries)
+SELECT *, ValidFrom, ValidTo
+FROM dbo.Employees
+FOR SYSTEM_TIME FROM '2024-01-01' TO '2024-07-01';
+
+-- Rows entirely within a period (started AND ended inside the window)
+SELECT * FROM dbo.Employees
+FOR SYSTEM_TIME CONTAINED IN ('2024-01-01', '2024-07-01');
+
+-- Full audit trail for a specific employee across all history
+SELECT *, ValidFrom, ValidTo
+FROM dbo.Employees
+FOR SYSTEM_TIME ALL
+WHERE EmployeeId = 42
+ORDER BY ValidFrom;
+```
 
 ## External Tables
 
@@ -114,27 +180,38 @@ WITH (
 
 ## Ledger Tables
 
-Ledger tables provide tamper-evident, cryptographically verified audit trails — stored using a blockchain-like linked hash chain.
+Ledger tables provide tamper-evident, cryptographically verified audit trails using a blockchain-style linked hash chain built directly into SQL.
+
+**Two types of ledger tables:**
+
+- **Updatable ledger tables** — support INSERT, UPDATE, DELETE; maintain a separate history table; each transaction is recorded with a cryptographic hash linking to the previous transaction
+- **Append-only ledger tables** — support INSERT only; rows cannot be updated or deleted; ideal for immutable audit logs
+
+**Auto-generated columns** (updatable ledger): `ledger_transaction_id`, `ledger_sequence_number`, `ledger_operation_type`, `ledger_operation_type_desc`
 
 ```sql
--- Updatable ledger table (tracks all changes)
-CREATE TABLE dbo.AccountBalances (
-    AccountId   int             NOT NULL PRIMARY KEY,
-    Balance     decimal(18,2)   NOT NULL
+-- Updatable ledger table: supports all DML, maintains full change history
+CREATE TABLE dbo.Salaries (
+    EmployeeID  INT             NOT NULL,
+    Salary      DECIMAL(18,2)   NOT NULL,
+    CONSTRAINT PK_Salaries PRIMARY KEY (EmployeeID)
 ) WITH (LEDGER = ON);
 
--- Append-only ledger table (no UPDATE/DELETE allowed)
-CREATE TABLE dbo.TransactionLog (
-    TransactionId   uniqueidentifier NOT NULL DEFAULT NEWID(),
-    Amount          decimal(18,2)    NOT NULL,
-    Timestamp       datetime2(0)     NOT NULL DEFAULT GETUTCDATE()
+-- Append-only ledger table: INSERT only — UPDATE and DELETE are blocked
+CREATE TABLE dbo.FinancialTransactions (
+    TransactionID   INT IDENTITY PRIMARY KEY,
+    Amount          DECIMAL(18,2),
+    Description     NVARCHAR(500)
 ) WITH (LEDGER = ON, APPEND_ONLY = ON);
 
--- Verify ledger integrity
-EXECUTE sp_verify_database_ledger;
+-- Verify ledger integrity: confirms no tampering since creation
+EXEC sp_verify_database_ledger;
+
+-- View the auto-created ledger history view for an updatable ledger table
+SELECT * FROM dbo.MSSQL_LedgerHistoryFor_Salaries;
 ```
 
-**Auto-generated columns (updatable ledger):** `ledger_transaction_id`, `ledger_sequence_number`, `ledger_operation_type`, `ledger_operation_type_desc`
+**Ledger verification** (`sp_verify_database_ledger`) recomputes the hash chain and compares it to stored digests. Any out-of-band modification — even by a DBA — breaks the chain and causes verification to fail, providing cryptographic proof of tampering.
 
 ## Graph Tables
 
@@ -173,7 +250,7 @@ See [04-Graph Queries](../03-advanced-tsql/04-graph-queries.md) for advanced MAT
 | **In-Memory** | Session state, shopping carts, real-time counters |
 | **Temporal** | Audit history, slowly changing dimensions, compliance |
 | **External** | Data virtualization, querying data lake files |
-| **Ledger** | Financial records, regulated audit trails |
+| **Ledger** | Financial records, regulated audit trails, cryptographic proof |
 | **Graph** | Social networks, fraud detection, recommendation engines |
 
 ## Common Issues & Errors
@@ -184,19 +261,47 @@ See [04-Graph Queries](../03-advanced-tsql/04-graph-queries.md) for advanced MAT
 | Temporal history table growing large | High update frequency | Add retention policy: `HISTORY_RETENTION_PERIOD = 1 YEAR` |
 | External table slow | File format mismatch or no statistics | Use `CREATE STATISTICS` on external tables |
 | Ledger verify fails | File tampering or corruption | Report to compliance; evidence of tampering |
+| `CONTAINED IN` returns no rows | Period wider than any row's lifetime | Check ValidFrom/ValidTo range; rows must start AND end inside the window |
+
+## Best Practices
+
+- Use `SCHEMA_ONLY` durability for memory-optimized tables that hold transient state (sessions, caches) — it eliminates transaction log overhead and delivers maximum throughput
+- Always specify a `HISTORY_TABLE` name when creating temporal tables; letting SQL auto-generate it makes schema management harder
+- Prefer `CONTAINED IN` when auditing completed transactions within a reporting window; use `FROM...TO` when you need any overlap
+- Store ledger database digests in Azure Confidential Ledger or Azure Blob Storage immutable containers so `sp_verify_database_ledger` can use external digests as a trust anchor
+- Use append-only ledger tables for event logs and financial transactions where immutability is a compliance requirement; reserve updatable ledger for master data that legitimately changes
 
 ## Exam Tips
 
 - **Temporal** tables need two `datetime2` columns with `PERIOD FOR SYSTEM_TIME` — the database tracks them automatically
 - **In-memory** tables require a `MEMORY_OPTIMIZED_DATA` filegroup first
-- **Ledger** append-only tables prevent UPDATE and DELETE — useful for immutable audit logs
+- **`CONTAINED IN`** vs **`FROM...TO`**: `CONTAINED IN` requires both ValidFrom and ValidTo to be within the window; `FROM...TO` only requires overlap
+- **Ledger** append-only tables prevent UPDATE and DELETE — useful for immutable audit logs; updatable ledger tables still allow DML but record it all
 - **Graph** tables use `$node_id` and `$edge_id` system columns automatically
+- **`sp_verify_database_ledger`** is the key verb for proving tamper-evidence — know it by name
 
 ## Key Takeaways
 
 - Each specialized table type solves a specific problem: throughput, history, virtualization, tamper-evidence, or relationships
 - Temporal tables automatically version history — no application code changes needed
-- Ledger tables can be verified cryptographically with `sp_verify_database_ledger`
+- Ledger tables can be verified cryptographically with `sp_verify_database_ledger`; even DBAs cannot modify data without detection
+- `SCHEMA_ONLY` memory-optimized tables trade durability for maximum write speed — appropriate for ephemeral data
+
+---
+
+**Practice Question**
+
+An auditor asks for proof that no one has modified the salary records table since it was created. Which table type provides cryptographic proof of data integrity?
+
+A. Temporal table with SYSTEM_TIME versioning
+B. Ledger table with APPEND_ONLY = ON
+C. Updatable ledger table with sp_verify_database_ledger
+D. Memory-optimized table with DURABILITY = SCHEMA_AND_DATA
+
+> [!success]- Answer
+> **C — Updatable ledger table with sp_verify_database_ledger**
+>
+> Ledger tables maintain a cryptographic hash chain over all transactions. `sp_verify_database_ledger` checks this chain to prove that no rows have been tampered with outside of the normal transactional path — even a DBA cannot modify data without detection. Temporal tables (A) record history but don't prevent or detect tampering. APPEND_ONLY ledger (B) prevents updates but the question asks about an existing salary table that needs updates. Memory-optimized tables (D) provide durability, not tamper-evidence.
 
 ## Related Topics
 

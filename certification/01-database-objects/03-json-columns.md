@@ -140,6 +140,119 @@ CREATE INDEX IX_Events_UserId
 ON dbo.Events (CAST(JSON_VALUE(Payload, '$.userId') AS int));
 ```
 
+## JSON Computed Columns for Indexing
+
+**Problem:** Using `JSON_VALUE` in a `WHERE` clause causes a table scan — the optimizer cannot index a JSON path expression directly.
+
+**Solution:** Extract the JSON property into a PERSISTED computed column, then create an index on that column.
+
+PERSISTED computed columns are physically stored on disk (unlike virtual computed columns), which is required for indexing.
+
+```sql
+-- Add persisted computed column extracting from JSON
+ALTER TABLE Orders
+ADD ShipCountry AS JSON_VALUE(ShippingJSON, '$.country') PERSISTED;
+
+-- Index the computed column
+CREATE INDEX IX_Orders_ShipCountry ON Orders(ShipCountry);
+
+-- Query now uses the index (optimizer treats JSON_VALUE(...) as the computed column)
+SELECT OrderID, TotalAmount
+FROM Orders
+WHERE JSON_VALUE(ShippingJSON, '$.country') = 'US';
+
+-- Filtered index on computed column for sparse values
+CREATE INDEX IX_Orders_UK_Country
+ON Orders(ShipCountry, TotalAmount)
+WHERE ShipCountry = 'UK';
+```
+
+## JSON_ARRAYAGG and JSON_OBJECTAGG
+
+Available in SQL Server 2022 and Azure SQL, these aggregate functions build JSON output directly from rows without requiring `FOR JSON` workarounds.
+
+- **JSON_ARRAYAGG**: aggregates a column of values into a JSON array (like `STRING_AGG` but produces JSON)
+- **JSON_OBJECTAGG**: aggregates key-value row pairs into a single JSON object
+- **Use case**: build nested JSON results inline within a query
+
+```sql
+-- JSON_ARRAYAGG: list of product names per category
+SELECT CategoryID,
+       JSON_ARRAYAGG(ProductName ORDER BY ProductName) AS ProductNames
+FROM Products
+GROUP BY CategoryID;
+
+-- JSON_OBJECTAGG: build a property bag from rows
+SELECT OrderID,
+       JSON_OBJECTAGG(AttributeName: AttributeValue) AS Attributes
+FROM OrderAttributes
+GROUP BY OrderID;
+
+-- Nested JSON: orders with line items aggregated
+SELECT o.OrderID, o.OrderDate,
+       JSON_ARRAYAGG(JSON_OBJECT(
+           'sku': li.SKU,
+           'qty': li.Quantity,
+           'price': li.UnitPrice
+       )) AS LineItems
+FROM Orders o
+JOIN LineItems li ON o.OrderID = li.OrderID
+GROUP BY o.OrderID, o.OrderDate;
+```
+
+## Strict vs Lax Mode in JSON Paths
+
+JSON path expressions support two modes that control how missing paths are handled.
+
+- **Lax mode (default)**: missing paths return `NULL` instead of raising an error
+- **Strict mode**: raises error 13608 if the specified path does not exist in the JSON
+- **When to use strict**: data validation and ETL pipelines where a missing property indicates bad or incomplete data
+
+```sql
+DECLARE @json NVARCHAR(MAX) = '{"name":"Alice","address":{"city":"Seattle"}}';
+
+-- Lax (default): missing path returns NULL
+SELECT JSON_VALUE(@json, 'lax $.phone');         -- NULL, no error
+SELECT JSON_VALUE(@json, '$.phone');              -- NULL (lax is default)
+
+-- Strict: missing path raises error
+SELECT JSON_VALUE(@json, 'strict $.phone');      -- Error 13608
+
+-- Practical: validate required properties during import
+INSERT INTO Customers (Name, City)
+SELECT
+    JSON_VALUE(j.JsonData, 'strict $.name'),   -- fails fast if name missing
+    JSON_VALUE(j.JsonData, 'lax $.city')       -- OK if city missing
+FROM StagingJSON j
+WHERE IS_JSON(j.JsonData) = 1;
+```
+
+## JSON with OPENJSON and Schema Binding
+
+The `OPENJSON` function with the `WITH` clause shreds JSON into typed relational rows. Use the `AS JSON` modifier in the `WITH` clause to preserve nested objects or arrays as JSON fragments for further processing.
+
+```sql
+DECLARE @orderJSON NVARCHAR(MAX) = '{
+    "orderId": 1001,
+    "customer": "Alice",
+    "items": [{"sku":"A1","qty":2},{"sku":"B2","qty":1}]
+}';
+
+-- Parse top-level properties
+SELECT * FROM OPENJSON(@orderJSON)
+WITH (
+    OrderId INT '$.orderId',
+    Customer NVARCHAR(100) '$.customer',
+    Items NVARCHAR(MAX) '$.items' AS JSON  -- AS JSON preserves the array
+);
+
+-- Shred nested array with CROSS APPLY
+SELECT h.OrderId, li.SKU, li.Qty
+FROM (SELECT 1001 AS OrderId, @orderJSON AS Doc) h
+CROSS APPLY OPENJSON(h.Doc, '$.items')
+WITH (SKU NVARCHAR(20) '$.sku', Qty INT '$.qty') li;
+```
+
 ## Use Cases
 
 - **Product catalogs**: Variable attribute sets per product type stored as JSON
@@ -152,23 +265,50 @@ ON dbo.Events (CAST(JSON_VALUE(Payload, '$.userId') AS int));
 | Issue | Cause | Resolution |
 | :--- | :--- | :--- |
 | `JSON_VALUE` returns NULL | Path does not exist or value is not scalar | Use `JSON_QUERY` for objects/arrays; verify path |
-| Slow JSON queries | No index on JSON property | Create computed column + index on the property |
+| Slow JSON queries | No index on JSON property | Create PERSISTED computed column + index on the property |
 | `ISJSON` returns 0 | Malformed JSON in the column | Add CHECK constraint on insert; validate at application layer |
 | `OPENJSON` returns no rows | JSON is valid but path is wrong | Test path with `JSON_VALUE` first |
+| Error 13608 | Strict mode path not found | Switch to lax mode or fix the JSON to include the required property |
+
+## Best Practices
+
+- Always add a `CHECK (ISJSON(col) = 1)` constraint on `nvarchar` columns that store JSON to reject malformed data at the database layer.
+- Use PERSISTED computed columns — not virtual ones — when you need to index a JSON property; virtual computed columns cannot be indexed.
+- Prefer `strict` mode in ETL and import pipelines to catch missing required properties early; use `lax` mode for optional fields.
+- Use `JSON_ARRAYAGG` / `JSON_OBJECTAGG` (SQL Server 2022+) for aggregating JSON inline instead of post-processing `FOR JSON PATH` results.
+- Shred JSON into relational columns at insert time when the data will be queried frequently; keep JSON for flexible or rarely queried attributes only.
 
 ## Exam Tips
 
 - `JSON_VALUE` returns scalars (strings); `JSON_QUERY` returns JSON objects or arrays
 - `OPENJSON` with `WITH` clause provides typed output — preferred for structured parsing
-- To filter efficiently on JSON properties, create a **computed column + index**
+- To filter efficiently on JSON properties, create a **PERSISTED computed column + index**
 - `JSON_ARRAYAGG` and `JSON_CONTAINS` are newer functions — know which SQL Server version supports them
+- Lax mode is the default; strict mode raises error 13608 on missing paths
+- `AS JSON` in an `OPENJSON WITH` clause preserves nested arrays/objects as JSON strings
 
 ## Key Takeaways
 
 - JSON is stored as `nvarchar` or the new native `json` type
 - Always validate JSON with `ISJSON` or a `CHECK` constraint
-- Index JSON properties via computed columns for query performance
+- Index JSON properties via PERSISTED computed columns for query performance
 - `FOR JSON PATH` converts relational results to JSON for API responses
+- `JSON_ARRAYAGG` and `JSON_OBJECTAGG` (SQL Server 2022+) aggregate rows directly into JSON
+- Strict vs lax mode controls whether missing JSON paths raise an error or return NULL
+
+## Practice Question
+
+A table has a JSON column `Metadata` and a query filters on `JSON_VALUE(Metadata, '$.region') = 'EU'`. The query is slow with a full table scan. What is the BEST solution?
+
+A. Use FOR JSON PATH to reformat the data
+B. Add a PERSISTED computed column on `JSON_VALUE(Metadata, '$.region')` and index it
+C. Switch to OPENJSON for better performance
+D. Enable JSON path strict mode
+
+> [!success]- Answer
+> **B — Add a PERSISTED computed column on `JSON_VALUE(Metadata, '$.region')` and index it**
+>
+> The optimizer cannot index a JSON path expression directly. A PERSISTED computed column materializes the extracted value, and an index on that column allows efficient seeks. OPENJSON (C) is for shredding arrays and doesn't help filter performance. Strict mode (D) changes error behavior, not query speed.
 
 ## Related Topics
 

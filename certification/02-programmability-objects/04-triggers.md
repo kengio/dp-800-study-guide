@@ -50,6 +50,7 @@ END;
 ```
 
 **`inserted` and `deleted` tables:**
+
 | Operation | `inserted` | `deleted` |
 | :--- | :--- | :--- |
 | INSERT | New rows | Empty |
@@ -79,6 +80,43 @@ BEGIN
     SELECT c.CustomerId, i.OrderDate, i.TotalAmount
     FROM inserted i
     JOIN dbo.Customers c ON c.Name = i.CustomerName;
+END;
+```
+
+## INSTEAD OF Triggers on Views
+
+Multi-table views and views with aggregates are not directly updatable. INSTEAD OF triggers make these views accept DML by intercepting the statement and routing it manually to the underlying tables.
+
+Key behaviors:
+
+- The trigger fires **instead of** the DML — the original statement never executes
+- You must explicitly write the INSERT/UPDATE/DELETE in the trigger body
+- Supported: INSTEAD OF INSERT, INSTEAD OF UPDATE, INSTEAD OF DELETE
+- Fires **before** constraint checking (unlike AFTER triggers)
+
+```sql
+-- View joining two tables (not directly updatable)
+CREATE VIEW vw_OrderDetails
+AS SELECT o.OrderID, o.TotalAmount, c.Name, c.Email
+   FROM Orders o JOIN Customers c ON o.CustomerID = c.CustomerID;
+
+-- INSTEAD OF INSERT on the view
+CREATE TRIGGER trg_IOI_OrderDetails
+ON vw_OrderDetails
+INSTEAD OF INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    -- Insert customer first
+    INSERT INTO Customers (Name, Email)
+    SELECT i.Name, i.Email FROM inserted i
+    WHERE NOT EXISTS (SELECT 1 FROM Customers c WHERE c.Email = i.Email);
+
+    -- Then insert order
+    INSERT INTO Orders (CustomerID, TotalAmount)
+    SELECT c.CustomerID, i.TotalAmount
+    FROM inserted i
+    JOIN Customers c ON c.Email = i.Email;
 END;
 ```
 
@@ -115,6 +153,91 @@ BEGIN
 END;
 ```
 
+### DDL Trigger Details
+
+- **Scope:** database-level (`ON DATABASE`) or server-level (`ON ALL SERVER`)
+- **Common events:** `CREATE_TABLE`, `ALTER_TABLE`, `DROP_TABLE`, `CREATE_PROCEDURE`, `ALTER_PROCEDURE`, `DROP_PROCEDURE`
+- **`EVENTDATA()`:** returns an XML document containing event type, object name, login name, TSQL text, and more
+- **Typical use cases:** audit schema changes, prevent accidental table or database drops in production
+
+```sql
+-- Prevent dropping tables in production
+CREATE TRIGGER trg_PreventDrop
+ON DATABASE
+FOR DROP_TABLE
+AS
+BEGIN
+    PRINT 'Table drops are not allowed. Contact DBA team.';
+    ROLLBACK;
+END;
+
+-- Audit DDL changes to a log table
+CREATE TRIGGER trg_AuditDDL
+ON DATABASE
+FOR CREATE_TABLE, ALTER_TABLE, DROP_TABLE
+AS
+BEGIN
+    INSERT INTO DDLAuditLog (EventType, ObjectName, LoginName, EventTime, EventData)
+    SELECT
+        EVENTDATA().value('(/EVENT_INSTANCE/EventType)[1]', 'NVARCHAR(100)'),
+        EVENTDATA().value('(/EVENT_INSTANCE/ObjectName)[1]', 'NVARCHAR(200)'),
+        EVENTDATA().value('(/EVENT_INSTANCE/LoginName)[1]', 'NVARCHAR(200)'),
+        GETUTCDATE(),
+        EVENTDATA();
+END;
+```
+
+## Trigger Execution Order
+
+When multiple triggers exist for the same event on the same table, use `sp_settriggerorder` to designate which fires FIRST or LAST. Intermediate triggers fire in an undefined order.
+
+- **Nested triggers:** a trigger that performs DML on another table can fire that table's trigger (up to 32 levels deep)
+- **Recursive triggers:** an UPDATE inside a trigger on table T fires T's own trigger again — disabled by default (`RECURSIVE_TRIGGERS OFF`)
+- **Maximum nesting level:** 32; exceeding it raises an error and rolls back the transaction
+
+```sql
+-- Set trigger execution order
+EXEC sp_settriggerorder
+    @triggername = 'trg_AuditUpdate',
+    @order = 'First',
+    @stmttype = 'UPDATE';
+
+-- Check if recursive triggers are enabled
+SELECT name, is_recursive_triggers_on
+FROM sys.databases WHERE name = DB_NAME();
+```
+
+## Logon Triggers
+
+Logon triggers are server-scoped triggers that fire when a SQL Server login session is established (after authentication but before the session is fully open).
+
+- **Scope:** server-level — defined with `ON ALL SERVER`
+- **Use cases:** restrict logins to business hours, enforce IP-based access control, log all connection attempts
+- **ROLLBACK** inside a logon trigger terminates the connection before it fully opens
+- Logon triggers do **not** have access to `inserted`/`deleted` tables; use `EVENTDATA()` or `ORIGINAL_LOGIN()` instead
+
+```sql
+-- Restrict logins to business hours (Mon-Fri, 08:00-18:00)
+CREATE TRIGGER trg_RestrictLoginHours
+ON ALL SERVER
+FOR LOGON
+AS
+BEGIN
+    DECLARE @Hour int = DATEPART(HOUR, GETDATE());
+    DECLARE @Weekday int = DATEPART(WEEKDAY, GETDATE());
+
+    -- Weekday: 1=Sun, 7=Sat; block weekends and outside 08-18
+    IF @Weekday IN (1, 7) OR @Hour < 8 OR @Hour >= 18
+    BEGIN
+        IF ORIGINAL_LOGIN() <> 'sa'  -- allow emergency SA access
+        BEGIN
+            PRINT 'Logins are only allowed Mon-Fri 08:00-18:00.';
+            ROLLBACK;
+        END;
+    END;
+END;
+```
+
 ## Managing Triggers
 
 ```sql
@@ -132,19 +255,13 @@ SELECT definition FROM sys.sql_modules
 WHERE object_id = OBJECT_ID('trg_Orders_Audit');
 ```
 
-## Trigger Best Practices
-
-- **Write set-based logic**: `inserted` and `deleted` can contain multiple rows — never assume single-row triggers
-- **Keep triggers short**: Heavy logic in triggers causes blocking; use async approaches for long operations
-- **Avoid recursive triggers**: Can cause infinite loops; disable with `ALTER DATABASE SET RECURSIVE_TRIGGERS OFF`
-- **Use `SET NOCOUNT ON`**: Prevents extra result sets from being sent to the client
-
 ## Use Cases
 
 - **Auditing**: Track who changed what and when without modifying application code
 - **Enforcing complex rules**: Business logic that can't be expressed as CHECK constraints
 - **Synchronizing derived data**: Maintain denormalized columns or summary tables
 - **View DML**: Enable INSERT/UPDATE/DELETE on views with complex logic
+- **Schema governance**: DDL triggers prevent unauthorized drops or changes in production
 
 ## Common Issues & Errors
 
@@ -153,6 +270,15 @@ WHERE object_id = OBJECT_ID('trg_Orders_Audit');
 | Trigger fires once for multi-row DML | `inserted`/`deleted` tables have multiple rows | Write set-based logic, not `SELECT TOP 1` or scalar variables |
 | Recursive trigger loop | Trigger updates a table that triggers itself | Check `sys.triggers.is_recursive` or disable recursive triggers |
 | Performance degradation | Trigger runs synchronously on every DML | Move heavy work to async process (Service Broker, queue) |
+| Logon trigger locks everyone out | Faulty ROLLBACK logic in logon trigger | Connect via DAC (`admin:`) to disable or drop the trigger |
+
+## Best Practices
+
+- **Write set-based logic**: `inserted` and `deleted` can contain multiple rows — never assume single-row triggers
+- **Keep triggers short**: Heavy logic in triggers causes blocking; use async approaches (Service Broker) for long operations
+- **Use `SET NOCOUNT ON`**: Prevents extra result sets from being sent to the client and avoids unexpected row-count side effects
+- **Avoid recursive triggers**: Can cause infinite loops; disable with `ALTER DATABASE SET RECURSIVE_TRIGGERS OFF`
+- **Test logon triggers carefully**: A broken logon trigger can lock all users out; always preserve a DAC or `sa` bypass path
 
 ## Exam Tips
 
@@ -160,12 +286,31 @@ WHERE object_id = OBJECT_ID('trg_Orders_Audit');
 - INSTEAD OF triggers fire **before constraints** — and replace the DML
 - `EVENTDATA()` returns an XML document with details about DDL events
 - Triggers that use `ROLLBACK` inside a TRY/CATCH require careful transaction management
+- A view joining multiple tables requires an **INSTEAD OF** trigger — AFTER triggers cannot make a non-updatable view accept DML
+- Logon triggers use `ON ALL SERVER` and can disconnect users by calling `ROLLBACK`
+- `sp_settriggerorder` controls which trigger fires FIRST or LAST when multiple triggers exist on the same event
 
 ## Key Takeaways
 
 - `inserted` = new rows; `deleted` = old rows; both populated for UPDATE
-- INSTEAD OF triggers on views enable DML on non-updatable views
+- INSTEAD OF triggers on views enable DML on non-updatable views by replacing the statement entirely
 - DDL triggers audit or prevent schema changes using `EVENTDATA()`
+- Logon triggers enforce connection-level policies at the server scope
+- Trigger nesting depth is capped at 32; recursive triggers are off by default
+
+## Practice Question
+
+A view joins the Orders and Customers tables. A user tries to INSERT into the view and gets an error. Which trigger type resolves this?
+
+A. AFTER INSERT trigger on the Orders table
+B. INSTEAD OF INSERT trigger on the view
+C. DDL trigger for CREATE event on the view
+D. AFTER INSERT trigger on the view
+
+> [!success]- Answer
+> **B — INSTEAD OF INSERT trigger on the view**
+>
+> INSTEAD OF triggers intercept DML on views and allow you to manually route inserts to the underlying tables. AFTER triggers fire after the DML completes — they cannot make a non-updatable view accept inserts. DDL triggers (C) respond to schema events like CREATE TABLE, not DML. AFTER triggers on views (D) can exist but don't solve the multi-table insert problem.
 
 ## Related Topics
 
@@ -177,6 +322,7 @@ WHERE object_id = OBJECT_ID('trg_Orders_Audit');
 
 - [DML Triggers (SQL Server)](https://learn.microsoft.com/en-us/sql/relational-databases/triggers/dml-triggers)
 - [DDL Triggers (SQL Server)](https://learn.microsoft.com/en-us/sql/relational-databases/triggers/ddl-triggers)
+- [Logon Triggers (SQL Server)](https://learn.microsoft.com/en-us/sql/relational-databases/triggers/logon-triggers)
 
 ---
 

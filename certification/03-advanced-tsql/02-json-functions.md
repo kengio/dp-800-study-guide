@@ -71,6 +71,7 @@ FROM OPENJSON(@json, '$.tags');
 ```
 
 **OPENJSON type values:**
+
 | Value | JSON Type |
 | :--- | :--- |
 | 0 | null |
@@ -105,12 +106,41 @@ SELECT JSON_ARRAY(1, 'two', NULL, GETDATE());
 ### JSON_ARRAYAGG (SQL Server 2022+)
 
 ```sql
--- Aggregate rows into a JSON array
+-- Aggregate rows into a JSON array grouped by category
 SELECT
     CategoryId,
     JSON_ARRAYAGG(Name ORDER BY Name) AS ProductNames
 FROM dbo.Products
 GROUP BY CategoryId;
+
+-- Aggregate full JSON objects into an array
+SELECT
+    OrderId,
+    JSON_ARRAYAGG(
+        JSON_OBJECT('sku': Sku, 'qty': Quantity, 'price': UnitPrice)
+        ORDER BY LineNumber
+    ) AS LineItemsJson
+FROM dbo.OrderLines
+GROUP BY OrderId;
+```
+
+### JSON_OBJECTAGG (SQL Server 2022+)
+
+```sql
+-- Aggregate key-value pairs into a single JSON object
+-- Useful for pivoting attribute tables into JSON documents
+SELECT
+    ProductId,
+    JSON_OBJECTAGG(AttributeName: AttributeValue) AS Attributes
+FROM dbo.ProductAttributes
+GROUP BY ProductId;
+-- Example output: {"color":"red","size":"L","weight":"1.2kg"}
+
+-- Combine with JSON_OBJECTAGG for config tables
+SELECT JSON_OBJECTAGG(ConfigKey: ConfigValue) AS AppConfig
+FROM dbo.AppSettings
+WHERE IsActive = 1;
+-- Output: {"MaxRetries":"3","Timeout":"30","Environment":"prod"}
 ```
 
 ### FOR JSON PATH
@@ -186,6 +216,83 @@ WHERE ISJSON(Attributes, OBJECT) = 1   -- must be a JSON object
 WHERE ISJSON(Tags, ARRAY) = 1          -- must be a JSON array
 ```
 
+## JSON Path Expressions Quick Reference
+
+| Expression | Returns |
+| :--- | :--- |
+| `$.property` | Top-level property |
+| `$.a.b` | Nested property |
+| `$.array[0]` | First element of array |
+| `$.array[*]` | All array elements (OPENJSON) |
+| `lax $.missing` | NULL if missing (default) |
+| `strict $.missing` | Error if missing |
+
+Path mode defaults to `lax` in all JSON functions. Prefix with `strict` to
+convert missing-path NULLs into errors — useful for validation queries.
+
+## Nested JSON with CROSS APPLY
+
+Use `CROSS APPLY OPENJSON` to shred nested arrays within JSON documents into
+a flat relational result set.
+
+```sql
+-- Order JSON with nested line items array
+DECLARE @orders NVARCHAR(MAX) = '[
+    {"id": 1, "customer": "Alice", "items": [{"sku":"A1","qty":2},{"sku":"B2","qty":1}]},
+    {"id": 2, "customer": "Bob",   "items": [{"sku":"C3","qty":5}]}
+]';
+
+-- Shred orders, then shred each items array
+SELECT o.id, o.customer, li.sku, li.qty
+FROM OPENJSON(@orders)
+WITH (
+    id       INT             '$.id',
+    customer NVARCHAR(100)   '$.customer',
+    items    NVARCHAR(MAX)   '$.items' AS JSON
+) o
+CROSS APPLY OPENJSON(o.items)
+WITH (sku NVARCHAR(20) '$.sku', qty INT '$.qty') li;
+```
+
+The `AS JSON` flag in the `WITH` clause tells OPENJSON to return the nested
+array as a raw JSON fragment rather than a string, enabling the second
+`CROSS APPLY OPENJSON` call on it.
+
+## JSON Schema Validation Patterns
+
+### IS_JSON as a CHECK Constraint
+
+```sql
+-- Enforce valid JSON at write time
+ALTER TABLE Products
+ADD CONSTRAINT CK_ValidJSON CHECK (IS_JSON(Attributes) = 1);
+```
+
+### ETL Validation — Detect Invalid or Incomplete Rows
+
+```sql
+-- Validate required JSON properties during bulk load
+SELECT src.RowID, src.JsonData
+FROM StagingTable src
+WHERE IS_JSON(src.JsonData) = 0                              -- invalid JSON
+   OR JSON_VALUE(src.JsonData, 'strict $.id')   IS NULL      -- missing required field
+   OR JSON_VALUE(src.JsonData, 'strict $.name') IS NULL;
+
+-- Count valid vs invalid JSON rows
+SELECT
+    SUM(CASE WHEN IS_JSON(JsonData) = 1 THEN 1 ELSE 0 END) AS ValidCount,
+    SUM(CASE WHEN IS_JSON(JsonData) = 0 THEN 1 ELSE 0 END) AS InvalidCount
+FROM StagingTable;
+```
+
+### Type-Specific Validation (SQL Server 2022+)
+
+```sql
+-- Reject rows where the column is not a JSON object (rejects arrays, scalars)
+ALTER TABLE Events
+ADD CONSTRAINT CK_PayloadIsObject CHECK (ISJSON(Payload, OBJECT) = 1);
+```
+
 ## Practical Patterns
 
 ```sql
@@ -218,19 +325,48 @@ SELECT JSON_OBJECT(
 | `JSON_VALUE` returns NULL | Path not found (lax mode) | Verify path; use `strict` to get an error instead |
 | `JSON_QUERY` returns NULL on scalar | Scalar values need `JSON_VALUE` | Use `JSON_VALUE` for strings/numbers, `JSON_QUERY` for objects/arrays |
 | `FOR JSON` produces unexpected nesting | Column naming causes auto-nesting | Use explicit aliases or `FOR JSON PATH` with dot notation |
+| `CROSS APPLY OPENJSON` returns no rows | Nested column not declared `AS JSON` | Add `AS JSON` flag to the nested array column in the outer `WITH` clause |
+| `JSON_OBJECTAGG` / `JSON_ARRAYAGG` not found | Functions require SQL Server 2022+ | Verify compatibility level ≥ 160; use `FOR JSON` as fallback on older versions |
+
+## Best Practices
+
+- Store JSON columns as `NVARCHAR(MAX)` and add an `IS_JSON` CHECK constraint to catch invalid data at write time rather than at query time.
+- Prefer `OPENJSON` with a typed `WITH` clause over repeated `JSON_VALUE` calls — it parses the document once and produces strongly-typed columns in a single pass.
+- Use `strict` path mode in validation and ETL queries so missing required fields surface as errors rather than silent NULLs.
+- Index computed columns derived from `JSON_VALUE` (e.g., `AS JSON_VALUE(Payload, '$.customerId')`) when the same JSON property appears frequently in `WHERE` or `JOIN` predicates.
+- Prefer `JSON_OBJECTAGG` / `JSON_ARRAYAGG` (SQL 2022+) over `FOR JSON PATH` when aggregating subsets of rows — they compose cleanly inside larger `SELECT` statements without subqueries.
 
 ## Exam Tips
 
 - `JSON_VALUE` = scalar → string; `JSON_QUERY` = objects/arrays → JSON fragment
 - `OPENJSON` with `WITH` clause provides strongly-typed output — preferred for structured parsing
 - `FOR JSON PATH` gives explicit control; `FOR JSON AUTO` infers nesting from aliases
-- `JSON_ARRAYAGG` is SQL Server 2022+ — know it for newer platform questions
+- `JSON_ARRAYAGG` and `JSON_OBJECTAGG` are SQL Server 2022+ — know them for newer platform questions
+- Default path mode is `lax` (returns NULL on missing path); `strict` raises an error — critical for exam scenario questions about error behavior
+
+## Practice Questions
+
+**Practice Question**
+
+A query uses `JSON_VALUE(col, '$.address.city')` but some rows have no `address` property. What is returned for those rows by default?
+
+A. An empty string ''
+B. NULL
+C. An error is raised
+D. The string 'null'
+
+> [!success]- Answer
+> **B — NULL**
+>
+> JSON_VALUE uses lax mode by default. In lax mode, if the path doesn't exist or the value is JSON null, it returns SQL NULL — no error is raised. To raise an error for missing paths, use `JSON_VALUE(col, 'strict $.address.city')`. Note: JSON `null` (lowercase) maps to SQL NULL in JSON_VALUE.
 
 ## Key Takeaways
 
 - Two read functions: `JSON_VALUE` (scalar) and `JSON_QUERY` (object/array)
 - `OPENJSON` is the most versatile — converts JSON to relational rows
 - `FOR JSON` converts relational results to JSON — essential for RAG prompt building
+- `JSON_OBJECTAGG` / `JSON_ARRAYAGG` (SQL 2022+) aggregate rows directly into JSON without subqueries
+- `CROSS APPLY OPENJSON` with `AS JSON` is the pattern for shredding nested arrays
 
 ## Related Topics
 

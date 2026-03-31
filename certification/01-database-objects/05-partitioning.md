@@ -39,6 +39,7 @@ AS RANGE RIGHT FOR VALUES (
 ```
 
 **RANGE LEFT vs RANGE RIGHT:**
+
 - `RANGE LEFT`: boundary value is the last value in the left partition (≤ boundary)
 - `RANGE RIGHT`: boundary value is the first value in the right partition (≥ boundary)
 - For date ranges, `RANGE RIGHT` is more intuitive (e.g., `'2025-01-01'` starts the January partition)
@@ -74,22 +75,55 @@ CREATE TABLE dbo.Sales (
 
 ## Partition Switching
 
-Partition switching moves an entire partition atomically (metadata-only operation) — used for fast archiving or loading:
+Partition switching is a near-instant metadata-only operation — SQL Server reassigns the data pages from one table to another without physically moving any rows.
+
+**SWITCH OUT** moves a partition from the main table to an archive table. **SWITCH IN** loads a staged partition into the main table.
+
+**Requirements:**
+
+- Source and target tables must have identical structure (same columns, data types, constraints)
+- Source and target must be on the same filegroup
+- Target partition must be empty when switching IN
 
 ```sql
--- Archive January 2025: switch partition 2 to archive table
-ALTER TABLE dbo.Sales
-SWITCH PARTITION 2 TO dbo.Sales_Archive PARTITION 2;
+-- Switch partition 1 (oldest month) out to archive table
+ALTER TABLE Orders
+SWITCH PARTITION 1 TO OrdersArchive;
 
--- Load new data: switch from staging to main table
-ALTER TABLE dbo.Sales_Staging
-SWITCH TO dbo.Sales PARTITION 14;
+-- Switch staged data into main table's latest partition
+ALTER TABLE OrdersStaging
+SWITCH TO Orders PARTITION 12;
+
+-- Verify partition contents before/after
+SELECT partition_number, rows
+FROM sys.partitions
+WHERE object_id = OBJECT_ID('Orders') AND index_id <= 1;
 ```
 
-**Requirements for partition switch:**
-- Both tables must have identical structure (same columns, data types, constraints)
-- Target partition must be empty (when switching IN)
-- Both must be on the same filegroup (when on different filegroups)
+## Sliding Window Pattern
+
+The sliding window pattern continuously adds new partitions for incoming data and removes old ones, keeping a rolling window (e.g., last 12 months) without unbounded table growth.
+
+**Steps for each cycle:**
+
+1. Add a new boundary value with `SPLIT RANGE` (creates a new empty partition for the next period)
+2. Switch the oldest partition out to an archive table
+3. Merge the old boundary with `MERGE RANGE` (removes the now-empty partition)
+
+```sql
+-- Step 1: Add new boundary for next month
+ALTER PARTITION FUNCTION pf_OrdersByMonth()
+SPLIT RANGE ('2025-02-01');
+
+-- Step 2: Switch oldest partition to archive
+ALTER TABLE Orders SWITCH PARTITION 1 TO OrdersArchive;
+
+-- Step 3: Merge old boundary (removes empty partition)
+ALTER PARTITION FUNCTION pf_OrdersByMonth()
+MERGE RANGE ('2024-01-01');
+```
+
+**Key tip:** Always SPLIT before loading new data, and always switch out the old partition before merging its boundary. SPLIT on an empty partition is instantaneous; SPLIT on a populated partition causes data movement.
 
 ## Managing Partitions
 
@@ -122,13 +156,43 @@ ORDER BY p.partition_number;
 
 ## Partition Elimination
 
-The optimizer skips irrelevant partitions when the WHERE clause filters on the partition key:
+Partition elimination is the optimizer behavior of skipping partitions that cannot contain rows matching the query's WHERE clause. It is one of the primary performance benefits of partitioning.
+
+**Requirement:** The query filter must reference the partition column directly. Implicit conversions or computed expressions on the column can prevent elimination.
+
+**Verifying elimination:** In the execution plan, select the Clustered Index Seek or Scan operator and inspect "Partitions Accessed" in the properties pane. A range like `[6, 6]` means only partition 6 was scanned.
 
 ```sql
--- Query only scans partition(s) for June 2025 — others eliminated
-SELECT SUM(Amount) FROM dbo.Sales
-WHERE SaleDate >= '2025-06-01' AND SaleDate < '2025-07-01';
+-- This query eliminates most partitions (filter on partition column)
+SELECT OrderID, TotalAmount
+FROM Orders
+WHERE OrderDate >= '2024-06-01' AND OrderDate < '2024-07-01';
+-- ^ Execution plan: accesses only partition 6
+
+-- This query does NOT eliminate partitions (filter on non-partition column)
+SELECT OrderID, TotalAmount
+FROM Orders
+WHERE CustomerID = 12345;
+-- ^ Execution plan: scans all partitions
+
+-- Check partitions accessed in sys.dm_exec_query_stats
 ```
+
+If your queries commonly filter on a column other than the partition key, partitioning on that key provides no elimination benefit and may add overhead.
+
+## Aligned vs Non-Aligned Indexes
+
+An **aligned index** uses the same partition function as the base table, so each index partition maps to the same rows as the corresponding table partition.
+
+A **non-aligned index** has a different partitioning scheme (or is not partitioned at all) from the base table.
+
+**Why it matters:**
+
+- Partition switching requires that all indexes on the table are aligned with the table's partition scheme
+- Non-aligned indexes block SWITCH operations
+- The optimizer can leverage aligned indexes for partition elimination on index seeks
+
+**Recommendation:** Always create indexes using the same partition scheme as the base table. When designing a partitioned table, define the partition scheme first, then all indexes on it.
 
 ## Use Cases
 
@@ -145,6 +209,15 @@ WHERE SaleDate >= '2025-06-01' AND SaleDate < '2025-07-01';
 | Switch fails: target not empty | Staging/archive partition has rows | Truncate or move target partition first |
 | No partition elimination | WHERE clause doesn't use partition key | Ensure filter is on the partition column directly |
 | SPLIT/MERGE slow | Large data movement between partitions | Keep the new/merged partition empty before SPLIT |
+| Switch fails: non-aligned index | Table has an index on a different scheme | Rebuild the index ON the same partition scheme |
+
+## Best Practices
+
+- Use `RANGE RIGHT` for date-based partition functions — the boundary value becomes the first date of the new partition, which maps naturally to month or year boundaries.
+- Always `SPLIT RANGE` before the new period's data arrives; the new partition must be empty at split time to avoid data movement.
+- Map all partitions to `[PRIMARY]` during development; introduce separate filegroups for I/O separation only when storage architecture justifies it.
+- Align all indexes (clustered and nonclustered) with the table's partition scheme so that `SWITCH` operations succeed without rebuilding indexes.
+- Automate the sliding window cycle (SPLIT → SWITCH → MERGE) in a stored procedure or SQL Agent job to ensure consistent execution each period.
 
 ## Exam Tips
 
@@ -152,12 +225,30 @@ WHERE SaleDate >= '2025-06-01' AND SaleDate < '2025-07-01';
 - `RANGE RIGHT` is standard for date partitioning — boundary value starts the new partition
 - Partition switching is a **metadata-only operation** — extremely fast even for billions of rows
 - Adding a new partition requires `ALTER PARTITION SCHEME ... NEXT USED` first, then `SPLIT`
+- Partition elimination only occurs when the WHERE clause filters **directly on the partition column**
+- All indexes must be **aligned** (same partition scheme) for `SWITCH` to succeed
 
 ## Key Takeaways
 
 - Three objects needed: partition function → partition scheme → table/index on scheme
 - Partition elimination improves performance only when filtering on the partition key
 - SPLIT and MERGE modify partition boundaries; SWITCH moves data between tables
+- The sliding window pattern (SPLIT → SWITCH → MERGE) manages a rolling data window efficiently
+- Aligned indexes are required for partition switching and enable partition elimination on index seeks
+
+## Practice Question
+
+You need to archive last month's orders from a partitioned Orders table to an archive table with zero downtime. Which operation achieves this?
+
+A. INSERT INTO OrdersArchive SELECT ... followed by DELETE FROM Orders
+B. ALTER TABLE Orders SWITCH PARTITION n TO OrdersArchive
+C. CREATE TABLE OrdersArchive AS SELECT * FROM Orders WHERE OrderDate < ...
+D. ALTER PARTITION FUNCTION MERGE RANGE on the oldest boundary
+
+> [!success]- Answer
+> **B — ALTER TABLE Orders SWITCH PARTITION n TO OrdersArchive**
+>
+> Partition SWITCH is a metadata-only operation that completes near-instantly with minimal locking — it simply reassigns the partition's data pages to the target table. INSERT/DELETE (A) physically moves data and holds locks. CREATE TABLE AS SELECT (C) is not valid T-SQL syntax. MERGE RANGE (D) removes a boundary but doesn't move data to an archive.
 
 ## Related Topics
 

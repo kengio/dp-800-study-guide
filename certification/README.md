@@ -71,6 +71,9 @@ pie title Exam Domain Distribution
 | [Mock Exam 2](resources/mock-exam-2/README.md) | Alternative practice exam |
 | [Exam Tips](resources/exam-tips.md) | Strategies and exam format guide |
 | [Official Links](resources/official-links.md) | Microsoft documentation and registration |
+| [Code Examples](resources/code-examples/tsql/README.md) | Standalone T-SQL code example files |
+| [Cheat Sheets](resources/cheat-sheets/README.md) | Quick-reference guides for exam topics |
+| [Appendix](resources/appendix/README.md) | Glossary, comparison tables, error messages |
 
 ## Study Progress Tracker
 

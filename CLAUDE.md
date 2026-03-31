@@ -19,9 +19,7 @@ dp-800-study-guide/
 │   ├── 09-models-embeddings/   # External models, embedding generation
 │   ├── 10-intelligent-search/  # Full-text, vector, and hybrid search
 │   ├── 11-rag/                 # Retrieval-augmented generation
-│   └── resources/              # Practice questions, mock exams, exam tips
-└── code-examples/
-    └── tsql/                   # T-SQL code examples (always .md files)
+│   └── resources/              # Practice questions, mock exams, exam tips, code examples, appendix, cheat sheets
 ```
 
 Each topic folder contains a `README.md` index and numbered `.md` topic files.
@@ -31,11 +29,11 @@ Each topic folder contains a `README.md` index and numbered `.md` topic files.
 ### Content Placement
 
 - **Single certification** — all content lives under `certification/`
-- **Code examples** go in `code-examples/tsql/` as `.md` files, never `.sql`
+- **Code examples** go in `certification/resources/code-examples/tsql/` as `.md` files, never `.sql`
 
 ### Code Examples
 
-- **Always `.md` files**, never `.sql` — store in `code-examples/tsql/`
+- **Always `.md` files**, never `.sql` — store in `certification/resources/code-examples/tsql/`
 - Fenced code blocks with language tags (`sql`, `tsql`, `json`, `yaml`)
 - Group related snippets under `##` headings; add YAML frontmatter with `tags`
 

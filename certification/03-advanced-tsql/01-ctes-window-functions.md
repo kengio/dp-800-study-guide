@@ -77,8 +77,66 @@ ORDER BY Level, Name;
 ```
 
 **Recursive CTE safeguards:**
+
 - Default recursion limit: 100 (override with `OPTION (MAXRECURSION n)`)
 - Always include a WHERE clause to terminate recursion
+
+## CTE Non-Materialization Behavior
+
+CTEs are **not materialized** by default — they are expanded inline like a view. The optimizer may execute the CTE multiple times if it is referenced more than once in the same query. This is different from temp tables and table variables, which are physically materialized.
+
+Recursive CTEs are an exception: the anchor result is temporarily cached for the recursive iterations.
+
+```sql
+-- CTE referenced twice — may execute twice (no materialization guarantee)
+WITH ExpensiveCTE AS (
+    SELECT CustomerID, COUNT(*) AS OrderCount
+    FROM Orders
+    GROUP BY CustomerID
+)
+SELECT c.Name, e.OrderCount
+FROM Customers c
+JOIN ExpensiveCTE e ON c.CustomerID = e.CustomerID
+WHERE e.OrderCount > (SELECT AVG(OrderCount) FROM ExpensiveCTE);  -- CTE runs again!
+
+-- Better: use temp table when CTE is referenced multiple times
+SELECT CustomerID, COUNT(*) AS OrderCount
+INTO #OrderCounts FROM Orders GROUP BY CustomerID;
+
+SELECT c.Name, o.OrderCount FROM Customers c
+JOIN #OrderCounts o ON c.CustomerID = o.CustomerID
+WHERE o.OrderCount > (SELECT AVG(OrderCount) FROM #OrderCounts);
+```
+
+**When to prefer a temp table over a CTE:**
+
+- CTE is referenced more than once with expensive aggregation/joins
+- Statistics are needed on the intermediate result (optimizer can use temp table stats)
+
+## Recursive CTE Depth Limit
+
+The default maximum recursion depth is **100**. Use `OPTION(MAXRECURSION n)` to override; `0` means unlimited (use with caution — infinite loops will run until cancelled).
+
+Always include an explicit termination condition in the recursive member to avoid runaway queries.
+
+```sql
+-- Traverse org chart with depth limit
+WITH OrgHierarchy AS (
+    -- Anchor: top-level managers
+    SELECT EmployeeID, Name, ManagerID, 0 AS Level
+    FROM Employees WHERE ManagerID IS NULL
+
+    UNION ALL
+
+    -- Recursive: employees reporting to previous level
+    SELECT e.EmployeeID, e.Name, e.ManagerID, h.Level + 1
+    FROM Employees e
+    JOIN OrgHierarchy h ON e.ManagerID = h.EmployeeID
+)
+SELECT * FROM OrgHierarchy
+ORDER BY Level, Name
+OPTION(MAXRECURSION 50);  -- Safety: limit to 50 levels
+```
 
 ## Window Functions
 
@@ -163,6 +221,52 @@ OVER (ORDER BY Date ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING) -- current
 OVER (PARTITION BY Dept ORDER BY Salary)                -- partition only
 ```
 
+## PERCENT_RANK and CUME_DIST
+
+Both functions produce a value between 0.0 and 1.0 and are useful for percentile-based analysis, salary banding, and outlier detection.
+
+| Function | Formula | Range |
+| :--- | :--- | :--- |
+| `PERCENT_RANK()` | (rank - 1) / (total rows - 1) | 0.0 (lowest) to 1.0 (highest) |
+| `CUME_DIST()` | rows with value ≤ current / total rows | 1/n (lowest) to 1.0 (highest) |
+
+Key difference: `PERCENT_RANK` uses the row's rank position; `CUME_DIST` counts how many rows have a value less than or equal to the current row.
+
+```sql
+SELECT EmployeeID, Name, Salary,
+       PERCENT_RANK() OVER (ORDER BY Salary) AS PctRank,
+       CUME_DIST() OVER (ORDER BY Salary) AS CumeDist
+FROM Employees;
+-- PERCENT_RANK: 0.0 for lowest, 1.0 for highest
+-- CUME_DIST: 1.0/n for lowest, always 1.0 for highest
+
+-- Find employees in top 10% of salary
+WITH RankedSalaries AS (
+    SELECT EmployeeID, Name, Salary,
+           PERCENT_RANK() OVER (ORDER BY Salary) AS PctRank
+    FROM Employees
+)
+SELECT * FROM RankedSalaries WHERE PctRank >= 0.90;
+```
+
+## FIRST_VALUE and LAST_VALUE Pitfall
+
+`FIRST_VALUE` works correctly with the default frame. `LAST_VALUE` does **not** — the default frame is `RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`, which stops at the current row, so `LAST_VALUE` returns the current row's value rather than the partition's last.
+
+This is a common exam trap. Always specify an explicit frame for `LAST_VALUE`.
+
+```sql
+SELECT OrderID, OrderDate, TotalAmount,
+       FIRST_VALUE(TotalAmount) OVER (PARTITION BY CustomerID ORDER BY OrderDate) AS FirstOrderAmount,
+       -- LAST_VALUE needs explicit frame!
+       LAST_VALUE(TotalAmount) OVER (
+           PARTITION BY CustomerID
+           ORDER BY OrderDate
+           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+       ) AS LastOrderAmount
+FROM Orders;
+```
+
 ## Common Patterns
 
 ```sql
@@ -187,6 +291,7 @@ SELECT * FROM Ranked WHERE dr <= 3;
 - **ROW_NUMBER**: Deduplication, pagination (`WHERE rn BETWEEN 1 AND 20`)
 - **LAG/LEAD**: Period-over-period comparisons, detecting gaps in sequences
 - **Running totals**: Cumulative sums for financial reporting
+- **PERCENT_RANK / CUME_DIST**: Salary banding, top-N percent filtering, outlier detection
 
 ## Common Issues & Errors
 
@@ -194,19 +299,49 @@ SELECT * FROM Ranked WHERE dr <= 3;
 | :--- | :--- | :--- |
 | Infinite recursion in CTE | Missing/incorrect termination condition | Add `WHERE` in recursive member; use `MAXRECURSION` |
 | Wrong running total | Missing `ROWS UNBOUNDED PRECEDING` | Default frame is `RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` — can cause unexpected results with ties |
-| `LAST_VALUE` returns current row | Default frame ends at current row | Add `ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING`; or use `ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING` to always get the partition's last value |
+| `LAST_VALUE` returns current row | Default frame ends at current row | Add `ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING` |
+| CTE runs slower when referenced twice | No materialization; query runs CTE logic multiple times | Replace with `#temp table` to force materialization |
+
+## Best Practices
+
+- Use temp tables instead of CTEs when the same CTE is referenced more than once in a query with expensive logic.
+- Always specify `ROWS` (not `RANGE`) in window frame clauses to avoid unexpected tie behavior.
+- Always include a termination condition in recursive CTEs and set an explicit `MAXRECURSION` limit appropriate to your data depth.
+- Prefer `DENSE_RANK()` over `RANK()` when gaps in rank values would confuse downstream logic.
+- Add `ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING` whenever using `LAST_VALUE` to get the true last value in the partition.
 
 ## Exam Tips
 
 - `RANK()` leaves gaps after ties; `DENSE_RANK()` does not; `ROW_NUMBER()` has no ties
 - Default window frame is `RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` — be explicit with `ROWS`
 - Recursive CTEs need both an anchor member and a recursive member joined with `UNION ALL`
+- CTEs are **not materialized** — referencing a CTE twice may execute the underlying query twice
+- `LAST_VALUE` with default frame returns the current row's value, not the partition's last value
+- `PERCENT_RANK` returns 0.0 for the lowest row; `CUME_DIST` never returns 0.0
+- `OPTION(MAXRECURSION 0)` removes the recursion limit — dangerous on unbounded hierarchies
 
 ## Key Takeaways
 
 - CTEs improve readability — they don't inherently improve performance
 - Window functions calculate over a window without reducing row count
 - `PARTITION BY` in window functions is independent of `GROUP BY`
+- CTE non-materialization is a performance trap when the same CTE is referenced multiple times
+
+## Practice Questions
+
+**Practice Question**
+
+A CTE is referenced twice in the same query and contains a complex aggregation. The query runs slower than expected. What is the MOST LIKELY cause?
+
+A. CTEs cannot contain aggregation functions
+B. The CTE is executed twice because CTEs are not materialized
+C. Window functions inside CTEs disable parallel execution
+D. CTEs are limited to 100 rows by default
+
+> [!success]- Answer
+> **B — The CTE is executed twice because CTEs are not materialized**
+>
+> SQL Server CTEs are expanded inline — they are not cached or materialized like temp tables. When a CTE is referenced multiple times in the same query, the underlying logic may execute multiple times. For expensive CTEs referenced more than once, use a `#temp table` or table variable to materialize the results first. Option D is wrong (MAXRECURSION 100 only applies to recursive CTEs).
 
 ## Related Topics
 
