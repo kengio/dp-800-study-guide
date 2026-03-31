@@ -61,7 +61,7 @@ Use callouts to break up dense text in topic files and cheat sheets. Standard ty
 | Callout | Usage |
 | :--- | :--- |
 | `> [!info]` | Section intros, neutral context, "what this is" |
-| `> [!tip] Exam Tip` | Exam-specific advice, things that are commonly tested |
+| `> [!tip] Exam Tips` | Exam-specific advice, things that are commonly tested |
 | `> [!warning] Common Mistake` | Frequent errors, gotchas, "don't confuse X with Y" |
 | `> [!note]` | Extra detail, caveats, "worth knowing but not critical" |
 | `> [!success]- Answer` | Collapsed practice question answers (foldable) |

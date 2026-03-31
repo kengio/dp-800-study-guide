@@ -19,7 +19,7 @@ tags:
 1. **Topic files** (`01-topic-name.md`) — core study material with SQL examples, comparison tables, and practice questions. Start here.
 2. **Section READMEs** — overview flowcharts and topic indexes. Use to orient before diving into a section.
 3. **Cheat sheets** (`resources/cheat-sheets/`) — compact quick-reference for exam day and review. Use after studying a section to reinforce.
-4. **Practice questions** (`resources/practice-questions/`) — 15 questions per domain, with explanations. Use to test knowledge after each domain.
+4. **Practice questions** (`resources/practice-questions/`) — 15–20 questions per domain (Domain 2 has 20; Domains 1 and 3 have 15 each), with explanations. Use to test knowledge after each domain.
 5. **Mock exams** (`resources/mock-exam/`, `resources/mock-exam-2/`) — full 45-question timed exams. Take after completing all domains.
 
 > Study path: topic files → cheat sheets → practice questions → mock exams
