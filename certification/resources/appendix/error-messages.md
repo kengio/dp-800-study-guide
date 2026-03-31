@@ -11,11 +11,49 @@ tags:
 
 Quick reference for error messages you are likely to encounter in Azure SQL Database and Fabric SQL when developing AI-enabled database solutions.
 
+> [!abstract] TL;DR
+> - 20 common error messages organized into 8 categories (constraints, JSON, concurrency, security, AI, etc.)
+> - Each entry includes the exact error text, cause, and a working solution with T-SQL code
+> - Focus on Msg 1205 (deadlocks), Msg 3960 (snapshot conflicts), and vector dimension mismatches — these are the most exam-relevant
+
+---
+
+## Table of Contents
+
+- [[#Constraint & Schema Errors]]
+  - [[#Msg 547: Foreign Key Violation]]
+  - [[#Msg 2627: Unique Constraint Violation (Duplicate Key)]]
+  - [[#Msg 515: Cannot Insert NULL into NOT NULL Column]]
+- [[#JSON Errors]]
+  - [[#Msg 13608: Property Not Found (Strict Mode)]]
+  - [[#Msg 13609: JSON Not Properly Formatted]]
+  - [[#Msg 13610: JSON_VALUE Returned Object/Array]]
+- [[#Concurrency & Transaction Errors]]
+  - [[#Msg 1205: Deadlock Victim]]
+  - [[#Msg 3960: Snapshot Update Conflict]]
+  - [[#Msg 3609: Transaction Ended in Trigger]]
+- [[#Performance & Configuration Errors]]
+  - [[#Msg 530: MAXRECURSION Exceeded]]
+  - [[#Msg 8623: Query Processor Out of Resources]]
+  - [[#Msg 8645: Memory Grant Timeout]]
+- [[#Partitioning Errors]]
+  - [[#Msg 4939: ALTER TABLE SWITCH Failed (Schema Mismatch)]]
+- [[#Security & Permissions Errors]]
+  - [[#Msg 229: Permission Denied]]
+  - [[#Msg 297: EXECUTE AS Impersonation Denied]]
+  - [[#Msg 33280: Cannot Encrypt Column (Always Encrypted Setup)]]
+- [[#Vector & AI Errors]]
+  - [[#Vector Dimension Mismatch]]
+  - [[#sp_invoke_external_rest_endpoint HTTP Error / Timeout]]
+  - [[#PREDICT Permission Denied]]
+- [[#Query Store Errors]]
+  - [[#Msg 12429: Query Store Read-Only Mode]]
+
 ---
 
 ## Constraint & Schema Errors
 
-### Msg 547 — Foreign Key Violation
+### Msg 547: Foreign Key Violation
 
 ```text
 Msg 547, Level 16, State 0
@@ -39,9 +77,7 @@ DELETE FROM dbo.Orders WHERE CustomerID = 99;
 DELETE FROM dbo.Customers WHERE CustomerID = 99;
 ```
 
----
-
-### Msg 2627 — Unique Constraint Violation (Duplicate Key)
+### Msg 2627: Unique Constraint Violation (Duplicate Key)
 
 ```text
 Msg 2627, Level 14, State 1
@@ -68,9 +104,7 @@ ON tgt.Email = src.Email
 WHEN NOT MATCHED THEN INSERT (EmployeeID, Email) VALUES (src.EmployeeID, src.Email);
 ```
 
----
-
-### Msg 515 — Cannot Insert NULL into NOT NULL Column
+### Msg 515: Cannot Insert NULL into NOT NULL Column
 
 ```text
 Msg 515, Level 16, State 2
@@ -95,7 +129,9 @@ ALTER TABLE dbo.Employees
 
 ## JSON Errors
 
-### Msg 13608 — Property Not Found (Strict Mode)
+### Msg 13608: Property Not Found (Strict Mode)
+
+> [!tip] Fix: switch to `lax` mode (the default) to return NULL instead of an error when the path is missing.
 
 ```text
 Msg 13608, Level 16, State 5
@@ -116,9 +152,7 @@ SELECT JSON_VALUE(@json, 'lax $.age') AS Age;        -- returns NULL
 SELECT JSON_VALUE(@json, 'strict $.name') AS Name;   -- returns 'Alice'
 ```
 
----
-
-### Msg 13609 — JSON Not Properly Formatted
+### Msg 13609: JSON Not Properly Formatted
 
 ```text
 Msg 13609, Level 16, State 2
@@ -139,9 +173,7 @@ ELSE
     PRINT 'Invalid JSON: ' + @raw;
 ```
 
----
-
-### Msg 13610 — JSON_VALUE Returned Object/Array
+### Msg 13610: JSON_VALUE Returned Object/Array
 
 ```text
 Msg 13610, Level 16, State 3
@@ -167,87 +199,11 @@ SELECT JSON_VALUE(@json, '$.person.name') AS PersonName;
 
 ---
 
-## Security & Permissions Errors
-
-### Msg 229 — Permission Denied
-
-```text
-Msg 229, Level 14, State 5
-The EXECUTE permission was denied on the object "usp_GetOrders", database "SalesDB", schema "dbo".
-```
-
-**Cause**: The current user or role does not have the required permission (SELECT, INSERT, EXECUTE, etc.) on the target object.
-
-**Solution**:
-
-```sql
--- Grant specific permission to a user or role
-GRANT EXECUTE ON dbo.usp_GetOrders TO [AppUser];
-
--- Or use a database role for grouped access
-ALTER ROLE db_datareader ADD MEMBER [AppUser];
-
--- Verify current permissions
-SELECT * FROM fn_my_permissions('dbo.usp_GetOrders', 'OBJECT');
-```
-
----
-
-### Msg 297 — EXECUTE AS Impersonation Denied
-
-```text
-Msg 297, Level 16, State 1
-The user does not have permission to perform this action. EXECUTE AS failed.
-```
-
-**Cause**: The caller does not have IMPERSONATE permission on the target login or user, or the target user does not have a server-level login when using `EXECUTE AS LOGIN`.
-
-**Solution**:
-
-```sql
--- Grant IMPERSONATE on the target user
-GRANT IMPERSONATE ON USER::ReportUser TO [AppUser];
-
--- Or use EXECUTE AS OWNER on the stored procedure
--- so callers inherit the owner's permissions without impersonation
-CREATE OR ALTER PROCEDURE dbo.usp_SecureReport
-WITH EXECUTE AS OWNER
-AS
-    SELECT * FROM dbo.SensitiveData;
-```
-
----
-
-### Msg 33280 — Cannot Encrypt Column (Always Encrypted Setup)
-
-```text
-Msg 33280, Level 16, State 0
-Column "SSN" in table "dbo.Patients" is encrypted using Always Encrypted but the encryption key
-has not been provisioned or the driver does not support column encryption.
-```
-
-**Cause**: Querying an Always Encrypted column without a driver that supports column encryption, or without the Column Encryption Key (CEK) available in the key store.
-
-**Solution**:
-
-```sql
--- Verify CMK and CEK exist in the database
-SELECT name, key_store_provider_name
-FROM sys.column_master_keys;
-
-SELECT name, column_master_key_id
-FROM sys.column_encryption_keys;
-
--- In application connection string, enable column encryption:
--- Column Encryption Setting=Enabled;
--- Ensure the client has access to the Azure Key Vault CMK.
-```
-
----
-
 ## Concurrency & Transaction Errors
 
-### Msg 1205 — Deadlock Victim
+### Msg 1205: Deadlock Victim
+
+> [!warning] You'll see this when two sessions hold locks the other needs — the lower-priority session is automatically killed.
 
 ```text
 Msg 1205, Level 13, State 51
@@ -273,9 +229,9 @@ SET DEADLOCK_PRIORITY HIGH;
 ALTER DATABASE SalesDB SET READ_COMMITTED_SNAPSHOT ON;
 ```
 
----
+### Msg 3960: Snapshot Update Conflict
 
-### Msg 3960 — Snapshot Update Conflict
+> [!warning] You'll see this under SNAPSHOT isolation when another transaction modified the same row after your snapshot began.
 
 ```text
 Msg 3960, Level 16, State 2
@@ -301,14 +257,12 @@ BEGIN CATCH
     BEGIN
         IF @@TRANCOUNT > 0 ROLLBACK;
         -- Retry logic or fallback to READ COMMITTED
-        PRINT 'Snapshot conflict — retrying under READ COMMITTED';
+        PRINT 'Snapshot conflict:retrying under READ COMMITTED';
     END
 END CATCH;
 ```
 
----
-
-### Msg 3609 — Transaction Ended in Trigger
+### Msg 3609: Transaction Ended in Trigger
 
 ```text
 Msg 3609, Level 16, State 2
@@ -349,7 +303,7 @@ END CATCH;
 
 ## Performance & Configuration Errors
 
-### Msg 530 — MAXRECURSION Exceeded
+### Msg 530: MAXRECURSION Exceeded
 
 ```text
 Msg 530, Level 16, State 1
@@ -375,9 +329,7 @@ SELECT * FROM OrgHierarchy
 OPTION (MAXRECURSION 500);  -- 0 = unlimited (use with caution)
 ```
 
----
-
-### Msg 8623 — Query Processor Out of Resources
+### Msg 8623: Query Processor Out of Resources
 
 ```text
 Msg 8623, Level 16, State 1
@@ -386,7 +338,7 @@ This is a rare event and only expected for extremely complex queries or queries 
 a very large number of tables or partitions.
 ```
 
-**Cause**: The query optimizer exhausted its internal stack or exceeded complexity thresholds — typically queries joining 16+ tables, deeply nested subqueries, or extremely large IN lists.
+**Cause**: The query optimizer exhausted its internal stack or exceeded complexity thresholds:typically queries joining 16+ tables, deeply nested subqueries, or extremely large IN lists.
 
 **Solution**:
 
@@ -407,9 +359,7 @@ DROP TABLE #CustomerTotals;
 -- to reduce join complexity at query time.
 ```
 
----
-
-### Msg 8645 — Memory Grant Timeout
+### Msg 8645: Memory Grant Timeout
 
 ```text
 Msg 8645, Level 17, State 1
@@ -440,14 +390,14 @@ OPTION (MAX_GRANT_PERCENT = 10);
 
 ## Partitioning Errors
 
-### Msg 4939 — ALTER TABLE SWITCH Failed (Schema Mismatch)
+### Msg 4939: ALTER TABLE SWITCH Failed (Schema Mismatch)
 
 ```text
 Msg 4939, Level 16, State 1
 ALTER TABLE SWITCH statement failed. The table "dbo.Orders_Archive" is not partitioned.
 ```
 
-**Cause**: `ALTER TABLE ... SWITCH` requires the source and target tables to have identical column definitions, indexes, constraints, and partitioning scheme. Any mismatch — including a missing partition function, different filegroup, or extra/missing index — causes this error.
+**Cause**: `ALTER TABLE ... SWITCH` requires the source and target tables to have identical column definitions, indexes, constraints, and partitioning scheme. Any mismatch:including a missing partition function, different filegroup, or extra/missing index:causes this error.
 
 **Solution**:
 
@@ -471,9 +421,85 @@ ALTER TABLE dbo.Orders
 
 ---
 
+## Security & Permissions Errors
+
+### Msg 229: Permission Denied
+
+```text
+Msg 229, Level 14, State 5
+The EXECUTE permission was denied on the object "usp_GetOrders", database "SalesDB", schema "dbo".
+```
+
+**Cause**: The current user or role does not have the required permission (SELECT, INSERT, EXECUTE, etc.) on the target object.
+
+**Solution**:
+
+```sql
+-- Grant specific permission to a user or role
+GRANT EXECUTE ON dbo.usp_GetOrders TO [AppUser];
+
+-- Or use a database role for grouped access
+ALTER ROLE db_datareader ADD MEMBER [AppUser];
+
+-- Verify current permissions
+SELECT * FROM fn_my_permissions('dbo.usp_GetOrders', 'OBJECT');
+```
+
+### Msg 297: EXECUTE AS Impersonation Denied
+
+```text
+Msg 297, Level 16, State 1
+The user does not have permission to perform this action. EXECUTE AS failed.
+```
+
+**Cause**: The caller does not have IMPERSONATE permission on the target login or user, or the target user does not have a server-level login when using `EXECUTE AS LOGIN`.
+
+**Solution**:
+
+```sql
+-- Grant IMPERSONATE on the target user
+GRANT IMPERSONATE ON USER::ReportUser TO [AppUser];
+
+-- Or use EXECUTE AS OWNER on the stored procedure
+-- so callers inherit the owner's permissions without impersonation
+CREATE OR ALTER PROCEDURE dbo.usp_SecureReport
+WITH EXECUTE AS OWNER
+AS
+    SELECT * FROM dbo.SensitiveData;
+```
+
+### Msg 33280: Cannot Encrypt Column (Always Encrypted Setup)
+
+```text
+Msg 33280, Level 16, State 0
+Column "SSN" in table "dbo.Patients" is encrypted using Always Encrypted but the encryption key
+has not been provisioned or the driver does not support column encryption.
+```
+
+**Cause**: Querying an Always Encrypted column without a driver that supports column encryption, or without the Column Encryption Key (CEK) available in the key store.
+
+**Solution**:
+
+```sql
+-- Verify CMK and CEK exist in the database
+SELECT name, key_store_provider_name
+FROM sys.column_master_keys;
+
+SELECT name, column_master_key_id
+FROM sys.column_encryption_keys;
+
+-- In application connection string, enable column encryption:
+-- Column Encryption Setting=Enabled;
+-- Ensure the client has access to the Azure Key Vault CMK.
+```
+
+---
+
 ## Vector & AI Errors
 
 ### Vector Dimension Mismatch
+
+> [!warning] You'll see this when the embedding model used for queries doesn't match the dimension of stored vectors.
 
 ```text
 Msg 4162, Level 16, State 1
@@ -502,8 +528,6 @@ CREATE TABLE dbo.Documents (
     Embedding    VECTOR(1536)   -- matches text-embedding-3-small output
 );
 ```
-
----
 
 ### sp_invoke_external_rest_endpoint HTTP Error / Timeout
 
@@ -535,8 +559,6 @@ BEGIN
 END
 ```
 
----
-
 ### PREDICT Permission Denied
 
 ```text
@@ -544,13 +566,15 @@ Msg 229, Level 14, State 5
 The EXECUTE permission was denied on the object "PREDICT", database "SalesDB", schema "sys".
 ```
 
-**Cause**: The user account does not have the `EXECUTE ANY EXTERNAL SCRIPT` server-level permission required to run `PREDICT` with ONNX models in Azure SQL Managed Instance or SQL Server with Machine Learning Services.
+**Cause**: The user account lacks the necessary database-level permission to run `PREDICT` with ONNX models. In SQL Server on-premises with Machine Learning Services, the `EXECUTE ANY EXTERNAL SCRIPT` server permission is required. In Azure SQL Database / Managed Instance, the permission model is database-scoped.
 
 **Solution**:
 
 ```sql
--- Grant at server level (requires sysadmin)
+-- SQL Server with ML Services: grant server-level permission (requires sysadmin)
 GRANT EXECUTE ANY EXTERNAL SCRIPT TO [MLUser];
+
+-- Azure SQL Database / MI: ensure user has appropriate database role
 
 -- Verify the external model is registered
 SELECT * FROM sys.external_models;
@@ -569,7 +593,7 @@ REVERT;
 
 ## Query Store Errors
 
-### Msg 12429 — Query Store Read-Only Mode
+### Msg 12429: Query Store Read-Only Mode
 
 ```text
 Msg 12429, Level 16, State 1

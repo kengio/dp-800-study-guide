@@ -16,9 +16,26 @@ Retrieval-Augmented Generation (RAG) in Azure SQL Database and Microsoft Fabric 
 `sp_invoke_external_rest_endpoint` to call Azure OpenAI APIs directly from T-SQL.
 The typical pipeline is: **embed query → vector search → retrieve context → call LLM → return answer**.
 
+> [!abstract] What You'll Learn
+> - Database scoped credential setup for Azure OpenAI REST calls
+> - Generating embeddings via sp_invoke_external_rest_endpoint
+> - Building RAG prompts from retrieved document context
+> - End-to-end RAG stored procedure: embed, search, prompt, respond
+
+## Table of Contents
+
+- [[#Database Scoped Credentials Setup]]
+- [[#Generating Embeddings via REST]]
+- [[#Building Prompts from Retrieved Context]]
+- [[#Calling Azure OpenAI Chat Completion]]
+- [[#Parsing and Storing LLM Responses]]
+- [[#End-to-End RAG Stored Procedure]]
+
 ---
 
 ## Database Scoped Credentials Setup
+
+> [!info] Use database scoped credentials to securely store API keys so sp_invoke_external_rest_endpoint can authenticate to Azure OpenAI.
 
 Before calling any external REST endpoint, the database must have a master key and a
 credential that carries the API key as an HTTP header.
@@ -50,12 +67,14 @@ FROM sys.database_scoped_credentials
 WHERE name = 'https://myopenai.openai.azure.com';
 ```
 
-> **Exam note:** The credential name must exactly match the base URL passed to
-> `@url` (the stored procedure resolves it by prefix match).
+> [!tip] Exam Tip
+> The credential name must exactly match the base URL passed to `@url` — the stored procedure resolves credentials by prefix match. A mismatched name silently fails authentication.
 
 ---
 
 ## Generating Embeddings via REST
+
+> [!info] Use the embeddings endpoint to convert text into vectors for storage in VECTOR columns and subsequent similarity search.
 
 Convert a text string into a vector by calling the Azure OpenAI embeddings endpoint.
 The response contains a floating-point array that can be cast to a `VECTOR` column.
@@ -133,9 +152,14 @@ CLOSE doc_cursor;
 DEALLOCATE doc_cursor;
 ```
 
+> [!warning] Watch Out
+> Cursor-based embedding is slow for large datasets and may hit API rate limits. For bulk embedding, consider batching via application code with retry logic and rate-limit awareness.
+
 ---
 
 ## Building Prompts from Retrieved Context
+
+> [!info] Use STRING_AGG to concatenate top-K document chunks into a system message that grounds the LLM response.
 
 After a vector search returns the most relevant document chunks, concatenate them into
 a context string and inject that string into the system message.
@@ -182,6 +206,8 @@ SELECT
 ---
 
 ## Calling Azure OpenAI Chat Completion
+
+> [!info] Use the chat completions endpoint after assembling the context-enriched prompt to generate a natural-language answer.
 
 Use the assembled messages to call a chat completions deployment (e.g., `gpt-4o`).
 
@@ -242,6 +268,8 @@ SELECT @chat_response AS raw_response;
 ---
 
 ## Parsing and Storing LLM Responses
+
+> [!info] Use JSON_VALUE to extract the answer, detect errors, and log the full interaction for auditing and cost tracking.
 
 Extract the generated answer from the response JSON, handle errors, and log the
 full RAG interaction for auditing.
@@ -314,6 +342,8 @@ CREATE TABLE RAGLog (
 ---
 
 ## End-to-End RAG Stored Procedure
+
+> [!info] Use a single stored procedure to encapsulate the complete RAG pipeline for reuse by applications or other procedures.
 
 A complete stored procedure that encapsulates the full RAG pipeline:
 embed the query → vector search → retrieve context → call LLM → return answer.
@@ -431,6 +461,9 @@ EXEC dbo.usp_RAGQuery
     @question = 'How do I create a vector index in Azure SQL?',
     @top_k    = 3;
 ```
+
+> [!tip] Exam Tip
+> `sp_invoke_external_rest_endpoint` is only available in **Azure SQL Database** and **Fabric SQL** — it does not exist in on-premises SQL Server or Azure SQL Managed Instance. The exam tests platform availability.
 
 ---
 

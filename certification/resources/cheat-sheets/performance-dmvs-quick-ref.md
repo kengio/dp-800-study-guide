@@ -13,13 +13,20 @@ tags:
 
 Key Dynamic Management Views (DMVs), diagnostic queries, and performance tuning patterns for Azure SQL Database.
 
+> [!abstract] Quick Reference
+> - DMV reference table for query stats, waits, indexes, locking, and Azure SQL resource usage
+> - Copy-paste diagnostic queries for top CPU, I/O, blocking, and missing indexes
+> - Use when practicing performance tuning scenarios or memorizing key DMV names
+
 ---
 
 ## DMV Reference Table
 
+> [!info] DMVs expose internal engine state — memorize the category groupings to quickly find the right view on the exam.
+
 | DMV | Category | Purpose |
 | :--- | :--- | :--- |
-| `sys.dm_exec_query_stats` | Query | Aggregate query performance stats |
+| ==`sys.dm_exec_query_stats`== | Query | Aggregate query performance stats |
 | `sys.dm_exec_query_plan` | Query | XML execution plan for a plan handle |
 | `sys.dm_exec_sql_text` | Query | SQL text for a sql_handle |
 | `sys.dm_exec_requests` | Session | Currently executing requests |
@@ -39,6 +46,8 @@ Key Dynamic Management Views (DMVs), diagnostic queries, and performance tuning 
 ---
 
 ## Top Queries by CPU
+
+> [!info] This is the single most useful diagnostic query — it identifies which statements consume the most CPU time.
 
 ```sql
 SELECT TOP 20
@@ -65,6 +74,8 @@ ORDER BY AvgCPU_us DESC;
 
 ## Top Queries by Logical Reads (I/O)
 
+> [!info] High logical reads indicate queries scanning more data than necessary — often fixable with better indexes.
+
 ```sql
 SELECT TOP 20
     qs.total_logical_reads / qs.execution_count AS AvgReads,
@@ -86,6 +97,8 @@ ORDER BY AvgReads DESC;
 ---
 
 ## Currently Running Queries
+
+> [!info] Use this query to see what is executing right now, including wait types and blocking relationships.
 
 ```sql
 SELECT
@@ -110,6 +123,8 @@ ORDER BY r.total_elapsed_time DESC;
 ---
 
 ## Wait Statistics
+
+> [!info] Wait stats reveal the bottleneck category — always check waits first before diving into individual queries.
 
 ### Top Waits (Cumulative)
 
@@ -138,16 +153,21 @@ ORDER BY wait_time_ms DESC;
 | Wait Type | Category | Indicates |
 | :--- | :--- | :--- |
 | `CXPACKET` / `CXCONSUMER` | Parallelism | Parallel query waits (often benign) |
-| `PAGEIOLATCH_*` | I/O | Reading pages from disk |
+| ==`PAGEIOLATCH_*`== | I/O | Reading pages from disk |
 | `LCK_M_*` | Locking | Blocked by another session |
 | `SOS_SCHEDULER_YIELD` | CPU | CPU pressure |
 | `WRITELOG` | Transaction log | Log write latency |
 | `RESOURCE_SEMAPHORE` | Memory | Waiting for memory grant |
 | `ASYNC_NETWORK_IO` | Network | Client not consuming results fast enough |
 
+> [!warning] Common Mistake
+> CXPACKET waits alone do not indicate a parallelism problem. They are normal in parallel queries. Only investigate if combined with high LATCH or SOS_SCHEDULER_YIELD waits.
+
 ---
 
 ## Index Analysis
+
+> [!info] Index DMVs help you find missing indexes, unused indexes, and fragmentation levels.
 
 ### Missing Indexes
 
@@ -168,6 +188,9 @@ JOIN sys.dm_db_missing_index_details d
     ON g.index_handle = d.index_handle
 ORDER BY ImprovementScore DESC;
 ```
+
+> [!warning] Common Mistake
+> Missing index DMV suggestions are cumulative since last restart and do not account for write overhead. Always evaluate the trade-off before blindly creating suggested indexes.
 
 ### Index Usage Stats
 
@@ -210,12 +233,17 @@ ORDER BY ips.avg_fragmentation_in_percent DESC;
 | Fragmentation | Action |
 | :--- | :--- |
 | 10-30% | `ALTER INDEX ... REORGANIZE` |
-| > 30% | `ALTER INDEX ... REBUILD` |
+| > 30% | ==`ALTER INDEX ... REBUILD`== |
 | < 10% | No action needed |
+
+> [!tip] Exam Tip
+> Remember the thresholds: REORGANIZE for 10-30% fragmentation, REBUILD for over 30%. In Azure SQL Database, automatic tuning can handle index management, but you still need to know the manual thresholds.
 
 ---
 
 ## Blocking & Deadlocks
+
+> [!info] Blocking chains show which session holds the lock that other sessions are waiting on.
 
 ### Current Blocking Chain
 
@@ -245,6 +273,8 @@ KILL 55;   -- use with caution, rolls back the blocker's transaction
 
 ## Azure SQL Resource Usage
 
+> [!info] dm_db_resource_stats provides CPU, I/O, and memory percentages at 15-second intervals for the last hour.
+
 ```sql
 -- Last hour, 15-second intervals
 SELECT TOP 60
@@ -263,6 +293,8 @@ ORDER BY end_time DESC;
 
 ## Execution Plan Warning Flags
 
+> [!info] These warnings appear in actual execution plans — each one points to a specific optimization opportunity.
+
 | Warning | Meaning | Fix |
 | :--- | :--- | :--- |
 | Missing index hint | Optimizer suggests an index | Evaluate and create if beneficial |
@@ -273,9 +305,14 @@ ORDER BY end_time DESC;
 | Parameter sniffing | Plan compiled for atypical value | OPTION (RECOMPILE), plan guides, OPTIMIZE FOR |
 | Cardinality estimate warning | Row estimate far from actual | Update statistics, use query hints |
 
+> [!tip] Exam Tip
+> Implicit conversions are the most commonly missed performance issue. They occur when comparing mismatched data types (e.g., VARCHAR column filtered with NVARCHAR parameter) and prevent index seeks.
+
 ---
 
 ## Quick Tuning Checklist
+
+> [!info] Follow this sequence to systematically diagnose and resolve performance issues.
 
 1. **Check wait stats** — identify bottleneck category (CPU, I/O, locks, memory)
 2. **Find top queries** — by CPU, reads, or duration

@@ -30,6 +30,9 @@ Quick-reference guides for high-frequency exam topics. Each sheet is designed fo
 - **After completing a topic** — use the sheet to self-test recall
 - **Final review** — read all sheets end-to-end as a refresher
 
+> [!tip] Study Tip
+> Print these cheat sheets or keep them open on a second screen during practice questions. Active recall works best when you attempt the answer first, then check the cheat sheet — avoid reading passively.
+
 ## Key Numbers to Remember
 
 | Item | Value |

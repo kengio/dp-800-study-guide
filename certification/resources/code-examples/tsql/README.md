@@ -13,6 +13,9 @@ This folder contains standalone T-SQL code examples referenced throughout the DP
 
 These examples complement the study notes in `certification/` and are particularly useful for hands-on practice against an Azure SQL Database instance.
 
+> [!tip] How to Practice
+> Run these examples against an **Azure SQL Database** (free tier works) or a **Fabric SQL analytics endpoint**. Most patterns also work in SQL Server 2022+ where noted.
+
 ---
 
 ## Code Example Files

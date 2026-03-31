@@ -12,7 +12,27 @@ tags:
 
 Reusable T-SQL window function patterns for Azure SQL Database and Microsoft Fabric SQL analytics workloads.
 
+> [!abstract] What You'll Learn
+> - Ranking functions: ROW_NUMBER, RANK, DENSE_RANK, NTILE
+> - Aggregate window functions with running totals, moving averages, and contribution percentages
+> - ROWS vs RANGE frame clauses and their behavioral differences
+> - Offset and distribution functions, deduplication, and top-N per group
+
+## Table of Contents
+
+- [[#Ranking Functions]]
+- [[#Aggregate Window Functions]]
+- [[#ROWS vs RANGE Framing]]
+- [[#Offset Functions]]
+- [[#Distribution Functions]]
+- [[#Deduplication with ROW_NUMBER]]
+- [[#Top-N Per Group]]
+
+---
+
 ## Ranking Functions
+
+> [!info] Use ranking functions to assign sequential numbers, handle ties, or create groups within partitions.
 
 Ranking functions assign a numeric rank to each row within a partition. All four variants are commonly tested on DP-800.
 
@@ -79,7 +99,24 @@ FROM Sales
 ORDER BY Region, SaleAmount DESC;
 ```
 
+**Sample output** (4 rows tied at $500 in the East region):
+
+| SaleAmount | RowNum | Rnk | DenseRnk | Quartile |
+|---|---|---|---|---|
+| 500 | 1 | 1 | 1 | 1 |
+| 500 | 2 | 1 | 1 | 1 |
+| 500 | 3 | 1 | 1 | 2 |
+| 500 | 4 | 1 | 1 | 2 |
+| 400 | 5 | **5** | **2** | 3 |
+
+> [!tip] Exam Tip
+> RANK produces gaps after ties (1, 1, **3**) while DENSE_RANK does not (1, 1, **2**). The exam frequently tests which function returns `1,1,3` vs `1,1,2`. ROW_NUMBER always produces unique values regardless of ties.
+
+---
+
 ## Aggregate Window Functions
+
+> [!info] Use aggregate window functions when you need row-level detail alongside group-level summaries without GROUP BY.
 
 Aggregate functions used with OVER() compute values across a window without collapsing rows, unlike GROUP BY.
 
@@ -138,7 +175,11 @@ SELECT
 FROM Sales;
 ```
 
+---
+
 ## ROWS vs RANGE Framing
+
+> [!info] Use an explicit frame clause when the default RANGE behavior with ties would produce unexpected results.
 
 The frame clause controls which rows are included in the window relative to the current row.
 
@@ -197,7 +238,14 @@ FROM Sales;
 -- UNBOUNDED FOLLOWING  = end of partition
 ```
 
+> [!tip] Exam Tip
+> When ORDER BY is present without an explicit frame, the default is `RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` — which includes all ties. Use `ROWS` instead of `RANGE` when you want a physical row-by-row running total.
+
+---
+
 ## Offset Functions
+
+> [!info] Use offset functions to compare values across rows, such as month-over-month change or gap detection.
 
 Offset functions look backward or forward within the ordered partition to compare values across rows.
 
@@ -280,7 +328,17 @@ SELECT
 FROM Orders AS o;
 ```
 
+> [!warning] Watch Out
+> `LAST_VALUE` without an explicit frame only sees up to the current row (the default frame), so it returns the current row's value — not the partition's last value. Always specify `ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING`.
+
+> [!tip] Exam Tip
+> LAST_VALUE requires an explicit `ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING` frame to return the true last value in the partition. Without it, the default frame ends at `CURRENT ROW`.
+
+---
+
 ## Distribution Functions
+
+> [!info] Use distribution functions to compute percentiles, cumulative distributions, or medians within partitions.
 
 Distribution functions compute statistical position of each row within its partition.
 
@@ -329,7 +387,11 @@ FROM Sales
 ORDER BY Region;
 ```
 
-## Deduplication with ROW\_NUMBER
+---
+
+## Deduplication with ROW_NUMBER
+
+> [!info] Use ROW_NUMBER in a CTE to identify and remove duplicate rows while keeping the most recent record.
 
 A classic pattern in Azure SQL and Fabric SQL for removing duplicate rows while keeping the most recent record.
 
@@ -352,7 +414,16 @@ WITH DeduplicatedCustomers AS (
 SELECT *
 FROM DeduplicatedCustomers
 WHERE rn > 1;  -- these are the duplicates that would be deleted
+```
 
+**Sample output** (duplicate rows with `rn > 1`):
+
+| CustomerID | Email | FullName | CreatedDate | rn |
+|---|---|---|---|---|
+| 7 | alice@co.com | Alice Smith | 2025-01-15 | 2 |
+| 3 | alice@co.com | Alice S. | 2024-06-01 | 3 |
+
+```sql
 -- Step 2: DELETE duplicate rows (keep rn = 1 only)
 WITH DeduplicatedCustomers AS (
     SELECT
@@ -384,7 +455,11 @@ FROM (
 WHERE rn = 1;
 ```
 
+---
+
 ## Top-N Per Group
+
+> [!info] Use ROW_NUMBER or RANK in a CTE to return the top N rows per category without correlated subqueries.
 
 A frequently tested pattern: return the top N rows per category without using a correlated subquery.
 

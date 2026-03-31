@@ -13,9 +13,16 @@ tags:
 
 Compact reference for the most frequently tested T-SQL commands on the DP-800 exam.
 
+> [!abstract] Quick Reference
+> - Core DDL (CREATE/ALTER TABLE, indexes, partitioning) and DML (INSERT, UPDATE, DELETE, MERGE) syntax
+> - Window functions, CTEs, APPLY, PIVOT, and control flow patterns
+> - Use during practice questions when you need to quickly verify T-SQL syntax
+
 ---
 
 ## DDL — Data Definition Language
+
+> [!info] DDL commands define and modify database structure — tables, indexes, constraints, and partitions.
 
 ### CREATE TABLE
 
@@ -130,6 +137,8 @@ CREATE TABLE dbo.OrdersPartitioned (
 
 ## DML — Data Manipulation Language
 
+> [!info] DML commands manipulate data — INSERT, UPDATE, DELETE, and MERGE are the core operations.
+
 ### INSERT Patterns
 
 ```sql
@@ -190,9 +199,14 @@ WHEN NOT MATCHED BY SOURCE THEN
 OUTPUT $action, inserted.ProductID, deleted.ProductID;
 ```
 
+> [!tip] Exam Tip
+> MERGE requires a semicolon terminator and always needs an ON clause. The three WHEN clauses (MATCHED, NOT MATCHED BY TARGET, NOT MATCHED BY SOURCE) map to UPDATE, INSERT, and DELETE respectively.
+
 ---
 
 ## Query Patterns
+
+> [!info] These query patterns appear frequently on the exam — especially window functions and CTEs.
 
 ### Window Functions
 
@@ -214,6 +228,9 @@ SELECT
     LEAD(TotalAmount, 1, 0) OVER (PARTITION BY CustomerID ORDER BY OrderDate) AS NextAmt
 FROM dbo.Orders;
 ```
+
+> [!tip] Exam Tip
+> ROW_NUMBER always produces unique values; RANK can produce ties with gaps; DENSE_RANK produces ties without gaps. Know the ROWS vs RANGE framing difference for running totals.
 
 ### Common Table Expressions (CTEs)
 
@@ -260,6 +277,9 @@ OUTER APPLY (
 ) t;
 ```
 
+> [!warning] Common Mistake
+> CROSS APPLY excludes outer rows with no match (like INNER JOIN), while OUTER APPLY includes them with NULLs (like LEFT JOIN). Confusing the two changes your result set.
+
 ### PIVOT / UNPIVOT
 
 ```sql
@@ -277,6 +297,8 @@ PIVOT (
 ---
 
 ## Control Flow
+
+> [!info] Control flow structures manage conditional logic, loops, and error handling in T-SQL batches.
 
 ```sql
 -- IF / ELSE
@@ -311,20 +333,26 @@ END CATCH;
 | Feature | THROW | RAISERROR |
 | :--- | :--- | :--- |
 | Minimum severity | Always 16 | Configurable (0-25) |
-| Honors SET XACT_ABORT | Yes | Only severity >= 16 |
+| Honors SET XACT_ABORT | Yes | Only severity >= 11 |
 | Requires msg_id in sys.messages | No | Yes (with msg_id form) |
 | Terminates batch | Yes (when used without params in CATCH) | Only severity >= 20 |
-| Recommended for new code | Yes | No |
+| Recommended for new code | ==Yes== | No |
+
+> [!warning] Common Mistake
+> THROW without parameters re-raises the current error only inside a CATCH block. Using THROW outside CATCH without parameters causes a syntax error — use THROW with explicit msg_id, message, and state instead.
 
 ---
 
 ## Session & Transaction
 
+> [!info] Session settings control isolation levels, transaction behavior, and error handling for the connection.
+
 ```sql
 -- Set isolation level
 SET TRANSACTION ISOLATION LEVEL READ COMMITTED;        -- default
 SET TRANSACTION ISOLATION LEVEL SNAPSHOT;               -- optimistic, requires DB setting
-SET TRANSACTION ISOLATION LEVEL READ COMMITTED SNAPSHOT; -- via ALTER DATABASE
+-- READ_COMMITTED_SNAPSHOT is not a session-level setting;
+-- enable at the database level: ALTER DATABASE ... SET READ_COMMITTED_SNAPSHOT ON
 
 -- XACT_ABORT: auto-rollback on any error
 SET XACT_ABORT ON;
@@ -343,6 +371,8 @@ COMMIT;
 ---
 
 ## Metadata Queries
+
+> [!info] System catalog views let you inspect table structure, indexes, columns, and foreign keys programmatically.
 
 ```sql
 -- List tables and row counts
@@ -378,6 +408,8 @@ SELECT name, compatibility_level FROM sys.databases;
 
 ## String Functions Cheat Table
 
+> [!info] String functions are commonly tested — pay special attention to STRING_AGG, STRING_SPLIT, and TRANSLATE.
+
 | Function | Example | Result |
 | :--- | :--- | :--- |
 | `LEN()` | `LEN('hello')` | 5 |
@@ -387,7 +419,7 @@ SELECT name, compatibility_level FROM sys.databases;
 | `CHARINDEX()` | `CHARINDEX('ll', 'hello')` | 3 |
 | `REPLACE()` | `REPLACE('hello', 'l', 'r')` | `herro` |
 | `TRANSLATE()` | `TRANSLATE('2+3', '+-', '  ')` | `2 3` |
-| `STRING_AGG()` | `STRING_AGG(Name, ', ')` | Comma-delimited |
+| ==`STRING_AGG()`== | `STRING_AGG(Name, ', ')` | Comma-delimited |
 | `STRING_SPLIT()` | `STRING_SPLIT('a,b,c', ',')` | 3 rows |
 | `TRIM()` | `TRIM('  hi  ')` | `hi` |
 | `FORMAT()` | `FORMAT(1234.5, 'C', 'en-US')` | `$1,234.50` |
@@ -398,11 +430,13 @@ SELECT name, compatibility_level FROM sys.databases;
 
 ## Date Functions Cheat Table
 
+> [!info] Date functions appear in nearly every query scenario — know the difference between DATEPART and DATENAME.
+
 | Function | Example | Notes |
 | :--- | :--- | :--- |
 | `GETDATE()` | Local server time | `DATETIME` |
 | `GETUTCDATE()` | UTC time | `DATETIME` |
-| `SYSUTCDATETIME()` | UTC time | `DATETIME2(7)` — preferred |
+| ==`SYSUTCDATETIME()`== | UTC time | `DATETIME2(7)` — preferred |
 | `DATEADD()` | `DATEADD(DAY, 7, @d)` | Add interval |
 | `DATEDIFF()` | `DATEDIFF(DAY, @start, @end)` | Returns INT |
 | `DATEDIFF_BIG()` | Same, returns BIGINT | For large ranges |

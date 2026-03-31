@@ -11,9 +11,41 @@ tags:
 
 A systematic reference for diagnosing and resolving SQL Server and Azure SQL performance issues.
 
+> [!abstract] TL;DR
+> - Follow the 7-step diagnosis workflow to systematically narrow down performance problems
+> - Key DMV reference table and ready-to-run diagnostic queries for each category
+> - Focus on wait stats analysis, execution plan warnings, and blocking chain resolution — these dominate performance questions on the exam
+
 ---
 
-## 1. Slow Query Diagnosis Workflow
+## Table of Contents
+
+- [[#Slow Query Diagnosis Workflow]]
+- [[#Key DMVs Reference Table]]
+- [[#Wait Stats Analysis]]
+  - [[#Wait Type Reference]]
+  - [[#Top Wait Stats Query]]
+- [[#Execution Plan Warning Signs]]
+- [[#Index Usage Analysis]]
+  - [[#Unused Indexes]]
+  - [[#Missing Indexes]]
+  - [[#Duplicate and Overlapping Indexes]]
+  - [[#Index Fragmentation]]
+- [[#Memory Grant Issues]]
+  - [[#Active Memory Grants]]
+  - [[#Common Fixes]]
+- [[#Blocking Chain Resolution]]
+  - [[#Find the Blocking Chain]]
+  - [[#Identify the Head Blocker]]
+  - [[#Resolution Options]]
+  - [[#Read Committed Snapshot Isolation (RCSI)]]
+
+---
+
+## Slow Query Diagnosis Workflow
+
+> [!tip] Quick Win
+> Start with wait stats — they immediately tell you the category of problem (CPU, I/O, locks, memory) and prevent wasted time investigating the wrong area.
 
 Follow these steps in order. Each step narrows the cause before moving to the next.
 
@@ -51,7 +83,9 @@ ORDER BY wait_time_ms DESC;
 
 ---
 
-## 2. Key DMVs Reference Table
+## Key DMVs Reference Table
+
+> [!info] These 8 DMVs are the most commonly referenced in performance troubleshooting scenarios on the DP-800 exam.
 
 | DMV | Purpose | Key Columns |
 |-----|---------|-------------|
@@ -82,7 +116,7 @@ ORDER BY qs.total_worker_time DESC;
 
 ---
 
-## 3. Wait Stats Analysis
+## Wait Stats Analysis
 
 ### Wait Type Reference
 
@@ -132,7 +166,10 @@ ORDER BY wait_time_ms DESC;
 
 ---
 
-## 4. Execution Plan Warning Signs
+## Execution Plan Warning Signs
+
+> [!tip] Quick Win
+> Key Lookups are the most common plan problem — adding INCLUDE columns to a nonclustered index often eliminates them with minimal effort.
 
 | Warning | What It Means | Fix |
 |---------|--------------|-----|
@@ -159,11 +196,14 @@ ORDER BY qs.total_worker_time DESC;
 
 ---
 
-## 5. Index Usage Analysis
+## Index Usage Analysis
 
 ### Unused Indexes
 
-Unused indexes consume write overhead and storage without benefiting reads. Review before dropping — `dm_db_index_usage_stats` resets on restart.
+> [!warning] Common Mistake
+> `dm_db_index_usage_stats` resets on service restart — don't drop indexes based solely on zero reads if the server recently restarted. Collect data over a full business cycle.
+
+Unused indexes consume write overhead and storage without benefiting reads.
 
 ```sql
 -- Indexes with no user reads since last restart
@@ -265,9 +305,7 @@ ORDER BY ips.avg_fragmentation_in_percent DESC;
 
 ---
 
-## 6. Memory Grant Issues
-
-### Detection
+## Memory Grant Issues
 
 Memory grant problems manifest as `RESOURCE_SEMAPHORE` waits (query queued waiting for a grant) or sort/hash spills in execution plans (granted memory was insufficient). Both stem from inaccurate row estimates.
 
@@ -312,7 +350,7 @@ OPTION (RECOMPILE);
 
 ---
 
-## 7. Blocking Chain Resolution
+## Blocking Chain Resolution
 
 ### Find the Blocking Chain
 
@@ -392,7 +430,7 @@ AND s.session_id NOT IN (
 RCSI eliminates most reader/writer blocking by using row versioning in `tempdb`. It is the recommended baseline for Azure SQL Database (enabled by default) and should be evaluated for on-premises workloads with high read/write contention.
 
 ```sql
--- Enable RCSI (requires brief single-user mode or low activity)
+-- Enable RCSI (Azure SQL: on by default; on-prem SQL Server: requires exclusive database access)
 ALTER DATABASE [YourDatabase]
 SET READ_COMMITTED_SNAPSHOT ON;
 

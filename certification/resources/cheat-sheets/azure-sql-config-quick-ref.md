@@ -14,9 +14,16 @@ tags:
 
 Database configurations, Query Store, Data API Builder (DAB), and sqlpackage for Azure SQL Database.
 
+> [!abstract] Quick Reference
+> - Database scoped configurations, compatibility levels, and Query Store setup
+> - Data API Builder (DAB) configuration, REST/GraphQL endpoints, and sqlpackage actions
+> - Use when reviewing deployment, configuration, or API integration questions
+
 ---
 
 ## Database Configuration Settings
+
+> [!info] Database scoped configurations control optimizer behavior, parallelism, and recovery without server-level access.
 
 ### ALTER DATABASE SCOPED CONFIGURATION
 
@@ -47,7 +54,7 @@ ALTER DATABASE SCOPED CONFIGURATION FOR SECONDARY SET MAXDOP = 4;
 
 | Setting | Default | Exam Relevance |
 | :--- | :--- | :--- |
-| `MAXDOP` | 0 (unlimited) | Parallelism control |
+| ==`MAXDOP`== | 0 (unlimited) | Parallelism control |
 | `LEGACY_CARDINALITY_ESTIMATION` | OFF | Use new CE by default |
 | `PARAMETER_SNIFFING` | ON | Disable for ad-hoc workloads |
 | `QUERY_OPTIMIZER_HOTFIXES` | OFF | Enable for latest optimizer fixes |
@@ -73,9 +80,14 @@ ALTER DATABASE CURRENT SET COMPATIBILITY_LEVEL = 160;  -- SQL Server 2022
 | 140 | SQL Server 2017 | Adaptive joins, interleaved execution |
 | 130 | SQL Server 2016 | Batch mode for columnstore, Query Store |
 
+> [!warning] Common Mistake
+> Changing compatibility level does not upgrade the database engine — it only changes query optimizer behavior. A database at level 150 on SQL Server 2022 still runs on the 2022 engine.
+
 ---
 
 ## Query Store
+
+> [!info] Query Store captures query plans and runtime stats over time — essential for identifying regressions and forcing good plans.
 
 ### Enable / Configure
 
@@ -159,9 +171,14 @@ EXEC sp_query_store_set_hints
 EXEC sp_query_store_clear_hints @query_id = 42;
 ```
 
+> [!tip] Exam Tip
+> Query Store hints let you apply OPTION hints to queries without modifying application code. This is the recommended approach when you cannot change the application's SQL.
+
 ---
 
 ## Transaction Isolation Levels
+
+> [!info] Isolation levels control the trade-off between concurrency and consistency — SNAPSHOT and RCSI use row versioning instead of locks.
 
 ```sql
 -- Set at session level
@@ -174,7 +191,7 @@ SET TRANSACTION ISOLATION LEVEL READ COMMITTED;  -- default
 | READ COMMITTED | No | Yes | Yes | Shared (released after read) |
 | REPEATABLE READ | No | No | Yes | Shared (held to end of txn) |
 | SERIALIZABLE | No | No | No | Range locks |
-| SNAPSHOT | No | No | No | Row versioning (no locks) |
+| ==SNAPSHOT== | No | No | No | Row versioning (no locks) |
 | READ COMMITTED SNAPSHOT | No | Yes | Yes | Row versioning |
 
 ```sql
@@ -188,6 +205,8 @@ ALTER DATABASE CURRENT SET READ_COMMITTED_SNAPSHOT ON;
 ---
 
 ## Data API Builder (DAB)
+
+> [!info] DAB exposes Azure SQL tables and stored procedures as REST and GraphQL endpoints with zero custom code.
 
 REST and GraphQL API layer for Azure SQL, no custom code required.
 
@@ -287,6 +306,8 @@ mutation {
 
 ## sqlpackage — Schema Deployment
 
+> [!info] sqlpackage is the CLI tool for DACPAC/BACPAC operations — know the difference between Extract/Publish and Export/Import.
+
 ### Common Actions
 
 ```bash
@@ -332,11 +353,16 @@ sqlpackage /Action:DeployReport \
 | Use case | CI/CD deployment | Backup / migration |
 | Action: create | Extract | Export |
 | Action: apply | Publish | Import |
-| Incremental | Yes (diff-based) | No (full replace) |
+| Incremental | ==Yes (diff-based)== | No (full replace) |
+
+> [!tip] Exam Tip
+> DACPAC = schema only, incremental deployment (Extract + Publish). BACPAC = schema + data, full replacement (Export + Import). The exam frequently tests which action to use for CI/CD vs migration scenarios.
 
 ---
 
 ## SQL Database Projects
+
+> [!info] SQL Database Projects use .sqlproj files to version-control schema and produce DACPACs during CI/CD builds.
 
 ```bash
 # Build project (creates DACPAC)
@@ -361,6 +387,8 @@ dotnet publish MyProject.sqlproj /p:TargetConnectionString="..."
 ---
 
 ## Change Data Capture (CDC)
+
+> [!info] CDC tracks row-level changes in a system table — the operation codes (1-4) are frequently tested on the exam.
 
 ```sql
 -- Enable CDC on database
@@ -392,6 +420,9 @@ SELECT * FROM cdc.fn_cdc_get_net_changes_dbo_Orders(
 | 2 | Insert |
 | 3 | Update (before) |
 | 4 | Update (after) |
+
+> [!warning] Common Mistake
+> CDC operation code 3 is the "before" image of an update and code 4 is the "after" image. Using fn_cdc_get_net_changes only returns codes 1, 2, and 4 (no before-image rows).
 
 ---
 

@@ -12,9 +12,26 @@ tags:
 
 Common JSON patterns for Azure SQL and Fabric SQL — covering construction, parsing, scalar functions, indexing, and SQL Server 2022+ construction functions.
 
+> [!abstract] What You'll Learn
+> - FOR JSON PATH/AUTO for constructing JSON output from query results
+> - OPENJSON with default and typed schemas for parsing JSON input
+> - JSON_VALUE, JSON_QUERY, JSON_MODIFY, and ISJSON scalar functions
+> - SQL Server 2022+ construction functions and JSON column indexing strategies
+
+## Table of Contents
+
+- [[#FOR JSON — Constructing JSON Output]]
+- [[#OPENJSON — Parsing JSON Input]]
+- [[#JSON Scalar Functions]]
+- [[#JSON Construction Functions (SQL Server 2022 / Azure SQL)]]
+- [[#Strict vs Lax Mode]]
+- [[#Indexing JSON Columns]]
+
 ---
 
 ## FOR JSON — Constructing JSON Output
+
+> [!info] Use FOR JSON to serialize relational query results as JSON for APIs, exports, or downstream processing.
 
 Use `FOR JSON` to serialize query results as JSON. Two modes: `PATH` (explicit) and `AUTO` (inferred from table aliases).
 
@@ -84,6 +101,8 @@ FOR JSON PATH, INCLUDE_NULL_VALUES;
 
 ## OPENJSON — Parsing JSON Input
 
+> [!info] Use OPENJSON to shred incoming JSON strings into relational rows for joining, filtering, or inserting.
+
 `OPENJSON` is a table-valued function that shreds a JSON string into rows. It supports a default schema (three generic columns) or an explicit `WITH` clause for typed output.
 
 ```sql
@@ -92,10 +111,16 @@ FOR JSON PATH, INCLUDE_NULL_VALUES;
 DECLARE @json NVARCHAR(MAX) = '[{"id":1,"amount":100.50},{"id":2,"amount":200.00}]';
 
 SELECT * FROM OPENJSON(@json);
--- key | value                      | type
--- 0   | {"id":1,"amount":100.50}   | 5
--- 1   | {"id":2,"amount":200.00}   | 5
 ```
+
+**Default schema output:**
+
+| key | value | type |
+|---|---|---|
+| 0 | `{"id":1,"amount":100.50}` | 5 (object) |
+| 1 | `{"id":2,"amount":200.00}` | 5 (object) |
+
+> Type values: 0 = null, 1 = string, 2 = number, 3 = boolean, 4 = array, 5 = object.
 
 ```sql
 -- WITH clause: typed columns mapped via JSON path expressions
@@ -145,6 +170,8 @@ WITH (
 
 ## JSON Scalar Functions
 
+> [!info] Use JSON_VALUE for scalar properties, JSON_QUERY for objects/arrays, and JSON_MODIFY to produce updated JSON strings.
+
 Four core functions for reading and modifying JSON values inline.
 
 ```sql
@@ -161,6 +188,9 @@ SELECT JSON_VALUE(@order, '$.id');               -- '1' (always a string)
 SELECT JSON_VALUE(@order, '$.items');            -- NULL — use JSON_QUERY instead
 ```
 
+> [!warning] Watch Out
+> `JSON_VALUE` on an object or array path returns NULL silently (lax mode) or raises an error (strict mode). Use `JSON_QUERY` for objects and arrays.
+
 ```sql
 DECLARE @order NVARCHAR(MAX) =
     '{"id":1,"customer":{"name":"Alice"},"items":[{"sku":"A1","qty":2}]}';
@@ -171,6 +201,9 @@ SELECT JSON_QUERY(@order, '$.customer');         -- {"name":"Alice"}
 SELECT JSON_QUERY(@order, '$.items');            -- [{"sku":"A1","qty":2}]
 SELECT JSON_QUERY(@order, '$.items[0]');         -- {"sku":"A1","qty":2}
 ```
+
+> [!tip] Exam Tip
+> JSON_VALUE returns NULL for objects/arrays; JSON_QUERY returns NULL for scalars. The exam tests which function to use for each data shape. Remember: **VALUE = scalar, QUERY = object/array**.
 
 ```sql
 DECLARE @order NVARCHAR(MAX) =
@@ -190,6 +223,7 @@ SELECT JSON_MODIFY(
 -- items becomes: [{"sku":"A1","qty":2},{"sku":"B2","qty":1}]
 
 -- Setting a path to NULL removes the property (lax mode)
+-- WARNING: this deletes the key, not sets it to JSON null
 SELECT JSON_MODIFY(@order, '$.customer.name', NULL);  -- removes "name" key
 
 -- Chain multiple JSON_MODIFY calls for multiple updates
@@ -200,27 +234,35 @@ SELECT JSON_MODIFY(
 );
 ```
 
+> [!warning] Watch Out
+> `JSON_MODIFY` with NULL in lax mode **removes** the property entirely rather than setting it to JSON `null`. To set a JSON null value, use `CAST('null' AS NVARCHAR(MAX))` as the new value.
+
 ```sql
--- IS_JSON: validates that a string is well-formed JSON; returns 1, 0, or NULL
+-- ISJSON: validates that a string is well-formed JSON; returns 1, 0, or NULL
 -- Use in CHECK constraints and WHERE filters
-SELECT IS_JSON('{"valid":true}');                -- 1
-SELECT IS_JSON('{bad json}');                    -- 0
-SELECT IS_JSON(NULL);                            -- NULL
+SELECT ISJSON('{"valid":true}');                -- 1
+SELECT ISJSON('{bad json}');                    -- 0
+SELECT ISJSON(NULL);                            -- NULL
 
 -- Validate before parsing (avoids runtime errors in OPENJSON)
 SELECT OrderID, LineItemsJSON
 FROM Orders
-WHERE IS_JSON(LineItemsJSON) = 1;
+WHERE ISJSON(LineItemsJSON) = 1;
 
 -- Enforce valid JSON in a column via CHECK constraint
 ALTER TABLE Orders
 ADD CONSTRAINT CK_Orders_LineItemsJSON
-    CHECK (LineItemsJSON IS NULL OR IS_JSON(LineItemsJSON) = 1);
+    CHECK (LineItemsJSON IS NULL OR ISJSON(LineItemsJSON) = 1);
 ```
+
+> [!tip] Exam Tip
+> ISJSON can be used in CHECK constraints to enforce valid JSON on insert/update. This is a common exam pattern for schema-level JSON validation.
 
 ---
 
 ## JSON Construction Functions (SQL Server 2022 / Azure SQL)
+
+> [!info] Use JSON_OBJECT, JSON_ARRAY, and JSON_ARRAYAGG when you need inline JSON construction without FOR JSON.
 
 SQL Server 2022 and Azure SQL Database added `JSON_OBJECT`, `JSON_ARRAY`, `JSON_ARRAYAGG`, and `JSON_OBJECTAGG` for inline JSON construction without `FOR JSON`.
 
@@ -279,6 +321,8 @@ WHERE AppID = 42;
 
 ## Strict vs Lax Mode
 
+> [!info] Use strict mode in ETL and validation pipelines to catch missing paths early; use lax mode in application queries for graceful NULL handling.
+
 JSON path expressions support two modes. Lax is the default; strict raises an error for missing paths or type mismatches.
 
 ```sql
@@ -313,9 +357,14 @@ FROM StagingEvents
 WHERE EventType = 'OrderCreated';
 ```
 
+> [!tip] Exam Tip
+> Lax is the default mode (no prefix needed). Strict mode raises error **13608** ("Property cannot be found") for missing paths. The exam tests whether you know which mode causes errors vs returns NULL.
+
 ---
 
 ## Indexing JSON Columns
+
+> [!info] Use persisted computed columns to make JSON properties indexable when you filter or join on JSON values frequently.
 
 JSON columns are stored as `NVARCHAR(MAX)` and are not natively indexable. Use persisted computed columns to expose individual JSON properties for indexing.
 

@@ -10,6 +10,11 @@ tags:
 
 A reference of key terms and concepts for the DP-800: Developing AI-Enabled Database Solutions exam.
 
+> [!abstract] TL;DR
+> - 79 terms across all three exam domains — Design & Develop, Secure/Optimize/Deploy, and AI Capabilities
+> - Use as a lookup during study when you encounter unfamiliar acronyms or Azure SQL concepts
+> - Terms marked with bold are the ones most frequently tested on the exam
+
 ---
 
 ## A
@@ -45,6 +50,9 @@ A reference of key terms and concepts for the DP-800: Developing AI-Enabled Data
 | **CROSS APPLY** | See APPLY. Returns only rows from the outer table for which the applied expression produces at least one row. |
 | **CTE (Common Table Expression)** | A named temporary result set defined with the `WITH` clause that can be referenced once in the immediately following SELECT, INSERT, UPDATE, DELETE, or MERGE statement. Supports recursion. |
 
+> [!tip] Exam Tip
+> The Always Encrypted key hierarchy: CMK (external store) → CEK (column encryption key) → encrypted column data. The CMK **never** touches the server — that is what makes it safe from DBA access.
+
 ---
 
 ## D
@@ -60,6 +68,9 @@ A reference of key terms and concepts for the DP-800: Developing AI-Enabled Data
 | **DMV (Dynamic Management View)** | A system view in SQL Server prefixed with `sys.dm_` that exposes internal server state, health, and performance metrics useful for monitoring and troubleshooting. |
 | **Dot Product Distance** | A vector similarity metric computed as the sum of element-wise products. Higher values indicate greater similarity; valid for comparing normalized vectors where it is equivalent to cosine similarity. |
 | **Dynamic Data Masking** | A feature that obfuscates sensitive column data in query results for unauthorized users without changing the stored data. Masking rules are defined at the column level and applied at query time. |
+
+> [!tip] Exam Tip
+> DiskANN enables approximate nearest neighbor (ANN) vector search in Azure SQL — if the scenario involves searching millions of vectors, a DiskANN index is required. DDM is **not encryption** — privileged users can still see plaintext. Always Encrypted actually encrypts the data.
 
 ---
 
@@ -213,6 +224,9 @@ A reference of key terms and concepts for the DP-800: Developing AI-Enabled Data
 | **ROWVERSION** | A SQL Server data type that automatically generates a unique binary number incremented with each INSERT or UPDATE in the database, used for optimistic concurrency and change tracking. |
 | **RLS (Row-Level Security)** | A SQL Server feature that controls which rows a user can access in a table by binding security policies with filter and block predicates to the table, enforced transparently at the engine level. |
 
+> [!tip] Exam Tip
+> RCSI is a **database-level** setting that transparently upgrades all READ COMMITTED reads — no app changes needed. Snapshot isolation requires per-transaction `SET TRANSACTION ISOLATION LEVEL SNAPSHOT`. RAG pipeline = embed → store → retrieve (vector search) → generate (LLM). RRF is the standard algorithm for combining full-text + vector results in hybrid search.
+
 ---
 
 ## S
@@ -245,6 +259,9 @@ A reference of key terms and concepts for the DP-800: Developing AI-Enabled Data
 | **TRY_CONVERT** | A T-SQL function that attempts a data type conversion and returns NULL on failure instead of raising an error, providing safe conversion handling without TRY/CATCH blocks. |
 | **TVF (Table-Valued Function)** | A user-defined function that returns a table result set, available as Inline TVF (single SELECT, optimizer-friendly) or Multi-Statement TVF (imperative logic, less optimizable). |
 
+> [!tip] Exam Tip
+> TDE protects data-at-rest (files and backups) with zero app changes. Always Encrypted protects against DBA access using client-side keys. Temporal tables use `FOR SYSTEM_TIME AS OF` for point-in-time queries. Ledger tables use `sp_verify_database_ledger` for tamper-proof cryptographic verification.
+
 ---
 
 ## V
@@ -255,6 +272,9 @@ A reference of key terms and concepts for the DP-800: Developing AI-Enabled Data
 | **VECTOR_DISTANCE** | A T-SQL function that computes the distance between two vector values using a specified metric (cosine, euclidean, dot), enabling similarity scoring in queries. |
 | **VECTOR_SEARCH** | A T-SQL function or capability in Azure SQL that performs approximate nearest neighbor search over a vector column using a DiskANN index, returning the top-K most similar rows. |
 | **Version Store** | A region of tempdb (or the primary filegroup for RCSI in Azure SQL) that stores previous row versions needed by snapshot-based isolation levels and online index operations. |
+
+> [!tip] Exam Tip
+> `VECTOR` is a native Azure SQL data type for storing embeddings. `VECTOR_DISTANCE()` computes similarity (ENN — brute force). `VECTOR_SEARCH()` with a DiskANN index is the efficient path for ANN search at scale. Cosine distance is most common for text embeddings.
 
 ---
 

@@ -12,9 +12,16 @@ tags:
 
 All JSON functions available in Azure SQL Database and SQL Server 2022+, with syntax and examples.
 
+> [!abstract] Quick Reference
+> - All JSON functions: scalar extraction, construction, OPENJSON parsing, and FOR JSON serialization
+> - Lax vs strict mode, JSON indexing strategies, and common JSON manipulation patterns
+> - Use when practicing JSON-related questions or building JSON query patterns
+
 ---
 
 ## JSON Function Summary
+
+> [!info] This table maps every JSON function to its purpose — use it to quickly identify the right function for each scenario.
 
 | Function | Purpose | Returns |
 | :--- | :--- | :--- |
@@ -27,13 +34,15 @@ All JSON functions available in Azure SQL Database and SQL Server 2022+, with sy
 | `JSON_ARRAY()` | Build JSON array | NVARCHAR(MAX) |
 | `JSON_ARRAYAGG()` | Aggregate rows into array | NVARCHAR(MAX) |
 | `JSON_OBJECTAGG()` | Aggregate key-value pairs | NVARCHAR(MAX) |
-| `OPENJSON()` | Parse JSON to rowset | Table |
+| ==`OPENJSON()`== | Parse JSON to rowset | Table |
 | `FOR JSON PATH` | Serialize rows to JSON | NVARCHAR(MAX) |
 | `FOR JSON AUTO` | Serialize rows (auto-nesting) | NVARCHAR(MAX) |
 
 ---
 
 ## Scalar Functions
+
+> [!info] Scalar functions extract, modify, and validate individual values within a JSON document.
 
 ### ISJSON
 
@@ -69,7 +78,8 @@ SELECT JSON_VALUE(@json, 'strict $.customer.phone');
 SELECT JSON_VALUE(@json, '$.items[0].sku');         -- A1
 ```
 
-> **Exam tip:** `JSON_VALUE` returns NVARCHAR(4000). For larger values or objects/arrays, use `JSON_QUERY`.
+> [!tip] Exam Tip
+> `JSON_VALUE` returns NVARCHAR(4000). For larger values or objects/arrays, use `JSON_QUERY`.
 
 ### JSON_QUERY — Extract Object or Array
 
@@ -88,9 +98,12 @@ SELECT JSON_QUERY(@json, '$.customer.name');        -- NULL
 
 | Scenario | JSON_VALUE | JSON_QUERY |
 | :--- | :--- | :--- |
-| Scalar (string, number) | Returns value | NULL |
+| Scalar (string, number) | ==Returns value== | NULL |
 | Object `{}` | NULL | Returns object |
 | Array `[]` | NULL | Returns array |
+
+> [!warning] Common Mistake
+> Using JSON_VALUE to extract an object or array returns NULL (not an error) in lax mode. Use JSON_QUERY for objects/arrays and JSON_VALUE only for scalars.
 
 ### JSON_MODIFY — Update JSON
 
@@ -119,6 +132,9 @@ SELECT JSON_MODIFY(@doc, '$.address', JSON_QUERY('{"city":"Seattle"}'));
 -- {"name":"Alice","age":30,"address":{"city":"Seattle"}}
 ```
 
+> [!warning] Common Mistake
+> When inserting a JSON object with JSON_MODIFY, wrap the value in JSON_QUERY() to avoid double-escaping. Without JSON_QUERY, the object is treated as a plain string and gets escaped.
+
 ### JSON_PATH_EXISTS
 
 ```sql
@@ -129,6 +145,8 @@ SELECT JSON_PATH_EXISTS(@json, '$.customer.phone');  -- 0
 ---
 
 ## Construction Functions (SQL Server 2022+ / Azure SQL)
+
+> [!info] Construction functions (SQL Server 2022+) build JSON objects and arrays directly in T-SQL without string concatenation.
 
 ### JSON_OBJECT
 
@@ -179,6 +197,8 @@ FROM dbo.Customers;
 
 ## OPENJSON — Parse JSON to Rows
 
+> [!info] OPENJSON shreds JSON into a relational rowset — it is the primary tool for importing and querying JSON data.
+
 ### Default Schema (key/value/type)
 
 ```sql
@@ -212,6 +232,9 @@ WITH (
 );
 ```
 
+> [!tip] Exam Tip
+> Use `AS JSON` in the WITH clause to preserve nested JSON as a string column. Without it, OPENJSON tries to extract a scalar and returns NULL for objects/arrays.
+
 ### Nested OPENJSON with CROSS APPLY
 
 ```sql
@@ -228,6 +251,8 @@ WHERE o.OrderDate > '2025-01-01';
 ---
 
 ## FOR JSON — Serialize to JSON
+
+> [!info] FOR JSON serializes query results into JSON output — PATH gives you full control, AUTO infers nesting from joins.
 
 ### FOR JSON PATH
 
@@ -257,6 +282,8 @@ FOR JSON AUTO;
 
 ## Indexing JSON Columns
 
+> [!info] JSON columns cannot be indexed directly — use computed columns with JSON_VALUE to enable index-based lookups.
+
 ```sql
 -- Computed column + index for fast JSON scalar lookups
 ALTER TABLE dbo.Customers
@@ -274,15 +301,19 @@ WHERE JSON_VALUE(ProfileData, '$.email') = 'alice@example.com';
 
 ## Strict vs Lax Mode Summary
 
+> [!info] Mode selection determines whether missing paths return NULL silently or raise an error.
+
 | Behavior | Lax (default) | Strict |
 | :--- | :--- | :--- |
-| Path not found | Returns NULL | Raises error |
+| Path not found | ==Returns NULL== | Raises error |
 | Type mismatch (e.g., JSON_VALUE on object) | Returns NULL | Raises error |
 | Syntax | `$.path` | `strict $.path` |
 
 ---
 
 ## Common Patterns
+
+> [!info] These patterns combine multiple JSON functions for real-world scenarios commonly tested on the exam.
 
 ### Validate before INSERT
 

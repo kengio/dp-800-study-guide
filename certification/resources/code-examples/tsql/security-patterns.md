@@ -16,7 +16,26 @@ tags:
 T-SQL patterns for implementing Row-Level Security, Dynamic Data Masking, permissions,
 ownership chaining, and Always Encrypted — all exam-relevant for DP-800 Domain 2.
 
+> [!abstract] What You'll Learn
+> - Row-Level Security with filter and block predicates for multi-tenant isolation
+> - Dynamic Data Masking with all four masking functions
+> - Permission management patterns with GRANT, DENY, REVOKE, and roles
+> - Ownership chaining and Always Encrypted key hierarchy
+
+## Table of Contents
+
+- [[#Row-Level Security — Filter Predicates]]
+- [[#Row-Level Security — Block Predicates]]
+- [[#Dynamic Data Masking]]
+- [[#Permission Management — GRANT / DENY / REVOKE]]
+- [[#Ownership Chaining]]
+- [[#Always Encrypted — Key Hierarchy]]
+
+---
+
 ## Row-Level Security — Filter Predicates
+
+> [!info] Use filter predicates to silently restrict row visibility per user or tenant without changing application queries.
 
 Filter predicates silently restrict which rows a user can read (SELECT) or write (INSERT/UPDATE/DELETE).
 The predicate function returns a table; rows are included only when the function returns a row.
@@ -82,7 +101,14 @@ SELECT * FROM dbo.Orders;   -- returns only TenantID = 42 rows
 REVERT;                     -- always revert after testing
 ```
 
+> [!warning] Watch Out
+> Filter predicates fail silently (return 0 rows instead of an error). Always test with `EXECUTE AS` to verify the predicate returns the correct rows for each user context.
+
+---
+
 ## Row-Level Security — Block Predicates
+
+> [!info] Use block predicates to prevent users from writing rows that violate the security policy.
 
 Block predicates prevent write operations that violate the security policy.
 They complement filter predicates, which only restrict reads.
@@ -128,7 +154,11 @@ DROP SECURITY POLICY dbo.TenantPolicy;
 -- Filter violations return 0 rows silently — no error is raised.
 ```
 
+---
+
 ## Dynamic Data Masking
+
+> [!info] Use DDM to obfuscate sensitive column values for unprivileged users without changing stored data.
 
 Dynamic Data Masking (DDM) obfuscates sensitive column values for unprivileged users.
 Privileged users (db_owner, users granted UNMASK) always see the real data.
@@ -192,7 +222,23 @@ REVERT;
 -- Determined users with ALTER TABLE permission can remove masks — use RLS + DDM together.
 ```
 
+**Masked output** (as `low_priv_user`):
+
+| CustomerID | Name | Email | Phone | CreditScore |
+|---|---|---|---|---|
+| 1 | XXXX | jXXX@XXXX.com | 04XXX-XXXX-78 | 617 |
+
+> [!warning] Watch Out
+> DDM can be bypassed by users with `db_owner` or `ALTER TABLE` permissions — they can simply remove masks. Combine DDM with RLS for defense in depth.
+
+> [!tip] Exam Tip
+> DDM does **not** encrypt data at rest — it only alters query result presentation. Users with ALTER TABLE can remove masks. The exam tests awareness of this limitation.
+
+---
+
 ## Permission Management — GRANT / DENY / REVOKE
+
+> [!info] Use GRANT/DENY/REVOKE to control object and schema-level access, remembering that DENY always overrides GRANT.
 
 The T-SQL permission model: GRANT gives access, DENY explicitly refuses access (overrides GRANT),
 REVOKE removes a previously granted or denied permission (neither allows nor denies).
@@ -243,7 +289,14 @@ SELECT * FROM fn_my_permissions('dbo.Orders', 'OBJECT');    -- current user, obj
 SELECT HAS_PERMS_BY_NAME('dbo.Orders', 'OBJECT', 'SELECT'); -- 1 = yes, 0 = no
 ```
 
+> [!tip] Exam Tip
+> DENY **always** overrides GRANT, even through role membership. If a user's role has GRANT SELECT but the user has DENY SELECT, the DENY wins. The exam tests this precedence order.
+
+---
+
 ## Ownership Chaining
+
+> [!info] Use ownership chaining to avoid granting direct table permissions when stored procedures and tables share the same owner.
 
 Ownership chaining allows SQL Server to skip intermediate permission checks when all objects
 in a call chain share the same owner. When the owner changes, the chain breaks and explicit
@@ -291,7 +344,11 @@ GO
 -- 'username':       permission checks use the named user's context
 ```
 
+---
+
 ## Always Encrypted — Key Hierarchy
+
+> [!info] Use Always Encrypted when the database engine and DBAs must never see plaintext values — only client applications with the CMK can decrypt.
 
 Always Encrypted protects sensitive columns so that only client applications with access to
 the Column Master Key (CMK) can read plaintext values. The database engine and DBAs see only
@@ -360,7 +417,7 @@ CREATE TABLE dbo.Patients (
             COLUMN_ENCRYPTION_KEY = MyCEK
         ),
 
-    -- Deterministic on an INT: supports equality and range queries via parameterized queries
+    -- Deterministic on an INT: supports equality queries via parameterized queries (not range queries)
     DiagnosisCode INT
         ENCRYPTED WITH (
             ENCRYPTION_TYPE       = DETERMINISTIC,
@@ -386,6 +443,9 @@ WHERE SSN = @ssn;   -- parameterized query — driver handles encryption transpa
 -- Done via SSMS wizard or PowerShell (Invoke-SqlColumnMasterKeyRotation).
 -- No schema changes needed for the table columns.
 ```
+
+> [!tip] Exam Tip
+> DETERMINISTIC encryption supports equality predicates (`=`, `IN`, `JOIN`) but **not** range queries (`>`, `<`, `BETWEEN`). RANDOMIZED encryption supports **neither** — it is display-only. The exam tests which operations each encryption type allows.
 
 ---
 

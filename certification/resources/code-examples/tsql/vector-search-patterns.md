@@ -13,7 +13,26 @@ tags:
 
 T-SQL patterns for vector storage, similarity search, DiskANN indexing, and hybrid search with Reciprocal Rank Fusion (RRF). Relevant to DP-800 Domain 3 (AI capabilities).
 
+> [!abstract] What You'll Learn
+> - VECTOR data type storage and metadata functions (VECTOR_NORMALIZE, VECTORPROPERTY)
+> - VECTOR_DISTANCE with cosine, dot product, and euclidean metrics
+> - Approximate nearest neighbor search with DiskANN indexes and VECTOR_SEARCH
+> - Hybrid search combining vector and full-text search with Reciprocal Rank Fusion (RRF)
+
+## Table of Contents
+
+- [[#Vector Data Type and Storage]]
+- [[#Vector Distance Functions]]
+- [[#Approximate Nearest Neighbor (ANN) with DiskANN]]
+- [[#Full-Text Search Setup]]
+- [[#Hybrid Search with Reciprocal Rank Fusion (RRF)]]
+- [[#Similarity Score Conversion]]
+
+---
+
 ## Vector Data Type and Storage
+
+> [!info] Use the VECTOR data type to store embedding arrays directly in Azure SQL or Fabric SQL columns.
 
 ```sql
 -- Create a table with a VECTOR column for storing embeddings
@@ -52,7 +71,14 @@ FROM Documents
 WHERE doc_id = 1;
 ```
 
+> [!warning] Watch Out
+> The VECTOR column dimension must match the embedding model's output dimension (e.g., 1536 for text-embedding-ada-002 and text-embedding-3-small). Mismatched dimensions cause runtime errors on INSERT or UPDATE.
+
+---
+
 ## Vector Distance Functions
+
+> [!info] Use VECTOR_DISTANCE to compute similarity between a query vector and stored embeddings for nearest-neighbor retrieval.
 
 ```sql
 -- VECTOR_DISTANCE(metric, vector1, vector2) — returns a FLOAT distance value
@@ -91,6 +117,9 @@ ORDER BY euclidean_dist ASC;
 | `dot` | Pre-normalized vectors | Same result as cosine, slightly faster |
 | `euclidean` | Image / spatial data | Sensitive to vector magnitude |
 
+> [!tip] Exam Tip
+> Cosine distance is the default and best choice for text embeddings. Dot product requires pre-normalized vectors (use VECTOR_NORMALIZE first). The exam tests which metric to use for text vs image scenarios.
+
 ```sql
 -- Full example: exact nearest neighbor (ENN) — top-5 most similar documents
 -- ENN performs a full table scan; accurate but slow on large tables
@@ -105,7 +134,11 @@ ORDER BY distance ASC;
 -- Note: no WHERE clause needed; ORDER BY + TOP gives nearest neighbors
 ```
 
+---
+
 ## Approximate Nearest Neighbor (ANN) with DiskANN
+
+> [!info] Use DiskANN indexes and VECTOR_SEARCH when exact search is too slow on large datasets.
 
 ```sql
 -- DiskANN is a disk-resident ANN index optimized for large vector datasets
@@ -141,6 +174,12 @@ ORDER BY v.distance ASC;
 -- │ + DiskANN index)    │ — very fast  │ approximate   │
 -- └─────────────────────┴──────────────┴───────────────┘
 -- Use ANN for production; ENN only for small datasets or ground-truth testing
+```
+
+> [!tip] Exam Tip
+> `VECTOR_SEARCH` requires a DiskANN index and returns **approximate** results. `ORDER BY VECTOR_DISTANCE` performs **exact** (ENN) search with no index required. The exam tests when to use each approach.
+
+```sql
 
 -- ANN search with a JOIN to retrieve full document data
 DECLARE @query_vector VECTOR(1536) = '[0.021, -0.015, 0.093, ...]';
@@ -155,7 +194,11 @@ JOIN Documents d ON v.doc_id = d.doc_id
 ORDER BY v.distance ASC;
 ```
 
+---
+
 ## Full-Text Search Setup
+
+> [!info] Use full-text indexes as the keyword leg of hybrid search to catch exact terms that embeddings may miss.
 
 ```sql
 -- Full-text search (FTS) is required for the text leg of hybrid search
@@ -193,7 +236,11 @@ JOIN Documents d ON ct.[KEY] = d.doc_id
 ORDER BY ct.RANK DESC;
 ```
 
+---
+
 ## Hybrid Search with Reciprocal Rank Fusion (RRF)
+
+> [!info] Use Reciprocal Rank Fusion to merge vector and keyword ranked lists without normalizing raw scores.
 
 Hybrid search combines vector similarity (semantic) with full-text keyword search. Vector search captures meaning; full-text catches exact terms that embeddings may miss. **Reciprocal Rank Fusion (RRF)** merges the two ranked lists without needing to normalize raw scores.
 
@@ -257,7 +304,11 @@ DECLARE @text_weight   FLOAT = 0.3;
 --   @text_weight   * ISNULL(1.0 / (@k + text_rank),   0)
 ```
 
+---
+
 ## Similarity Score Conversion
+
+> [!info] Use distance-to-similarity conversions when you need intuitive threshold-based filtering.
 
 ```sql
 -- Raw VECTOR_DISTANCE values are distances (lower = closer).
@@ -296,6 +347,9 @@ ORDER BY euclidean_similarity DESC;
 -- │ euclidean    │ 1 / (1 + distance)                   │ (0, 1]            │
 -- └──────────────┴──────────────────────────────────────┴───────────────────┘
 ```
+
+> [!tip] Exam Tip
+> Cosine similarity = `1 - cosine distance`. The exam may test the conversion formula and the fact that VECTOR_DISTANCE returns a **distance** (lower = more similar), not a similarity score.
 
 ---
 

@@ -14,9 +14,16 @@ tags:
 
 Encryption, masking, row-level security, permissions, and auditing for Azure SQL Database.
 
+> [!abstract] Quick Reference
+> - Encryption methods (TDE, Always Encrypted, column-level), Dynamic Data Masking, and Row-Level Security
+> - Permissions model (GRANT/DENY/REVOKE), database roles, and auditing setup
+> - Use when reviewing security scenarios or comparing encryption approaches on the exam
+
 ---
 
 ## Encryption Methods Comparison
+
+> [!info] The exam tests your ability to choose the right encryption method based on threat model and application requirements.
 
 | Feature | TDE | Always Encrypted | Column-Level (ENCRYPTBYKEY) |
 | :--- | :--- | :--- | :--- |
@@ -25,13 +32,15 @@ Encryption, masking, row-level security, permissions, and auditing for Azure SQL
 | Data encrypted at rest | Yes | Yes | Yes |
 | Data encrypted in transit | No (use TLS) | Yes | No |
 | Data encrypted in memory | No | Yes | No |
-| Server can see plaintext | Yes | No | Yes |
+| Server can see plaintext | Yes | ==No== | Yes |
 | Performance impact | Low | Medium | Medium |
 | Key management | Service-managed or BYOK | Column master key (client-side) | Symmetric/asymmetric keys |
 
 ---
 
 ## Transparent Data Encryption (TDE)
+
+> [!info] TDE encrypts the entire database at rest with zero application changes — it is enabled by default on Azure SQL.
 
 ```sql
 -- Check TDE status
@@ -51,9 +60,11 @@ Encryption states: 0=unencrypted, 1=unencrypted (key present), 2=encrypting, 3=e
 
 ## Always Encrypted
 
+> [!info] Always Encrypted keeps data encrypted end-to-end — the server never sees plaintext, making it ideal for sensitive columns.
+
 ### Key Hierarchy
 
-```
+```text
 Column Master Key (CMK) → stored in Azure Key Vault / cert store / CNG
     └── Column Encryption Key (CEK) → encrypted by CMK, stored in DB metadata
         └── Column data → encrypted by CEK
@@ -99,8 +110,11 @@ CREATE TABLE dbo.Patients (
 
 | Type | Equality search | Range search | Sorting | GROUP BY |
 | :--- | :--- | :--- | :--- | :--- |
-| Deterministic | Yes | No | No | Yes |
+| ==Deterministic== | Yes | No | No | Yes |
 | Randomized | No | No | No | No |
+
+> [!tip] Exam Tip
+> Deterministic encryption allows equality comparisons and GROUP BY but not range queries. If you need range comparisons or sorting, you must use Always Encrypted with secure enclaves.
 
 ### Always Encrypted with Secure Enclaves
 
@@ -111,6 +125,8 @@ CREATE TABLE dbo.Patients (
 ---
 
 ## Dynamic Data Masking (DDM)
+
+> [!info] DDM hides sensitive data from non-privileged users at query time without changing stored values.
 
 ### Masking Functions
 
@@ -155,11 +171,14 @@ GRANT UNMASK ON dbo.Employees(Salary) TO [HRUser];
 REVOKE UNMASK FROM [ReportUser];
 ```
 
-> **Exam tip:** `UNMASK` is not column-level in earlier versions. Granular unmask requires SQL Server 2022+ or Azure SQL.
+> [!tip] Exam Tip
+> `UNMASK` is not column-level in earlier versions. Granular unmask requires SQL Server 2022+ or Azure SQL.
 
 ---
 
 ## Row-Level Security (RLS)
+
+> [!info] RLS uses inline table-valued functions as predicates to transparently filter rows per user or tenant.
 
 ### Setup Pattern
 
@@ -184,6 +203,9 @@ WITH (STATE = ON, SCHEMABINDING = ON);
 -- 3. Set session context in application
 EXEC sp_set_session_context @key = N'TenantID', @value = 42;
 ```
+
+> [!warning] Common Mistake
+> FILTER predicates silently exclude rows (no error), while BLOCK predicates raise an error on write. Forgetting to add BLOCK predicates means users can insert rows they cannot later see.
 
 ### Predicate Types
 
@@ -213,6 +235,8 @@ SELECT * FROM sys.security_predicates;
 
 ## Permissions
 
+> [!info] The GRANT/DENY/REVOKE model controls access at object, schema, and database levels — DENY always wins.
+
 ### GRANT / DENY / REVOKE
 
 ```sql
@@ -227,7 +251,12 @@ GRANT SELECT ON dbo.Orders TO [TeamLead] WITH GRANT OPTION;
 
 -- DENY overrides GRANT
 DENY SELECT ON dbo.Employees(Salary) TO [AppUser];
+```
 
+> [!warning] Common Mistake
+> DENY always overrides GRANT, even through role membership. If a user is in db_datareader but has a DENY on a specific table, the DENY wins.
+
+```sql
 -- REVOKE removes both GRANT and DENY
 REVOKE SELECT ON dbo.Orders FROM [AppUser];
 ```
@@ -247,7 +276,7 @@ GRANT EXECUTE ON SCHEMA::dbo TO [AppUser];
 | Role | Permissions |
 | :--- | :--- |
 | `db_owner` | Full control |
-| `db_datareader` | SELECT on all tables/views |
+| ==`db_datareader`== | SELECT on all tables/views |
 | `db_datawriter` | INSERT, UPDATE, DELETE on all tables |
 | `db_ddladmin` | DDL statements (CREATE, ALTER, DROP) |
 | `db_securityadmin` | Manage role membership and permissions |
@@ -277,6 +306,8 @@ CREATE USER [user@contoso.com] FROM EXTERNAL PROVIDER;
 ---
 
 ## Auditing
+
+> [!info] Auditing tracks who accessed what data and when — Azure SQL sends audit logs to blob storage, Log Analytics, or Event Hub.
 
 ### Azure SQL Auditing
 
@@ -317,6 +348,8 @@ FROM sys.fn_get_audit_file('C:\Audits\*.sqlaudit', DEFAULT, DEFAULT);
 ---
 
 ## Security Best Practices Summary
+
+> [!info] This table maps each security principle to its concrete implementation in Azure SQL.
 
 | Practice | Implementation |
 | :--- | :--- |
