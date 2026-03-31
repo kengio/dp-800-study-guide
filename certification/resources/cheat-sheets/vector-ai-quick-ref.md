@@ -206,7 +206,7 @@ ORDER BY ft.RANK DESC;
 
 > [!info] Hybrid search combines vector and full-text results using Reciprocal Rank Fusion for better relevance than either alone.
 
-Reciprocal Rank Fusion (RRF) combines rankings from multiple search methods.
+**Reciprocal Rank Fusion** (RRF) combines rankings from multiple search methods.
 
 ```sql
 -- Step 1: Vector search results

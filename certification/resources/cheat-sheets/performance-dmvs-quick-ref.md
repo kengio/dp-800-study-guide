@@ -11,7 +11,7 @@ tags:
 
 # Performance & DMVs — Quick Reference
 
-Key Dynamic Management Views (DMVs), diagnostic queries, and performance tuning patterns for Azure SQL Database.
+Key **Dynamic Management Views** (DMVs), diagnostic queries, and performance tuning patterns for Azure SQL Database.
 
 > [!abstract] Quick Reference
 > - DMV reference table for query stats, waits, indexes, locking, and Azure SQL resource usage
@@ -301,7 +301,7 @@ ORDER BY end_time DESC;
 | Key Lookup | Bookmark lookup to clustered index | Add INCLUDE columns to nonclustered index |
 | Sort with spill | Sort exceeded memory grant | Update statistics, increase memory grant |
 | Hash match spill | Hash join exceeded memory grant | Update statistics, add index |
-| Implicit conversion | Data type mismatch in join/filter | Fix column types or cast explicitly |
+| ==Implicit conversion== | Data type mismatch in join/filter | Fix column types or cast explicitly |
 | Parameter sniffing | Plan compiled for atypical value | OPTION (RECOMPILE), plan guides, OPTIMIZE FOR |
 | Cardinality estimate warning | Row estimate far from actual | Update statistics, use query hints |
 

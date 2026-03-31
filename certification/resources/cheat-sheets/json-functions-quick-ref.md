@@ -197,7 +197,7 @@ FROM dbo.Customers;
 
 ## OPENJSON — Parse JSON to Rows
 
-> [!info] OPENJSON shreds JSON into a relational rowset — it is the primary tool for importing and querying JSON data.
+> [!info] **OPENJSON** shreds JSON into a relational rowset — it is the primary tool for importing and querying JSON data.
 
 ### Default Schema (key/value/type)
 

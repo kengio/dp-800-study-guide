@@ -206,7 +206,7 @@ OUTPUT $action, inserted.ProductID, deleted.ProductID;
 
 ## Query Patterns
 
-> [!info] These query patterns appear frequently on the exam — especially window functions and CTEs.
+> [!info] These query patterns appear frequently on the exam — especially **window functions** and CTEs.
 
 ### Window Functions
 

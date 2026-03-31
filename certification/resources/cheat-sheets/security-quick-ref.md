@@ -126,7 +126,7 @@ CREATE TABLE dbo.Patients (
 
 ## Dynamic Data Masking (DDM)
 
-> [!info] DDM hides sensitive data from non-privileged users at query time without changing stored values.
+> [!info] **Dynamic Data Masking** hides sensitive data from non-privileged users at query time without changing stored values.
 
 ### Masking Functions
 
@@ -211,7 +211,7 @@ EXEC sp_set_session_context @key = N'TenantID', @value = 42;
 
 | Predicate | Effect |
 | :--- | :--- |
-| FILTER | Silently filters rows from SELECT, UPDATE, DELETE |
+| FILTER | ==Silently filters rows from SELECT, UPDATE, DELETE== |
 | BLOCK AFTER INSERT | Prevents inserting rows that fail predicate |
 | BLOCK AFTER UPDATE | Prevents updating rows to values that fail predicate |
 | BLOCK BEFORE UPDATE | Prevents updating rows that currently fail predicate |

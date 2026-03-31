@@ -87,7 +87,7 @@ ALTER DATABASE CURRENT SET COMPATIBILITY_LEVEL = 160;  -- SQL Server 2022
 
 ## Query Store
 
-> [!info] Query Store captures query plans and runtime stats over time — essential for identifying regressions and forcing good plans.
+> [!info] **Query Store** captures query plans and runtime stats over time — essential for identifying regressions and forcing good plans.
 
 ### Enable / Configure
 
@@ -419,7 +419,7 @@ SELECT * FROM cdc.fn_cdc_get_net_changes_dbo_Orders(
 | 1 | Delete |
 | 2 | Insert |
 | 3 | Update (before) |
-| 4 | Update (after) |
+| 4 | ==Update (after)== |
 
 > [!warning] Common Mistake
 > CDC operation code 3 is the "before" image of an update and code 4 is the "after" image. Using fn_cdc_get_net_changes only returns codes 1, 2, and 4 (no before-image rows).
