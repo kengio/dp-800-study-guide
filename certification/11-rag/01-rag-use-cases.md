@@ -13,7 +13,7 @@ tags:
 
 ## Overview
 
-Retrieval-Augmented Generation (RAG) grounds large language model (LLM) responses in data from a database, preventing hallucinations and providing up-to-date, accurate answers. Rather than relying on what the model "knows" from training, RAG retrieves relevant context from a trusted data source and includes it in the prompt. SQL Database in Fabric and Azure SQL are natural RAG backends because they store both structured data and embeddings in one place.
+Retrieval-Augmented Generation (RAG) grounds large language model (LLM) responses in data from a database, preventing **hallucinations** and providing up-to-date, accurate answers. Rather than relying on what the model "knows" from training, RAG retrieves relevant context from a trusted data source and includes it in the prompt. SQL Database in Fabric and Azure SQL are natural RAG backends because they store both structured data and embeddings in one place.
 
 > [!abstract]
 > - Covers the RAG pattern (Retrieve-Augment-Generate), use cases, and Azure SQL as a RAG backend
@@ -24,6 +24,8 @@ Retrieval-Augmented Generation (RAG) grounds large language model (LLM) response
 > - RAG pattern: (1) embed user query → (2) search DB with VECTOR_SEARCH + CONTAINS → (3) retrieve top-K chunks → (4) build prompt → (5) call LLM → (6) return grounded response
 > - **Grounding ≠ fine-tuning** — RAG injects context at inference time; the model's weights are not changed
 > - Azure SQL is a natural RAG backend: stores both structured data AND vector embeddings in one database
+
+---
 
 ## The RAG Pattern
 
@@ -55,15 +57,19 @@ User Question
 └────────────────────────────────────────────────┘
 ```
 
+---
+
 ## Grounding Benefits
 
 | Without RAG | With RAG |
 | :--- | :--- |
-| LLM may hallucinate facts | Answers grounded in actual database records |
+| LLM may hallucinate facts | ==Answers grounded in actual database records== |
 | Knowledge cutoff from training | Uses current data (pricing, inventory, policies) |
 | No access to proprietary data | Can reference internal documents, customer records |
 | Generic responses | Specific, personalized responses |
 | No citation possible | Can cite the source documents used |
+
+---
 
 ## RAG Use Cases
 
@@ -164,6 +170,8 @@ Generate:
    followed by smart watches at 6.1%..."
 ```
 
+---
+
 ## Structured vs Unstructured Data in RAG
 
 ### Unstructured Data (Documents, Articles)
@@ -206,6 +214,8 @@ WHERE r.ProductId IN (1, 7, 23)
   AND VECTOR_DISTANCE('cosine', r.Embedding, @query_vector) < 0.3;
 ```
 
+---
+
 ## Multi-Turn RAG (Conversational)
 
 For multi-turn conversations, include conversation history in the prompt:
@@ -234,6 +244,8 @@ WHERE SessionId = @session_id
 
 -- Include in message array: [system, ...history, user_current]
 ```
+
+---
 
 ## Architecture Patterns
 
@@ -273,6 +285,8 @@ Top results → LLM via Azure OpenAI
 
 Advantages: Managed search service with built-in RRF; scales independently of database
 
+---
+
 ## Use Cases
 
 | Use Case | Data Type | Search Type | Latency Target |
@@ -283,6 +297,8 @@ Advantages: Managed search service with built-in RRF; scales independently of da
 | Analytics summary | Structured tables | SQL query only | < 5 seconds |
 | Customer history | Structured | SQL (exact match on IDs) | < 1 second |
 
+---
+
 ## Common Issues & Errors
 
 | Issue | Cause | Fix |
@@ -291,7 +307,9 @@ Advantages: Managed search service with built-in RRF; scales independently of da
 | LLM "makes up" information | Context doesn't contain the answer | Add "Only answer from the provided context. Say I don't know if not found." |
 | Slow end-to-end latency | Embedding + search + LLM in sequence | Parallelize where possible; use ANN index; use faster model (gpt-4o-mini) |
 | Context too long for LLM | Too many chunks retrieved | Limit to 3–5 most relevant chunks; use smaller chunks |
-| Inconsistent answers | Non-deterministic LLM | Set `temperature=0` for factual Q&A |
+| Inconsistent answers | Non-deterministic LLM | ==Set `temperature=0` for factual Q&A== |
+
+---
 
 ## Exam Tips
 
@@ -301,6 +319,8 @@ Advantages: Managed search service with built-in RRF; scales independently of da
 - The system message in the prompt is where you instruct the LLM to "only answer from provided context"
 - Multi-turn conversations require storing history — include recent turns in the prompt
 
+---
+
 ## Key Takeaways
 
 - RAG architecture: embed query → retrieve relevant data → build prompt with context → call LLM → return response
@@ -308,11 +328,15 @@ Advantages: Managed search service with built-in RRF; scales independently of da
 - Different use cases need different retrieval strategies: documents use vector search, structured data uses SQL queries
 - Grounding the LLM in retrieved context prevents hallucination and enables use of current proprietary data
 
+---
+
 ## Related Topics
 
 - [02-Prompts & Responses](./02-prompts-and-responses.md)
 - [03-Hybrid Search & RRF](../10-intelligent-search/03-hybrid-search-rrf.md)
 - [01-External Models](../09-models-embeddings/01-external-models.md)
+
+---
 
 ## Official Documentation
 

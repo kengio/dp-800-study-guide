@@ -13,7 +13,7 @@ tags:
 
 ## Overview
 
-`sp_invoke_external_rest_endpoint` is the T-SQL stored procedure for calling HTTP endpoints from within SQL Server and SQL Database in Fabric. It enables calling Azure OpenAI (or any REST API) directly from T-SQL, making it possible to build a complete RAG pipeline without leaving SQL. This topic covers the full workflow: retrieving context, converting to JSON, constructing prompts, calling the model, and parsing responses.
+`sp_invoke_external_rest_endpoint` is the T-SQL stored procedure for calling HTTP endpoints from within SQL Server and SQL Database in Fabric. It enables calling Azure OpenAI (or any REST API) directly from T-SQL, making it possible to build a complete **RAG pipeline** without leaving SQL. This topic covers the full workflow: retrieving context, converting to JSON, constructing prompts, calling the model, and parsing responses.
 
 > [!abstract]
 > - Covers prompt engineering for RAG: system message, user message, context injection, and response parameters
@@ -24,6 +24,8 @@ tags:
 > - **System message**: sets the model's persona, instructions, and constraints ("Answer only from provided context")
 > - **Context injection**: retrieved chunks go in the system message or as part of the user message — not as a separate API parameter
 > - **Temperature**: 0 = deterministic (best for factual answers); 1 = creative/random; use low temperature for RAG to reduce hallucination risk
+
+---
 
 ## sp_invoke_external_rest_endpoint Syntax
 
@@ -50,6 +52,8 @@ The `@response` output parameter contains the full HTTP response as a JSON strin
 }
 ```
 
+---
+
 ## DATABASE SCOPED CREDENTIAL for OpenAI
 
 ```sql
@@ -60,6 +64,8 @@ SECRET = '{"api-key": "your-azure-openai-api-key-here"}';
 ```
 
 The credential is referenced in `sp_invoke_external_rest_endpoint` via `@credential` — the API key header is automatically injected.
+
+---
 
 ## Converting Data to JSON with FOR JSON
 
@@ -99,6 +105,8 @@ FROM (
 ) t;
 ```
 
+---
+
 ## Constructing Prompts
 
 The Azure OpenAI chat completions API expects a JSON array of messages with `role` and `content`:
@@ -120,6 +128,8 @@ DECLARE @messages NVARCHAR(MAX) = N'[
     '\n\nQuestion: ' + REPLACE(@user_question, '"', '\"') + '"}
 ]';
 ```
+
+---
 
 ## Full RAG Procedure — End to End
 
@@ -206,6 +216,8 @@ END;
 EXEC dbo.ProductRAG @user_question = 'What headphones do you have under $100?';
 ```
 
+---
+
 ## Parsing JSON Responses
 
 ### JSON_VALUE — Single Scalar Values
@@ -261,6 +273,8 @@ DECLARE @choices NVARCHAR(MAX) = JSON_QUERY(@response, '$.result.choices');
 DECLARE @usage NVARCHAR(MAX) = JSON_QUERY(@response, '$.result.usage');
 ```
 
+---
+
 ## Structured Output — Forcing JSON Responses
 
 Use the `response_format` parameter to ensure the LLM returns valid JSON:
@@ -297,6 +311,8 @@ SELECT
 SELECT value AS Topic
 FROM OPENJSON(JSON_QUERY(@content, '$.topics'));
 ```
+
+---
 
 ## Error Handling
 
@@ -352,6 +368,8 @@ BEGIN CATCH
 END CATCH;
 ```
 
+---
+
 ## Token Management
 
 ```sql
@@ -372,12 +390,16 @@ BEGIN
 END;
 ```
 
+---
+
 ## Use Cases
 
 - **In-database RAG**: Build complete RAG pipelines in T-SQL without application-layer code — useful for scheduled jobs, stored procedure-based APIs
 - **Batch processing**: Process thousands of rows through an LLM in a T-SQL loop or cursor
 - **Classification**: Classify customer feedback, support tickets, or products using an LLM called from a SQL UPDATE statement
 - **Structured extraction**: Extract entities (dates, names, amounts) from unstructured text into structured columns
+
+---
 
 ## Common Issues & Errors
 
@@ -388,7 +410,9 @@ END;
 | `HTTP 400 Bad Request` | Prompt too long or malformed JSON | Check token count; validate JSON payload; escape special chars |
 | JSON parse error on response | Response is not valid JSON | Check `$.response.status.http.code` first; may be an HTML error page |
 | `QUOTENAME` returns NULL for inputs > 128 chars | `QUOTENAME` accepts `nvarchar(128)` — returns NULL (not a truncated value) for longer input | For long strings, use `REPLACE(@text, '"', '\"')` instead |
-| Inconsistent responses | Temperature > 0 | Set `"temperature": 0` for factual/deterministic output |
+| Inconsistent responses | Temperature > 0 | ==Set `"temperature": 0` for factual/deterministic output== |
+
+---
 
 ## Exam Tips
 
@@ -399,6 +423,8 @@ END;
 - `JSON_VALUE` extracts scalars; `JSON_QUERY` extracts objects/arrays; `OPENJSON` parses arrays into rows
 - Always check the HTTP status code before parsing the response body — errors have different JSON structure
 
+---
+
 ## Key Takeaways
 
 - `sp_invoke_external_rest_endpoint` calls external HTTP APIs from T-SQL — no application code needed
@@ -407,11 +433,15 @@ END;
 - Always handle HTTP errors (401, 429, 400) before extracting the response content
 - Use `"temperature": 0` for deterministic factual responses; `"response_format": {"type": "json_object"}` for structured output
 
+---
+
 ## Related Topics
 
 - [01-RAG Use Cases](./01-rag-use-cases.md)
 - [01-External Models](../09-models-embeddings/01-external-models.md)
 - [03-Hybrid Search & RRF](../10-intelligent-search/03-hybrid-search-rrf.md)
+
+---
 
 ## Official Documentation
 
