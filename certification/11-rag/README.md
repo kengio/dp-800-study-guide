@@ -14,6 +14,31 @@ status: draft
 
 Building RAG pipelines that convert structured data to JSON, retrieve relevant context via vector search, and send prompts to language models using `sp_invoke_external_rest_endpoint`.
 
+---
+
+## Quick Recall
+
+```mermaid
+mindmap
+  root((RAG))
+    Pattern
+      Embed query
+      Retrieve top-K
+      Augment prompt
+      Generate response
+    Grounding
+      Context at inference time
+      Not fine-tuning
+      Prevents hallucinations
+    Prompt Structure
+      System message - persona
+      Context - retrieved chunks
+      User question
+      Temperature 0 = deterministic
+```
+
+---
+
 ## Topics Overview
 
 ```mermaid

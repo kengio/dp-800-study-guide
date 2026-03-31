@@ -14,6 +14,18 @@ tags:
 
 Storing SQL Database Projects in Git enables collaboration, history tracking, and structured review of schema changes. Branching strategies control how schema changes move from development to production, while branch policies and pull requests enforce quality gates before changes are merged.
 
+> [!abstract]
+> - Covers Git-based source control for database schema files, branching strategies, and merge conflict resolution
+> - Database schema files (.sql) in a project are treated the same as application code — same Git workflows apply
+> - Key exam topics: feature branch workflow, PR-based review, handling schema file merge conflicts
+
+> [!tip] What the Exam Tests
+> - Database schema changes go through the same feature branch → PR → merge → deploy workflow as application code
+> - Merge conflicts in schema `.sql` files must be resolved manually — Git cannot auto-resolve SQL syntax conflicts
+> - The `.sqlproj` file itself can have conflicts if two branches add different objects
+
+---
+
 ## Configuring Source Control for SQL Database Projects
 
 ### Repository Structure
@@ -76,6 +88,8 @@ SQL Database Projects extension in VS Code / Azure Data Studio provides:
 - One-click "Update Project from Database" to capture current state
 - Integrated Git panel for staging and committing schema changes
 
+---
+
 ## Branching Strategies
 
 ### Git Flow (Standard for Database Projects)
@@ -94,7 +108,7 @@ hotfix/fix-sproc                               ●──→ (cherry-pick to main
 
 | Branch | Purpose | Deploys To |
 | :--- | :--- | :--- |
-| `main` | Production-ready code | Production |
+| `main` | ==Production-ready code== | Production |
 | `release/x.y` | Release stabilization | Staging/UAT |
 | `feature/*` | New tables, columns, procedures | Dev environment |
 | `hotfix/*` | Emergency production fixes | Production (via main) |
@@ -111,6 +125,8 @@ feat/A      ●      ●    ●    ●         (short-lived feature branches)
 - Merged to `main` via pull request
 - Main is always deployable
 - Feature flags control exposure of incomplete features
+
+---
 
 ## Pull Requests for Schema Changes
 
@@ -129,6 +145,8 @@ Pull requests enforce review before merging schema changes. For database project
 ```
 
 ### CODEOWNERS File
+
+**CODEOWNERS** files automatically add reviewers based on file paths — making them essential for database change governance.
 
 ```text
 # .github/CODEOWNERS or Azure DevOps equivalent
@@ -164,6 +182,8 @@ ALTER TABLE dbo.Orders ADD AuditUser NVARCHAR(50) NOT NULL
 - Are new indexes created `WITH (ONLINE = ON)` for live tables?
 - Do stored procedure changes affect existing callers?
 - Are pre-deployment scripts needed to migrate data?
+
+---
 
 ## Conflict Resolution in Schema Files
 
@@ -215,6 +235,8 @@ CREATE TABLE [dbo].[Orders]
 - **Keep feature branches short-lived**: Reduces divergence from `main`
 - **Use Schema Compare before merging**: Validate the merged result against a real database
 
+---
+
 ## Use Cases
 
 - **Feature branch workflow**: Developers create `feature/add-order-priority` branch, make schema changes, open PR for DBA review before merging
@@ -222,22 +244,29 @@ CREATE TABLE [dbo].[Orders]
 - **CODEOWNERS for DBA enforcement**: Any change to `Schema/` automatically requests DBA team review
 - **Hotfix branch**: Emergency fix to a stored procedure — branch from `main`, fix, PR, merge, deploy immediately
 
+---
+
 ## Common Issues & Errors
 
 | Issue | Cause | Fix |
 | :--- | :--- | :--- |
 | Merge conflict in `.sqlproj` | Both branches added files | Open `.sqlproj`, keep all `<Build>` entries (SDK-style usually auto-includes, so conflict may not occur) |
 | PR build fails with unresolved reference | Object referenced in one branch, deleted in another | Resolve the merge conflict to include both the object definition and its reference |
-| Direct push to `main` bypasses review | No branch protection | Enable branch protection rules in Azure DevOps or GitHub |
+| Direct push to `main` bypasses review | No branch protection | ==Enable branch protection rules in Azure DevOps or GitHub== |
 | Schema Compare shows unexpected changes after merge | Merge introduced formatting differences | Use SSDT Schema Compare to validate actual structural differences |
+
+---
 
 ## Exam Tips
 
-- Branch policies in Azure DevOps (require reviewers, require build success) enforce quality gates — know how to configure them
-- CODEOWNERS files automatically add reviewers based on file paths — critical for database change governance
-- `main` branch should always reflect production-deployable state — use feature/release branches for in-progress work
-- Schema conflicts are best avoided by one-object-per-file conventions and short-lived branches
-- Pull request builds should run `dotnet build` to validate the dacpac compiles before allowing merge
+> [!tip] Exam Tips
+> - Branch policies in Azure DevOps (require reviewers, require build success) enforce quality gates — know how to configure them
+> - CODEOWNERS files automatically add reviewers based on file paths — critical for database change governance
+> - `main` branch should always reflect production-deployable state — use feature/release branches for in-progress work
+> - Schema conflicts are best avoided by one-object-per-file conventions and short-lived branches
+> - Pull request builds should run `dotnet build` to validate the dacpac compiles before allowing merge
+
+---
 
 ## Key Takeaways
 
@@ -246,11 +275,15 @@ CREATE TABLE [dbo].[Orders]
 - CODEOWNERS ensures domain experts (DBAs) automatically review changes to critical schema files
 - Conflict resolution in schema files is straightforward when each object lives in its own file
 
+---
+
 ## Related Topics
 
 - [02-SQL Database Projects](./02-sql-database-projects.md)
 - [04-Deployment Pipelines](./04-deployment-pipelines.md)
 - [01-Testing Strategy](./01-testing-strategy.md)
+
+---
 
 ## Official Documentation
 

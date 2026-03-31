@@ -12,7 +12,19 @@ tags:
 
 ## Overview
 
-SQL Database Projects allow you to version-control your entire database schema as T-SQL source files and build a deployable dacpac artifact. The modern SDK-style `.sqlproj` format (using `Microsoft.Build.Sql`) integrates with standard `dotnet` tooling and CI/CD pipelines. A dacpac captures the desired state of a database schema — deployment calculates and applies the diff.
+SQL Database Projects allow you to version-control your entire database schema as T-SQL source files and build a deployable **dacpac** artifact. The modern SDK-style `.sqlproj` format (using `Microsoft.Build.Sql`) integrates with standard `dotnet` tooling and CI/CD pipelines. A dacpac captures the desired state of a database schema — deployment calculates and applies the diff.
+
+> [!abstract]
+> - Covers SQL Database Projects (.sqlproj), the dacpac build artifact, publishing, and pre/post-deployment scripts
+> - SQL DB Projects bring code-first, source-controlled schema management to SQL Server and Azure SQL
+> - Key exam topics: project structure, dacpac vs bacpac distinction, pre/post-deployment script role
+
+> [!tip] What the Exam Tests
+> - Build produces a `.dacpac` (schema only); `SqlPackage /Action:Publish` deploys the diff (compares target and applies changes)
+> - **dacpac** = schema-only; **bacpac** = schema + data (for import/export, not CI/CD deployment)
+> - Pre/post-deployment scripts run outside the dacpac diff — used for data migrations, seed data, one-time operations
+
+---
 
 ## SDK-Style Project Format
 
@@ -34,6 +46,8 @@ Key differences from the legacy format:
 - Uses standard MSBuild SDK conventions
 - Compatible with `dotnet build` CLI
 - Supports NuGet package references for shared objects
+
+---
 
 ## Project Directory Structure
 
@@ -66,6 +80,8 @@ MyDatabase/
     └── OrderTests/
         └── test_CreateOrder.sql
 ```
+
+---
 
 ## SQL Object Definitions
 
@@ -106,6 +122,8 @@ BEGIN
     VALUES (@OrderId, @ProductId, @Quantity);
 END;
 ```
+
+---
 
 ## Pre- and Post-Deployment Scripts
 
@@ -152,6 +170,8 @@ To mark a script as pre/post-deployment, set the Build Action in the project:
 </ItemGroup>
 ```
 
+---
+
 ## Building with dotnet
 
 ```bash
@@ -169,6 +189,8 @@ dotnet build MyDatabase.sqlproj --configuration Release
 # Output:
 # bin/Release/MyDatabase.dacpac
 ```
+
+---
 
 ## Validating and Deploying with sqlpackage
 
@@ -203,10 +225,12 @@ sqlpackage /Action:DeployReport \
 
 | Property | Default | Description |
 | :--- | :--- | :--- |
-| `BlockOnPossibleDataLoss` | `true` | Fail if deployment might lose data (column drops, type changes) |
+| `BlockOnPossibleDataLoss` | `true` | ==Fail if deployment might lose data (column drops, type changes)== |
 | `DropObjectsNotInSource` | `false` | Drop DB objects not in the dacpac (use with caution) |
 | `GenerateSmartDefaults` | `false` | Auto-generate default values when adding NOT NULL columns |
 | `IncludeTransactionalScripts` | `false` | Wrap each change in a transaction for safer rollback |
+
+---
 
 ## Extracting an Existing Database to dacpac
 
@@ -222,6 +246,11 @@ sqlpackage /Action:Export \
     /SourceConnectionString:"..."
 ```
 
+> [!warning] Common Mistake
+> dacpac and bacpac are not interchangeable. Use dacpac for CI/CD deployments (schema changes). Use bacpac for migrating data between environments (schema + data export). Publishing a dacpac does NOT import data.
+
+---
+
 ## NuGet Package References
 
 SDK-style projects support referencing shared objects as NuGet packages:
@@ -233,6 +262,8 @@ SDK-style projects support referencing shared objects as NuGet packages:
 </ItemGroup>
 ```
 
+---
+
 ## Use Cases
 
 - **Schema-as-code**: Every table, view, and stored procedure is a `.sql` file in source control — enables code review, diff tracking, and branching
@@ -240,23 +271,30 @@ SDK-style projects support referencing shared objects as NuGet packages:
 - **CI/CD pipelines**: `dotnet build` produces the artifact; `sqlpackage publish` deploys it
 - **Drift detection**: Extract current DB to dacpac and diff against source-controlled dacpac
 
+---
+
 ## Common Issues & Errors
 
 | Issue | Cause | Fix |
 | :--- | :--- | :--- |
 | `Unresolved reference to object` | Object referenced before it's defined | Use fully qualified names; SQL projects resolve by dependency order |
-| `BlockOnPossibleDataLoss` error | Column drop or type change detected | Review the change; use pre-deployment script to migrate data first |
+| `BlockOnPossibleDataLoss` error | Column drop or type change detected | ==Review the change; use pre-deployment script to migrate data first== |
 | Pre/post scripts not running | Build Action not set correctly | Add `<PreDeploy>` / `<PostDeploy>` elements in `.sqlproj` |
 | Test files included in dacpac | No exclusion rule | Add `<None Include="Tests\**\*.sql" />` to project |
 | `DSP` property mismatch | Wrong schema provider for target | Set DSP to match target: `SqlAzureV12` for Azure SQL |
 
+---
+
 ## Exam Tips
 
-- SDK-style projects use `<Project Sdk="Microsoft.Build.Sql/...">` — all `.sql` files are automatically included
-- The dacpac represents the **desired state** — deployment is always a diff, never a full recreate
-- `BlockOnPossibleDataLoss=true` is the safety net for production deployments — it prevents accidental data loss
-- Pre-deployment scripts handle data migrations that must happen before schema changes (e.g., moving data before dropping a column)
-- Post-deployment scripts handle reference data loads and are always run after the dacpac schema changes complete
+> [!tip] Exam Tips
+> - SDK-style projects use `<Project Sdk="Microsoft.Build.Sql/...">` — all `.sql` files are automatically included
+> - The dacpac represents the **desired state** — deployment is always a diff, never a full recreate
+> - `BlockOnPossibleDataLoss=true` is the safety net for production deployments — it prevents accidental data loss
+> - Pre-deployment scripts handle data migrations that must happen before schema changes (e.g., moving data before dropping a column)
+> - Post-deployment scripts handle reference data loads and are always run after the dacpac schema changes complete
+
+---
 
 ## Key Takeaways
 
@@ -265,11 +303,15 @@ SDK-style projects support referencing shared objects as NuGet packages:
 - dacpac deployment is idempotent and state-based — safe to run multiple times
 - Pre/post scripts run outside the dacpac diff and always execute in order
 
+---
+
 ## Related Topics
 
 - [01-Testing Strategy](./01-testing-strategy.md)
 - [03-Source Control & Branching](./03-source-control-branching.md)
 - [04-Deployment Pipelines](./04-deployment-pipelines.md)
+
+---
 
 ## Official Documentation
 

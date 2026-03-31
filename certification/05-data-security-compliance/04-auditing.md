@@ -14,9 +14,21 @@ tags:
 
 SQL Server Audit captures database activity events and writes them to a file, Windows Event Log, or Azure Monitor (Log Analytics / Event Hub). Azure SQL has additional managed audit capabilities.
 
+> [!abstract]
+> - Covers SQL Server Audit at the server and database level, audit action groups, and audit log destinations
+> - Auditing captures who did what and when — essential for compliance requirements
+> - Key exam topics: server-level vs database-level audit, audit destinations, querying audit logs
+
+> [!tip] What the Exam Tests
+> - Audit hierarchy: create `SERVER AUDIT` (defines destination) → create `DATABASE AUDIT SPECIFICATION` (defines what to capture)
+> - Audit destinations: **Storage Account** (blob), **Log Analytics** workspace, **Event Hub** — all three are valid
+> - Query audit logs with `sys.fn_get_audit_file()` for storage-based logs, or via Log Analytics KQL queries
+
+---
+
 ## SQL Server Audit Architecture
 
-SQL Server Audit is built from two components:
+**SQL Server Audit** is built from two components:
 
 - **Server Audit** — defines WHERE to write audit records (file, Application Event Log, Security Event Log)
 - **Audit Specification** — defines WHAT to capture; two types:
@@ -27,7 +39,7 @@ SQL Server Audit is built from two components:
 
 | Mode | Behavior When Queue Full |
 | :--- | :--- |
-| Synchronous (`QUEUE_DELAY = 0`) | Blocks the session until the event is written |
+| Synchronous (`QUEUE_DELAY = 0`) | ==Blocks the session until the event is written== |
 | Asynchronous (`QUEUE_DELAY > 0`) | Drops events if the queue fills; `ON_FAILURE` controls what happens |
 
 `ON_FAILURE = CONTINUE` — allows the operation to proceed even if auditing fails (less secure, more available).
@@ -48,6 +60,8 @@ ADD (SELECT, INSERT, UPDATE, DELETE ON SCHEMA::dbo BY PUBLIC),
 ADD (EXECUTE ON SCHEMA::dbo BY PUBLIC)
 WITH (STATE = ON);
 ```
+
+---
 
 ## SQL Server Audit (On-Premises / SQL Managed Instance)
 
@@ -107,6 +121,8 @@ FROM sys.fn_get_audit_file('C:\Audit\MyServerAudit_*.sqlaudit', DEFAULT, DEFAULT
 ORDER BY event_time DESC;
 ```
 
+---
+
 ## Azure SQL Database Auditing
 
 Azure SQL auditing differs from on-premises in key ways:
@@ -149,13 +165,15 @@ Set-AzSqlDatabaseAudit `
     -LogAnalyticsTargetState Enabled
 ```
 
+---
+
 ## Key Audit Action Groups
 
 Important audit action groups for the DP-800 exam:
 
 | Action Group | What It Captures |
 | :--- | :--- |
-| `BATCH_COMPLETED_GROUP` | All T-SQL batches completed (incl. SELECT with full SQL text) |
+| `BATCH_COMPLETED_GROUP` | ==All T-SQL batches completed (incl. SELECT with full SQL text)== |
 | `DATABASE_OBJECT_ACCESS_GROUP` | Access to database objects |
 | `DATABASE_OBJECT_PERMISSION_CHANGE_GROUP` | Permission changes on objects |
 | `DATABASE_ROLE_MEMBER_CHANGE_GROUP` | Role membership changes |
@@ -172,6 +190,8 @@ Also commonly used:
 | `DATABASE_PERMISSION_CHANGE_GROUP` | GRANT/DENY/REVOKE statements |
 | `DATABASE_PRINCIPAL_CHANGE_GROUP` | CREATE/DROP users and roles |
 
+---
+
 ## Querying Audit Logs
 
 Use `sys.fn_get_audit_file` to read on-premises audit files. Key columns returned:
@@ -183,7 +203,7 @@ Use `sys.fn_get_audit_file` to read on-premises audit files. Key columns returne
 | `server_principal_name` | Login that performed the action |
 | `database_name` | Database where the action occurred |
 | `object_name` | Table, view, or procedure accessed |
-| `statement` | Full SQL text of the batch |
+| `statement` | ==Full SQL text of the batch== |
 
 ```sql
 -- Read audit log files
@@ -201,6 +221,9 @@ AND action_id IN ('SL', 'IN', 'UP', 'DL')  -- SELECT, INSERT, UPDATE, DELETE
 ORDER BY event_time;
 ```
 
+> [!warning] Common Mistake
+> Audit logs are NOT queryable from regular DMVs like `sys.dm_exec_sessions` or `sys.dm_audit_actions`. Use `sys.fn_get_audit_file('path\*.sqlaudit', DEFAULT, DEFAULT)` for storage-based logs. The exam may offer DMV queries as distractors.
+
 ### Querying Audit Logs in Log Analytics
 
 ```kusto
@@ -213,6 +236,8 @@ AzureDiagnostics
 | project TimeGenerated, client_ip_s, server_principal_name_s, statement_s
 | order by TimeGenerated desc
 ```
+
+---
 
 ## Temporal Tables as Audit Trails
 
@@ -235,6 +260,8 @@ WHERE EmployeeID = 42
 ORDER BY ValidFrom;
 ```
 
+---
+
 ## Auditing Best Practices
 
 ```sql
@@ -246,11 +273,15 @@ ORDER BY ValidFrom;
 -- 5. Execution of privileged procedures
 ```
 
+---
+
 ## Use Cases
 
 - **Compliance**: GDPR, HIPAA, SOC2 require audit trails for data access
 - **Security investigation**: Identify who accessed what data and when
 - **Anomaly detection**: Send audit logs to SIEM for alerting on suspicious patterns
+
+---
 
 ## Common Issues & Errors
 
@@ -260,6 +291,8 @@ ORDER BY ValidFrom;
 | Log Analytics latency | Audit events take ~5-10 minutes | This is expected; not real-time |
 | Disk full, audit shutdown | `ON_FAILURE = SHUTDOWN` and disk full | Set `ON_FAILURE = CONTINUE` for non-critical; monitor disk |
 
+---
+
 ## Best Practices
 
 - Enable `BATCH_COMPLETED_GROUP` when you need full SQL text captured in audit logs — object-access groups alone do not always record the statement
@@ -268,13 +301,18 @@ ORDER BY ValidFrom;
 - Combine SQL Audit (who accessed what) with temporal tables (what the data was) for a complete compliance story
 - For Azure SQL, prefer server-level auditing over database-level to ensure all databases are covered, including future ones
 
+---
+
 ## Exam Tips
 
-- Azure SQL auditing destination options: **Storage account**, **Log Analytics**, **Event Hub**
-- Server-level audit action groups capture broad categories; table-level captures specific objects
-- `ON_FAILURE = SHUTDOWN` stops the SQL Server if auditing fails (high security); `CONTINUE` is more forgiving
-- `BATCH_COMPLETED_GROUP` is the only action group that captures full SQL statement text — key for SELECT auditing
-- Temporal tables capture data history (WHAT changed) but NOT access events (WHO accessed); SQL Audit captures access
+> [!tip] Exam Tips
+> - Azure SQL auditing destination options: **Storage account**, **Log Analytics**, **Event Hub**
+> - Server-level audit action groups capture broad categories; table-level captures specific objects
+> - `ON_FAILURE = SHUTDOWN` stops the SQL Server if auditing fails (high security); `CONTINUE` is more forgiving
+> - `BATCH_COMPLETED_GROUP` is the only action group that captures full SQL statement text — key for SELECT auditing
+> - Temporal tables capture data history (WHAT changed) but NOT access events (WHO accessed); SQL Audit captures access
+
+---
 
 ## Key Takeaways
 
@@ -283,6 +321,8 @@ ORDER BY ValidFrom;
 - Log Analytics uses KQL for querying audit logs; Event Hub for streaming to SIEM
 - `BATCH_COMPLETED_GROUP` captures full SQL text including SELECT statements
 - Temporal tables complement SQL Audit but cannot replace it for access logging
+
+---
 
 ## Practice Question
 
@@ -300,11 +340,15 @@ D. FAILED_DATABASE_AUTHENTICATION_GROUP
 >
 > BATCH_COMPLETED_GROUP captures all completed T-SQL batches including their SQL text (the `statement` column in audit logs). DATABASE_OBJECT_ACCESS_GROUP (A) and SCHEMA_OBJECT_ACCESS_GROUP (B) track object access events but may not capture the full SQL text of SELECT statements. FAILED_DATABASE_AUTHENTICATION_GROUP (D) captures failed logins only.
 
+---
+
 ## Related Topics
 
 - [03-Permissions & Access](./03-permissions-access.md)
 - [02-Specialized Tables — Ledger](../01-database-objects/02-specialized-tables.md)
 - [03-Monitoring](../08-azure-services-integration/03-monitoring.md)
+
+---
 
 ## Official Documentation
 

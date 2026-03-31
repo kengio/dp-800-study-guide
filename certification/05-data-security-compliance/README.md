@@ -15,6 +15,31 @@ status: draft
 
 Securing SQL database solutions through encryption, data masking, row-level security, permission management, and auditing.
 
+---
+
+## Quick Recall
+
+```mermaid
+mindmap
+  root((Security))
+    Encryption
+      TDE - at rest transparent
+      Always Encrypted - in memory
+      Column-level - manual
+    Masking and RLS
+      DDM - hide values not encrypt
+      RLS - filter/block rows
+    Permissions
+      DENY overrides GRANT
+      REVOKE removes not denies
+      Fixed roles
+    Auditing
+      Storage/Log Analytics/Event Hub
+      sys.fn_get_audit_file
+```
+
+---
+
 ## Topics Overview
 
 ```mermaid

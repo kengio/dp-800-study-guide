@@ -15,6 +15,18 @@ tags:
 
 Constraints enforce data integrity at the database level. SQL Server supports PRIMARY KEY, FOREIGN KEY, UNIQUE, CHECK, and DEFAULT constraints. SEQUENCES provide database-wide, shareable, non-identity number generators.
 
+> [!abstract]
+> - Covers PRIMARY KEY, FOREIGN KEY, CHECK, DEFAULT, UNIQUE constraints, and SEQUENCE objects
+> - Constraints enforce data integrity at the database level; sequences provide independent number generation
+> - Key exam topics: SEQUENCE vs IDENTITY, constraint types and enforcement timing
+
+> [!tip] What the Exam Tests
+> - `SEQUENCE` is **independent of any table** — can be shared across tables, cycled, and reset with `ALTER SEQUENCE`
+> - `IDENTITY` is **column-bound** — cannot be shared, cannot be reset cleanly without DBCC, increments only upward
+> - `CHECK` constraints can reference multiple columns in the same row; `FOREIGN KEY` enforces referential integrity across tables
+
+---
+
 ## Constraint Types
 
 ### PRIMARY KEY
@@ -57,7 +69,7 @@ CREATE TABLE dbo.Orders (
 | Action | On DELETE | On UPDATE |
 | :--- | :--- | :--- |
 | `NO ACTION` (default) | Error if child rows exist | Error if referenced key changes |
-| `CASCADE` | Delete child rows | Update child FK values |
+| `CASCADE` | ==Delete child rows== | Update child FK values |
 | `SET NULL` | Set FK to NULL | Set FK to NULL |
 | `SET DEFAULT` | Set FK to column default | Set FK to column default |
 
@@ -100,6 +112,8 @@ CREATE TABLE dbo.AuditLog (
 );
 ```
 
+---
+
 ## Disabling and Enabling Constraints
 
 ```sql
@@ -113,9 +127,11 @@ ALTER TABLE dbo.Orders WITH CHECK CHECK CONSTRAINT FK_Orders_Customers;
 ALTER TABLE dbo.Orders DISABLE TRIGGER ALL;
 ```
 
+---
+
 ## SEQUENCES
 
-A SEQUENCE is a schema-bound object that generates a sequence of numeric values, independent of any table — useful when the same sequence must be shared across tables.
+A **SEQUENCE** is a schema-bound object that generates a sequence of numeric values, independent of any table — useful when the same sequence must be shared across tables.
 
 ```sql
 -- Create a sequence
@@ -143,15 +159,20 @@ CREATE TABLE dbo.Invoices (
 );
 ```
 
+> [!warning] Common Mistake
+> IDENTITY and SEQUENCE both generate sequential numbers, but IDENTITY cannot be shared across tables and is tied to a specific column. If the exam scenario requires a shared counter across multiple tables, the answer is SEQUENCE.
+
 **SEQUENCE vs IDENTITY comparison:**
 
 | Aspect | IDENTITY | SEQUENCE |
 | :--- | :--- | :--- |
-| Scope | Single table | Schema-wide, multi-table |
+| Scope | Single table | ==Schema-wide, multi-table== |
 | Start/restart | Cannot restart easily | `ALTER SEQUENCE ... RESTART` |
 | Caching | No | Yes (`CACHE n`) — faster but gaps on crash |
 | Use in SELECT | No | `NEXT VALUE FOR` in any query |
 | Transaction rollback | No gap recovery | No gap recovery (same) |
+
+---
 
 ## CHECK Constraint Patterns
 
@@ -182,6 +203,8 @@ SELECT name, is_not_trusted FROM sys.check_constraints WHERE parent_object_id = 
 
 A constraint added with `WITH NOCHECK` sets `is_not_trusted = 1` in `sys.check_constraints`. The query optimizer cannot use an untrusted constraint for plan optimizations. To trust it, run `ALTER TABLE ... WITH CHECK CHECK CONSTRAINT ...`.
 
+---
+
 ## Cascading Referential Actions
 
 ON DELETE and ON UPDATE actions define what happens to child rows when a parent row is deleted or its key is changed.
@@ -191,7 +214,7 @@ ON DELETE and ON UPDATE actions define what happens to child rows when a parent 
 | `NO ACTION` | Raises an error; transaction rolls back if child rows exist |
 | `CASCADE` | Automatically deletes or updates matching child rows |
 | `SET NULL` | Sets the FK column(s) to NULL (columns must be nullable) |
-| `SET DEFAULT` | Sets the FK column(s) to their defined default value |
+| `SET DEFAULT` | ==Sets the FK column(s) to their defined default value== |
 
 **Circular reference limitation**: SQL Server does not allow `CASCADE` in a referential cycle. Self-referencing tables or mutual FK cycles must use `NO ACTION` and handle deletes manually (e.g., set ManagerID to NULL before deleting the manager row).
 
@@ -211,6 +234,8 @@ ADD CONSTRAINT FK_Employees_Manager
     FOREIGN KEY (ManagerID) REFERENCES Employees(EmployeeID)
     ON DELETE SET NULL;
 ```
+
+---
 
 ## Sequence Cycling and Caching
 
@@ -243,13 +268,15 @@ SELECT current_value FROM sys.sequences WHERE name = 'OrderSeq';
 ALTER TABLE Orders ADD CONSTRAINT DF_OrderID DEFAULT (NEXT VALUE FOR dbo.OrderSeq) FOR OrderID;
 ```
 
+---
+
 ## UNIQUE Constraints vs UNIQUE Indexes
 
 A UNIQUE constraint and a unique index are nearly identical in SQL Server — the constraint is implemented as a unique non-clustered index behind the scenes.
 
 | Feature | UNIQUE Constraint | Filtered UNIQUE Index |
 | :--- | :--- | :--- |
-| Allows NULLs | One NULL per column | Multiple NULLs (NULLs excluded from index) |
+| Allows NULLs | One NULL per column | ==Multiple NULLs (NULLs excluded from index)== |
 | Syntax | `ADD CONSTRAINT ... UNIQUE` | `CREATE UNIQUE INDEX ... WHERE col IS NOT NULL` |
 | Visible in SSMS | As a constraint | As an index |
 
@@ -263,12 +290,16 @@ ON dbo.Employees (NationalID)
 WHERE NationalID IS NOT NULL;
 ```
 
+---
+
 ## Use Cases
 
 - **PRIMARY KEY**: Every table should have one — defines entity identity
 - **FOREIGN KEY**: Enforce referential integrity between related tables
 - **CHECK**: Enforce domain rules (valid statuses, positive values, date ranges)
 - **SEQUENCE**: Invoice numbers, order numbers shared across multiple tables
+
+---
 
 ## Common Issues & Errors
 
@@ -277,9 +308,11 @@ WHERE NationalID IS NOT NULL;
 | FK violation on INSERT | Referenced row doesn't exist | Insert parent row first; or disable FK temporarily |
 | Duplicate key on INSERT | UNIQUE or PK violation | Check for existing values; use `MERGE` or upsert |
 | CHECK constraint violation | Value fails the condition | Validate at application layer before insert |
-| SEQUENCE cache gap | Server restart with CACHE | Use `NO CACHE` for sequential gaps (slower) |
+| SEQUENCE cache gap | Server restart with CACHE | ==Use `NO CACHE` for sequential gaps (slower)== |
 | Cascade cycle error | FK chain creates a cycle | Use `NO ACTION` on one FK; handle deletes in code |
 | Untrusted constraint | Added with `WITH NOCHECK` | Re-validate with `WITH CHECK CHECK CONSTRAINT` |
+
+---
 
 ## Best Practices
 
@@ -289,14 +322,19 @@ WHERE NationalID IS NOT NULL;
 - Avoid `CASCADE DELETE` on wide FK chains — explicit deletes in stored procedures are easier to audit and debug
 - Use `NO CACHE` sequences only when gaps are truly unacceptable; the performance cost can be significant at high insert rates
 
+---
+
 ## Exam Tips
 
-- `PRIMARY KEY` creates a clustered index by default — can be overridden with `NONCLUSTERED`
-- `UNIQUE` allows one NULL value per column; a filtered unique index can exclude NULLs entirely
-- `CHECK` constraints added with `WITH NOCHECK` are marked `is_not_trusted = 1` — the optimizer ignores them for plan simplification
-- `SEQUENCE` can `CYCLE` (wrap around) and `CACHE` values for performance; cached values are lost on server restart
-- `CASCADE` cannot be used in a circular FK reference — SQL Server raises an error at constraint creation time
-- `NOT FOR REPLICATION` on CHECK and FK constraints prevents them from firing during replication agent operations
+> [!tip] Exam Tips
+> - `PRIMARY KEY` creates a clustered index by default — can be overridden with `NONCLUSTERED`
+> - `UNIQUE` allows one NULL value per column; a filtered unique index can exclude NULLs entirely
+> - `CHECK` constraints added with `WITH NOCHECK` are marked `is_not_trusted = 1` — the optimizer ignores them for plan simplification
+> - `SEQUENCE` can `CYCLE` (wrap around) and `CACHE` values for performance; cached values are lost on server restart
+> - `CASCADE` cannot be used in a circular FK reference — SQL Server raises an error at constraint creation time
+> - `NOT FOR REPLICATION` on CHECK and FK constraints prevents them from firing during replication agent operations
+
+---
 
 ## Key Takeaways
 
@@ -304,6 +342,8 @@ WHERE NationalID IS NOT NULL;
 - FOREIGN KEY referential actions (`CASCADE`, `SET NULL`, `SET DEFAULT`) control child row behavior
 - SEQUENCES are more flexible than IDENTITY but require explicit `NEXT VALUE FOR`
 - CHECK constraints added without validation (`WITH NOCHECK`) are untrusted and ignored by the optimizer
+
+---
 
 ## Practice Question
 
@@ -321,10 +361,14 @@ D. A concurrent transaction consumed values 451-500
 >
 > When a sequence uses CACHE, SQL Server pre-allocates a batch of values in memory. If the server restarts before all cached values are used, those values are lost and the sequence resumes after the last cached batch. This is by design for performance — use NO CACHE if gaps are unacceptable.
 
+---
+
 ## Related Topics
 
 - [01-Tables & Indexes](./01-tables-indexes.md)
 - [05-Partitioning](./05-partitioning.md)
+
+---
 
 ## Official Documentation
 

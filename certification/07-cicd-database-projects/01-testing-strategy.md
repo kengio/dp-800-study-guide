@@ -14,9 +14,21 @@ tags:
 
 A robust testing strategy for database projects combines unit tests (isolated, fast, using mock data) with integration tests (end-to-end, using real data flows). The tSQLt framework is the standard unit testing framework for T-SQL, while reference/static data should be version-controlled alongside schema objects.
 
+> [!abstract]
+> - Covers testing approaches for database code: unit tests (tSQLt), integration tests, and end-to-end tests
+> - tSQLt is the standard T-SQL unit testing framework — tests run inside transactions that are rolled back
+> - Key exam topics: tSQLt test isolation mechanism, test doubles (fakes/mocks), assertion functions
+
+> [!tip] What the Exam Tests
+> - tSQLt tests run **inside transactions that are always rolled back** — no permanent data changes from test runs
+> - `tSQLt.FakeTable` replaces a real table with an empty copy for test isolation
+> - `tSQLt.AssertEquals`, `tSQLt.AssertEqualsTable`, `tSQLt.ExpectException` are the core assertion functions
+
+---
+
 ## tSQLt Unit Testing Framework
 
-tSQLt is a T-SQL unit testing framework that runs entirely inside SQL Server. Tests are organized into schemas (test classes), and each test is a stored procedure beginning with the word "test".
+**tSQLt** is a T-SQL unit testing framework that runs entirely inside SQL Server. Tests are organized into schemas (test classes), and each test is a stored procedure beginning with the word "test".
 
 ### Installing tSQLt
 
@@ -151,6 +163,8 @@ EXEC tSQLt.SetTestResultFormatter 'tSQLt.XmlResultFormatter';
 EXEC tSQLt.RunAll;
 ```
 
+---
+
 ## Integration Tests
 
 Integration tests verify that components work together correctly, including referential integrity, triggers, and multi-step workflows.
@@ -199,6 +213,8 @@ BEGIN
     ROLLBACK TRANSACTION; -- Always rollback in tests
 END;
 ```
+
+---
 
 ## Static / Reference Data Management
 
@@ -269,6 +285,8 @@ PRINT 'Loading reference data...';
 PRINT 'Reference data load complete.';
 ```
 
+---
+
 ## Use Cases
 
 - **Unit tests with tSQLt**: Test stored procedures, functions, and views in isolation before deploying to shared environments
@@ -276,23 +294,30 @@ PRINT 'Reference data load complete.';
 - **Integration tests**: Validate end-to-end workflows in a staging environment before production deployment
 - **MERGE for reference data**: Deploy lookup table data idempotently as part of CI/CD pipelines
 
+---
+
 ## Common Issues & Errors
 
 | Issue | Cause | Fix |
 | :--- | :--- | :--- |
-| `CLR not enabled` | tSQLt requires CLR | `EXEC sp_configure 'clr enabled', 1; RECONFIGURE;` |
+| `CLR not enabled` | tSQLt requires CLR | ==`EXEC sp_configure 'clr enabled', 1; RECONFIGURE;`== |
 | `TRUSTWORTHY must be ON` | tSQLt assembly requirement | `ALTER DATABASE db SET TRUSTWORTHY ON` |
 | Test fails with FK violation | FakeTable not used | Add `EXEC tSQLt.FakeTable` for dependency tables |
 | MERGE deletes unexpected rows | `WHEN NOT MATCHED BY SOURCE THEN DELETE` | Remove the DELETE clause if partial updates are intended |
 | Test data leaks between tests | Missing ROLLBACK | Wrap integration tests in `BEGIN TRAN / ROLLBACK` |
 
+---
+
 ## Exam Tips
 
-- tSQLt tests are stored procedures inside a schema with the `tSQLt.TestClass` extended property — no separate test runner binary
-- `FakeTable` removes ALL constraints by default; use `ApplyConstraint` to restore specific ones for constraint testing
-- `MERGE` is the recommended pattern for reference data because it is idempotent (safe to run repeatedly)
-- Post-deployment scripts in dacpac projects run after all schema changes are applied — the right place for reference data loads
-- `tSQLt.AssertEqualsTable` compares entire result sets — use for output of stored procedures returning rowsets
+> [!tip] Exam Tips
+> - tSQLt tests are stored procedures inside a schema with the `tSQLt.TestClass` extended property — no separate test runner binary
+> - `FakeTable` removes ALL constraints by default; use `ApplyConstraint` to restore specific ones for constraint testing
+> - `MERGE` is the recommended pattern for reference data because it is idempotent (safe to run repeatedly)
+> - Post-deployment scripts in dacpac projects run after all schema changes are applied — the right place for reference data loads
+> - `tSQLt.AssertEqualsTable` compares entire result sets — use for output of stored procedures returning rowsets
+
+---
 
 ## Key Takeaways
 
@@ -301,11 +326,15 @@ PRINT 'Reference data load complete.';
 - Static/reference data belongs in source control as idempotent MERGE scripts
 - Post-deployment scripts in SQL Database Projects are the standard deployment location for reference data
 
+---
+
 ## Related Topics
 
 - [02-SQL Database Projects](./02-sql-database-projects.md)
 - [03-Source Control & Branching](./03-source-control-branching.md)
 - [04-Deployment Pipelines](./04-deployment-pipelines.md)
+
+---
 
 ## Official Documentation
 

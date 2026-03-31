@@ -16,6 +16,34 @@ status: draft
 
 Advanced T-SQL querying including CTEs, window functions, JSON functions, regex/fuzzy matching, graph queries, correlated subqueries, and error handling.
 
+---
+
+## Quick Recall
+
+```mermaid
+mindmap
+  root((Advanced T-SQL))
+    CTEs
+      Non-recursive - readability
+      Recursive - hierarchies
+      MAXRECURSION limit
+    Window Functions
+      ROW_NUMBER - unique
+      RANK - gaps on tie
+      DENSE_RANK - no gaps
+      LAG/LEAD/SUM OVER
+    JSON
+      JSON_VALUE - scalar
+      JSON_QUERY - fragment
+      OPENJSON - rows
+    Graph
+      NODE + EDGE tables
+      MATCH clause
+      SHORTEST_PATH
+```
+
+---
+
 ## Topics Overview
 
 ```mermaid

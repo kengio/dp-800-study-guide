@@ -15,6 +15,18 @@ tags:
 
 The DP-800 exam covers enabling GitHub Copilot and Copilot in Fabric, configuring model and Model Context Protocol (MCP) tool options, and creating Copilot instruction files to provide project-specific context.
 
+> [!abstract]
+> - Covers GitHub Copilot features for database development: inline suggestions, Copilot Chat, slash commands
+> - Copilot suggests; it does not execute — all suggestions require human review
+> - Key exam topics: Copilot Chat slash commands (/explain, /fix, /doc), inline completion behavior, Azure SQL setup
+
+> [!tip] What the Exam Tests
+> - Copilot provides **suggestions only** — it cannot run SQL or make changes without explicit developer action
+> - Slash commands: `/explain` = explain selected code; `/fix` = suggest a fix; `/doc` = generate documentation; `/tests` = generate tests
+> - Copilot for Azure SQL in SSMS/VS Code requires the GitHub Copilot extension + appropriate license
+
+---
+
 ## Enabling GitHub Copilot
 
 ### For Individual Developers
@@ -40,6 +52,8 @@ The DP-800 exam covers enabling GitHub Copilot and Copilot in Fabric, configurin
 3. Use **Copilot Chat** panel for SQL generation: `Ctrl+Shift+I`
 4. Use inline completions while writing T-SQL
 
+---
+
 ## Enabling Copilot in Microsoft Fabric
 
 Copilot in Fabric is the integrated AI assistant for Fabric workloads (SQL databases, notebooks, pipelines).
@@ -56,9 +70,11 @@ Fabric Portal → Settings → Admin portal → Tenant settings
 - Suggests query optimizations
 - Available in the SQL query editor
 
+---
+
 ## Copilot Instruction Files
 
-Copilot instruction files provide repository-specific context that Copilot includes automatically in every chat session.
+**Copilot instruction files** provide repository-specific context that Copilot includes automatically in every chat session.
 
 ### Creating a GitHub Copilot Instructions File
 
@@ -91,6 +107,8 @@ Database: Azure SQL Database (SQL Server 2022 compatibility)
 
 **File location:** `.github/copilot-instructions.md` (GitHub Copilot reads this automatically)
 
+---
+
 ## Configuring Model Options in Chat
 
 ### Selecting the Model
@@ -106,7 +124,7 @@ Available models (as of early 2026, varies by subscription):
 | Model | Strengths for SQL/Database Work |
 |:---|:---|
 | GPT-4o | General-purpose SQL generation, fast responses |
-| o3-mini | Reasoning-heavy tasks, complex query logic |
+| o3-mini | ==Reasoning-heavy tasks, complex query logic== |
 | Claude 3.5 Sonnet | Long-context schema understanding, code review |
 | Claude 3.7 Sonnet | Extended reasoning, complex multi-step analysis |
 | Gemini 2.0 Flash | Fast completions, broad multi-modal context |
@@ -139,6 +157,8 @@ Model Context Protocol tools extend what Copilot can access in a chat session:
 
 In a chat session, enable/disable available tools with the **Tools** toggle or `#tool` references.
 
+---
+
 ## Using Copilot for SQL Development
 
 ### Generating Queries from Natural Language
@@ -163,6 +183,8 @@ Explain this execution plan and suggest improvements:
 Review this T-SQL for security vulnerabilities and performance issues:
 [paste T-SQL code]
 ```
+
+---
 
 ## Copilot for Azure SQL and Fabric SQL
 
@@ -189,7 +211,7 @@ Fabric provides Copilot for both **SQL analytics endpoints** (Lakehouse) and **F
 | Surface | Copilot Capability |
 |:---|:---|
 | SQL analytics endpoint | Natural language to T-SQL, explain errors |
-| Fabric SQL database | Generate, explain, fix T-SQL; schema-aware |
+| Fabric SQL database | ==Generate, explain, fix T-SQL; schema-aware== |
 | Notebook (Spark SQL) | SQL cell generation, explain output |
 
 **Key Fabric SQL Copilot features:**
@@ -206,6 +228,8 @@ Fabric Copilot can be enhanced with models deployed in Azure AI Foundry:
 - Connect a Fabric workspace to an Azure AI Foundry project
 - Use custom or fine-tuned models for domain-specific SQL generation
 - Enables richer context when working with proprietary data schemas
+
+---
 
 ## Custom Instructions Deep-Dive
 
@@ -259,6 +283,8 @@ When writing instructions for a SQL/database project, always specify:
 - Avoid cursors; prefer set-based operations
 ```
 
+---
+
 ## Copilot CLI for Database Projects
 
 ### Using `gh copilot suggest` from the Terminal
@@ -295,6 +321,8 @@ When a repository contains a `.sqlproj` file, Copilot becomes schema-aware:
 - Inline completions suggest table and column names from the project schema
 - Works with the **SQL Database Projects** extension in VS Code
 
+---
+
 ## Evaluating AI-Generated SQL
 
 AI-generated SQL should always be reviewed before execution in production.
@@ -321,6 +349,8 @@ EXEC sp_executesql @sql, N'@Name NVARCHAR(100)', @Name = @UserInput;
 
 AI models often generate the unsafe pattern. Always replace direct concatenation with `sp_executesql` when user input is involved.
 
+---
+
 ## Use Cases
 
 - **Query generation**: Describe what you need in English, get T-SQL
@@ -329,15 +359,19 @@ AI models often generate the unsafe pattern. Always replace direct concatenation
 - **Documentation**: Generate inline comments and procedure documentation
 - **Azure portal**: Use embedded Copilot in Azure SQL Query Editor for ad-hoc work
 
+---
+
 ## Common Issues & Errors
 
 | Issue | Cause | Resolution |
 |:---|:---|:---|
 | Copilot not suggesting SQL | Extension not installed | Install GitHub Copilot + Copilot Chat extensions |
-| Instructions file not used | Wrong location or format | Must be `.github/copilot-instructions.md` at repo root |
+| Instructions file not used | Wrong location or format | ==Must be `.github/copilot-instructions.md` at repo root== |
 | MCP server not connecting | Configuration error | Check `mcp.json` and environment variables |
 | Hallucinated column names | Model lacks schema context | Add schema summary to instructions file or use MCP |
 | Wrong model available | Subscription tier | Enterprise plans unlock all models; Individual has subset |
+
+---
 
 ## Best Practices
 
@@ -347,14 +381,19 @@ AI models often generate the unsafe pattern. Always replace direct concatenation
 - Combine MCP server configuration with instruction files to give Copilot both live schema access and coding standards.
 - Treat Copilot output as a first draft: always validate column names and join logic against the actual schema.
 
+---
+
 ## Exam Tips
 
-- **Instruction files** are at `.github/copilot-instructions.md` — know the exact location
-- Model selection is available in Copilot Chat — not the inline completion
-- MCP tool configuration can be scoped: session-level vs persistent (`.vscode/mcp.json`)
-- Copilot in Fabric is enabled at the **tenant level** by a Fabric admin
-- The Azure portal has its own embedded Copilot for Azure SQL — separate from GitHub Copilot
-- VS Code `github.copilot.chat.codeGeneration.instructions` is user/workspace level; `.github/copilot-instructions.md` is repo level
+> [!tip] Exam Tips
+> - **Instruction files** are at `.github/copilot-instructions.md` — know the exact location
+> - Model selection is available in Copilot Chat — not the inline completion
+> - MCP tool configuration can be scoped: session-level vs persistent (`.vscode/mcp.json`)
+> - Copilot in Fabric is enabled at the **tenant level** by a Fabric admin
+> - The Azure portal has its own embedded Copilot for Azure SQL — separate from GitHub Copilot
+> - VS Code `github.copilot.chat.codeGeneration.instructions` is user/workspace level; `.github/copilot-instructions.md` is repo level
+
+---
 
 ## Practice Question
 
@@ -370,6 +409,8 @@ D. Add instructions as code comments in each SQL file
 >
 > The `.github/copilot-instructions.md` file is automatically loaded by GitHub Copilot for all chat interactions in that repository. It persists across sessions and team members. Per-session instructions (A) don't persist. Extension settings (C) are user-level, not repo-level. Code comments (D) provide context for the current file only.
 
+---
+
 ## Key Takeaways
 
 - Instruction files provide project-specific context to every Copilot chat session
@@ -378,10 +419,14 @@ D. Add instructions as code comments in each SQL file
 - Azure SQL Database has native Copilot in the Azure portal Query Editor
 - Always validate AI-generated SQL for injection risks, schema accuracy, and implicit type conversions
 
+---
+
 ## Related Topics
 
 - [01-AI Security Impact](./01-ai-security-impact.md)
 - [03-MCP Server Endpoints](./03-mcp-server-endpoints.md)
+
+---
 
 ## Official Documentation
 

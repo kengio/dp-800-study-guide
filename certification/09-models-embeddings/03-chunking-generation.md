@@ -12,7 +12,19 @@ tags:
 
 ## Overview
 
-Before generating embeddings, you must decide which columns to embed and how to prepare the text. For long documents, you must also chunk the text into segments that fit within the model's token limit. The chunking strategy significantly affects retrieval quality. After chunking, embeddings are generated via an external model call and stored in a vector column.
+Before generating embeddings, you must decide which columns to embed and how to prepare the text. For long documents, you must also chunk the text into segments that fit within the model's token limit. The **chunking strategy** significantly affects retrieval quality. After chunking, embeddings are generated via an external model call and stored in a vector column.
+
+> [!abstract]
+> - Covers chunking strategies for preparing documents for embedding: fixed-size, semantic, and overlap
+> - Documents must be split into chunks before embedding because models have token limits
+> - Key exam topics: fixed vs semantic chunking trade-offs, overlap purpose, chunk size effects on retrieval quality
+
+> [!tip] What the Exam Tests
+> - **Fixed-size chunking**: split every N tokens; simple and predictable; may split mid-sentence
+> - **Semantic chunking**: split on sentence/paragraph boundaries; better context preservation; more complex
+> - **Overlap**: include last M tokens of previous chunk in the start of next chunk — prevents losing context at boundaries
+
+---
 
 ## Identifying Which Columns to Embed
 
@@ -45,6 +57,8 @@ SELECT
 FROM dbo.Products p
 JOIN dbo.Categories c ON p.CategoryId = c.CategoryId;
 ```
+
+---
 
 ## Chunking Strategies
 
@@ -173,9 +187,11 @@ GROUP BY DocumentId, ChunkNumber;
 | Strategy | Pros | Cons | Best For |
 | :--- | :--- | :--- | :--- |
 | Fixed-size | Simple, predictable | May cut mid-sentence | Technical docs, long text |
-| Overlapping | Better boundary recall | More chunks, higher cost | General documents |
+| Overlapping | ==Better boundary recall== | More chunks, higher cost | General documents |
 | Sentence-based | Semantically coherent | Variable chunk size | Articles, reviews, Q&A |
 | Paragraph-based | Natural breaks | Very variable size | Web content, documentation |
+
+---
 
 ## Generating Embeddings
 
@@ -300,12 +316,16 @@ FROM dbo.DocumentChunks
 WHERE TokenCount > 7500;  -- Leave headroom below 8192 limit
 ```
 
+---
+
 ## Use Cases
 
 - **Document search**: Chunk product manuals, knowledge base articles, or support documents; embed each chunk; retrieve the most relevant chunks for a user query
 - **Product catalog**: Embed concatenated product name + description for semantic product search
 - **Customer reviews**: Embed each review for sentiment clustering and semantic similarity
 - **Q&A pairs**: Embed both questions and answers separately for best retrieval quality
+
+---
 
 ## Common Issues & Errors
 
@@ -317,13 +337,18 @@ WHERE TokenCount > 7500;  -- Leave headroom below 8192 limit
 | Very slow batch embedding | One API call per row | Use batch REST calls or PREDICT in a set-based UPDATE |
 | Storage bloat | 1536 floats × 4 bytes × millions of rows | Use `text-embedding-3-small` (same dims as ada-002 but better quality); consider VECTOR compression |
 
+---
+
 ## Exam Tips
 
-- Embedding models have a **token limit** — chunk text before embedding; ~4 chars per token for English
-- **Overlapping chunks** improve recall at chunk boundaries — use when retrieval quality matters more than cost
-- `VECTOR(1536)` stores 1536 floats × 4 bytes = 6KB per row — plan storage accordingly
-- Always store the `ChunkText` alongside the embedding — it's needed to assemble the context for the LLM
-- `PREDICT(MODEL = ..., DATA = (SELECT text AS input_text))` — the alias `input_text` is required for embedding models
+> [!tip] Exam Tips
+> - Embedding models have a **token limit** — chunk text before embedding; ~4 chars per token for English
+> - **Overlapping chunks** improve recall at chunk boundaries — use when retrieval quality matters more than cost
+> - `VECTOR(1536)` stores 1536 floats × 4 bytes = 6KB per row — plan storage accordingly
+> - Always store the `ChunkText` alongside the embedding — it's needed to assemble the context for the LLM
+> - `PREDICT(MODEL = ..., DATA = (SELECT text AS input_text))` — the alias `input_text` is required for embedding models
+
+---
 
 ## Key Takeaways
 
@@ -332,12 +357,16 @@ WHERE TokenCount > 7500;  -- Leave headroom below 8192 limit
 - Store chunks in a separate table with `ChunkText`, `DocumentId`, `ChunkNumber`, and `Embedding` columns
 - Generate embeddings with `PREDICT` (external model) or `sp_invoke_external_rest_endpoint` (REST call)
 
+---
+
 ## Related Topics
 
 - [01-External Models](./01-external-models.md)
 - [02-Embedding Maintenance](./02-embedding-maintenance.md)
 - [02-Vector Search](../10-intelligent-search/02-vector-search.md)
 - [03-Hybrid Search & RRF](../10-intelligent-search/03-hybrid-search-rrf.md)
+
+---
 
 ## Official Documentation
 

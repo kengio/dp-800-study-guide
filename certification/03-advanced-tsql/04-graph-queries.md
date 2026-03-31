@@ -15,6 +15,18 @@ tags:
 
 SQL Server graph tables store node and edge data using special columns (`$node_id`, `$from_id`, `$to_id`) and support graph traversal with the `MATCH` predicate — enabling relationship queries without recursive CTEs.
 
+> [!abstract]
+> - Covers graph database objects (NODE tables, EDGE tables) and graph query syntax (MATCH, SHORTEST_PATH)
+> - SQL graph tables are regular SQL tables with special system-generated columns for graph traversal
+> - Key exam topics: NODE vs EDGE table creation, MATCH clause syntax, when graph outperforms relational (hierarchies)
+
+> [!tip] What the Exam Tests
+> - `CREATE TABLE … AS NODE` and `CREATE TABLE … AS EDGE` — EDGE tables reference NODE tables
+> - `MATCH (Person)-[Knows]->(Person)` syntax is required for graph traversal — you cannot use regular JOINs for graph patterns
+> - `SHORTEST_PATH` inside a `MATCH` clause finds the shortest path between two nodes in a connected graph
+
+---
+
 ## Graph Table Types
 
 ```sql
@@ -46,6 +58,8 @@ CREATE TABLE dbo.Visited (
 - Node tables: `$node_id` (unique node identifier, JSON format internally)
 - Edge tables: `$edge_id`, `$from_id` (source node), `$to_id` (target node)
 
+---
+
 ## Inserting Graph Data
 
 ```sql
@@ -75,6 +89,8 @@ VALUES (
     '2025-06-01', 5
 );
 ```
+
+---
 
 ## MATCH Predicate
 
@@ -106,6 +122,11 @@ WHERE MATCH(p1-(f)->p2-(l)->r)
   AND r.Cuisine = 'Japanese';
 ```
 
+> [!warning] Common Mistake
+> Graph tables are still regular SQL tables — they support regular JOINs, indexes, and constraints. The MATCH clause is an additional query capability, not a replacement for all SQL. Don't confuse "graph table" with "NoSQL graph database."
+
+---
+
 ## SHORTEST_PATH
 
 `SHORTEST_PATH` finds the minimum-hop path between nodes using a recursive graph traversal pattern. The `FOR PATH` keyword is required on edge and intermediate node aliases inside the pattern.
@@ -133,6 +154,8 @@ WHERE
     AND Person1.Name = 'Alice';
 ```
 
+---
+
 ## Edge Constraints
 
 Edge constraints enforce which node types are permitted on each side of an edge, preventing invalid connections at the schema level.
@@ -152,6 +175,8 @@ CREATE TABLE Manages (
     CONSTRAINT EC_Manages CONNECTION (Person TO Person, Person TO Team)
 ) AS EDGE;
 ```
+
+---
 
 ## Graph Queries with JSON
 
@@ -176,6 +201,8 @@ WHERE MATCH(p-(r)->p2)
 AND JSON_VALUE(p.Attributes, '$.category') = 'Electronics';
 ```
 
+---
+
 ## Performance Considerations for Graph Queries
 
 Graph tables behave like regular tables for indexing and statistics — apply standard tuning principles in addition to graph-specific guidance.
@@ -195,6 +222,8 @@ CREATE INDEX IX_FriendOf_To ON FriendOf($to_id);
 CREATE INDEX IX_Person_Name ON Person(Name);
 ```
 
+---
+
 ## Use Cases
 
 - **Social networks**: Friend recommendations, influence analysis
@@ -203,15 +232,19 @@ CREATE INDEX IX_Person_Name ON Person(Name);
 - **Bill of materials**: Component hierarchies with shared subcomponents
 - **Recommendation engines**: "People who liked X also liked Y"
 
+---
+
 ## Common Issues & Errors
 
 | Issue | Cause | Resolution |
 | :--- | :--- | :--- |
 | `MATCH` fails | Graph tables not in FROM clause | All nodes and edges used in MATCH must be in the FROM clause |
-| Edge insert fails | Wrong `$node_id` value | Always use subquery `(SELECT $node_id FROM ...)` to reference nodes |
+| Edge insert fails | Wrong `$node_id` value | ==Always use subquery `(SELECT $node_id FROM ...)` to reference nodes== |
 | Multiple MATCH patterns | Separate MATCH calls connected by AND | Use `AND MATCH(...)` for additional patterns |
 | SHORTEST_PATH returns no rows | Source node has no outbound edges | Verify edge direction and that `FOR PATH` aliases are used correctly |
 | Edge constraint violation | Inserting edge between disallowed node types | Check `CONNECTION` constraint definition; ensure source/target match allowed types |
+
+---
 
 ## Best Practices
 
@@ -221,15 +254,20 @@ CREATE INDEX IX_Person_Name ON Person(Name);
 - Use `FOR PATH` aliases only inside `SHORTEST_PATH`; do not mix `FOR PATH` aliases with regular node aliases in the same `MATCH` clause.
 - Treat graph tables as first-class relational tables: apply column statistics, filtered indexes, and partitioning where appropriate.
 
+---
+
 ## Exam Tips
 
-- `MATCH` can only be used with graph tables (defined `AS NODE` or `AS EDGE`)
-- Arrow direction in `MATCH` corresponds to `$from_id` → `$to_id` in the edge table
-- `SHORTEST_PATH` requires the `FOR PATH` keyword on edge and node aliases
-- `LAST_NODE()` returns the final node in a `SHORTEST_PATH` traversal — use it to get the destination
-- `STRING_AGG(...) WITHIN GROUP (GRAPH PATH)` orders path values in traversal sequence
-- Graph tables can have additional user-defined columns just like regular tables
-- Edge constraints use `CONSTRAINT ... CONNECTION (NodeType TO NodeType)` syntax — know this for schema design questions
+> [!tip] Exam Tips
+> - `MATCH` can only be used with graph tables (defined `AS NODE` or `AS EDGE`)
+> - Arrow direction in `MATCH` corresponds to `$from_id` → `$to_id` in the edge table
+> - `SHORTEST_PATH` requires the `FOR PATH` keyword on edge and node aliases
+> - `LAST_NODE()` returns the final node in a `SHORTEST_PATH` traversal — use it to get the destination
+> - `STRING_AGG(...) WITHIN GROUP (GRAPH PATH)` orders path values in traversal sequence
+> - Graph tables can have additional user-defined columns just like regular tables
+> - Edge constraints use `CONSTRAINT ... CONNECTION (NodeType TO NodeType)` syntax — know this for schema design questions
+
+---
 
 ## Key Takeaways
 
@@ -239,10 +277,14 @@ CREATE INDEX IX_Person_Name ON Person(Name);
 - Edge constraints enforce valid node-type pairings at the DDL level
 - Index `$from_id` and `$to_id` on edge tables for performant traversal
 
+---
+
 ## Related Topics
 
 - [02-Specialized Tables](../01-database-objects/02-specialized-tables.md)
 - [01-CTEs & Window Functions](./01-ctes-window-functions.md)
+
+---
 
 ## Official Documentation
 

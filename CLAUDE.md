@@ -61,12 +61,14 @@ Use callouts to break up dense text in topic files and cheat sheets. Standard ty
 | Callout | Usage |
 | :--- | :--- |
 | `> [!info]` | Section intros, neutral context, "what this is" |
-| `> [!tip] Exam Tips` | Exam-specific advice, things that are commonly tested |
+| `> [!tip] What the Exam Tests` | Top-of-file orientation: 2–4 bullets on what the exam specifically tests in this file |
+| `> [!tip] Exam Tips` | Exam-specific advice in the terminal Exam Tips section |
 | `> [!warning] Common Mistake` | Frequent errors, gotchas, "don't confuse X with Y" |
 | `> [!note]` | Extra detail, caveats, "worth knowing but not critical" |
 | `> [!success]- Answer` | Collapsed practice question answers (foldable) |
-| `> [!abstract]` | Quick-reference summaries at top of cheat sheets |
+| `> [!abstract]` | Quick-reference summaries at top of cheat sheets and topic files |
 
+- Use `> [!tip] What the Exam Tests` immediately after the `[!abstract]` callout, before the first `##` section
 - Use `> [!tip] Exam Tips` blocks instead of bare bullet lists for the **Exam Tips** section in topic files
 - Use `> [!warning]` to highlight traps covered in the **Common Issues** section
 - Highlight key terms in tables with `==text==` (Obsidian highlight syntax)

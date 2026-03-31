@@ -15,6 +15,18 @@ tags:
 
 Correlated subqueries reference the outer query and execute once per outer row. Error handling with `TRY/CATCH` and `THROW` provides structured exception management comparable to application-level try/catch blocks.
 
+> [!abstract]
+> - Covers correlated subqueries, EXISTS/NOT EXISTS, TRY/CATCH error handling, THROW vs RAISERROR, and transaction state
+> - Correlated subqueries reference the outer query; EXISTS is usually more efficient than IN for large datasets
+> - Key exam topics: XACT_STATE() values, THROW vs RAISERROR behavior, ERROR_* functions inside CATCH
+
+> [!tip] What the Exam Tests
+> - `XACT_STATE() = -1` = uncommittable transaction (must ROLLBACK); `= 1` = active committable transaction; `= 0` = no active transaction
+> - `THROW` re-raises with the original error number and severity; `RAISERROR` creates a new error message (can specify severity)
+> - `EXISTS (SELECT 1 FROM …)` stops scanning as soon as one row is found — more efficient than `IN (SELECT col FROM …)` for correlated checks
+
+---
+
 ## Correlated Subqueries
 
 A correlated subquery references a column from the outer query — it cannot run independently.
@@ -113,6 +125,11 @@ OUTER APPLY (
 ) AS last_order;
 ```
 
+> [!warning] Common Mistake
+> Not all errors are catchable in TRY/CATCH — severity 20+ errors (fatal connection-terminating errors) and syntax/compile errors bypass the CATCH block. Always check XACT_STATE() before COMMIT or ROLLBACK inside CATCH; committing with XACT_STATE() = -1 will throw an error.
+
+---
+
 ## Error Handling with TRY/CATCH
 
 ```sql
@@ -147,6 +164,8 @@ BEGIN CATCH
 END CATCH;
 ```
 
+---
+
 ## THROW vs RAISERROR
 
 ```sql
@@ -168,7 +187,7 @@ RAISERROR ('Value: %d', 16, 1, @MyVariable);   -- with parameter
 | Can use in CATCH | Yes (re-throw) | Yes |
 | Terminates batch | Yes (with XACT_ABORT) | Depends on severity |
 | Error number range | 50000+ or any | Any |
-| Re-raise original | `THROW;` preserves original error | Not possible |
+| Re-raise original | ==`THROW;` preserves original error== | Not possible |
 | Parameters | No formatting | printf-style formatting |
 | Recommended | **Modern code (SQL 2012+)** | Legacy |
 
@@ -188,6 +207,8 @@ BEGIN CATCH
 END CATCH;
 ```
 
+---
+
 ## Custom Error Numbers
 
 Custom errors must be > 50000 (or 13000+ for informational):
@@ -199,6 +220,8 @@ EXEC sp_addmessage 50001, 16, 'Account balance cannot go negative.';
 -- Use with RAISERROR by message number
 RAISERROR (50001, 16, 1);
 ```
+
+---
 
 ## TRY_PARSE and TRY_CONVERT
 
@@ -224,6 +247,8 @@ SELECT * FROM StagingImport
 WHERE TRY_CONVERT(DATE, EventDateStr) IS NOT NULL;
 ```
 
+---
+
 ## XACT_ABORT and Transaction Behavior
 
 `SET XACT_ABORT ON` causes any runtime error to immediately roll back the entire transaction. The default (`XACT_ABORT OFF`) performs statement-level rollback only, which can leave partial transactions open.
@@ -236,7 +261,7 @@ WHERE TRY_CONVERT(DATE, EventDateStr) IS NOT NULL;
 | Value | Meaning |
 | :--- | :--- |
 | `1` | Active transaction, committable |
-| `-1` | Active transaction, doomed — must ROLLBACK |
+| `-1` | ==Active transaction, doomed — must ROLLBACK== |
 | `0` | No active transaction |
 
 ```sql
@@ -263,6 +288,8 @@ BEGIN CATCH
     THROW;
 END CATCH;
 ```
+
+---
 
 ## Transaction Management in Error Handling
 
@@ -296,6 +323,8 @@ BEGIN
 END;
 ```
 
+---
+
 ## Use Cases
 
 - **EXISTS/NOT EXISTS**: Existence checks; generally faster than `IN` with NULLs
@@ -304,15 +333,19 @@ END;
 - **Correlated UPDATE**: Refreshing denormalized columns
 - **TRY_CONVERT/TRY_PARSE**: Validating staging data types without CATCH overhead
 
+---
+
 ## Common Issues & Errors
 
 | Issue | Cause | Resolution |
 | :--- | :--- | :--- |
-| `NOT IN` returns no rows | NULL in subquery result | Use `NOT EXISTS` instead (handles NULLs correctly) |
+| `NOT IN` returns no rows | NULL in subquery result | ==Use `NOT EXISTS` instead (handles NULLs correctly)== |
 | `CATCH` not catching | Error severity < 11 or compile error | `TRY/CATCH` only catches runtime errors ≥ severity 11 |
 | `THROW` outside `CATCH` | Used without preceding CATCH | Only use bare `THROW;` inside a `CATCH` block |
 | Partial transaction after error | `XACT_ABORT OFF` (default) | Set `XACT_ABORT ON` in stored procedures |
 | Transaction doomed in CATCH | `XACT_ABORT ON` fired | Check `XACT_STATE() = -1`; must ROLLBACK, cannot COMMIT |
+
+---
 
 ## Best Practices
 
@@ -322,15 +355,20 @@ END;
 - Use `TRY_CONVERT` or `TRY_PARSE` to validate incoming data types in ETL/staging pipelines instead of wrapping each conversion in a TRY/CATCH block.
 - Use `NOT EXISTS` rather than `NOT IN` whenever the subquery could return NULLs — `NOT IN` with any NULL in the result set returns zero rows.
 
+---
+
 ## Exam Tips
 
-- `NOT EXISTS` is preferred over `NOT IN` when the subquery might return NULLs
-- `CROSS APPLY` vs `OUTER APPLY`: same semantics as INNER JOIN vs LEFT JOIN
-- `THROW` inside `CATCH` re-raises the original error — preserves error number and message
-- `@@TRANCOUNT` > 0 inside a procedure means you're inside a caller's transaction
-- `TRY_CONVERT` / `TRY_PARSE` return NULL (not an error) on failed conversion — no TRY/CATCH needed
-- `XACT_STATE() = -1` means the transaction is doomed and can only be rolled back
-- `SET XACT_ABORT ON` causes the full transaction to roll back on any runtime error; without it, only the failing statement is rolled back
+> [!tip] Exam Tips
+> - `NOT EXISTS` is preferred over `NOT IN` when the subquery might return NULLs
+> - `CROSS APPLY` vs `OUTER APPLY`: same semantics as INNER JOIN vs LEFT JOIN
+> - `THROW` inside `CATCH` re-raises the original error — preserves error number and message
+> - `@@TRANCOUNT` > 0 inside a procedure means you're inside a caller's transaction
+> - `TRY_CONVERT` / `TRY_PARSE` return NULL (not an error) on failed conversion — no TRY/CATCH needed
+> - `XACT_STATE() = -1` means the transaction is doomed and can only be rolled back
+> - `SET XACT_ABORT ON` causes the full transaction to roll back on any runtime error; without it, only the failing statement is rolled back
+
+---
 
 ## Practice Questions
 
@@ -348,6 +386,8 @@ D. The transaction is committed up to the point of the error
 >
 > Without `SET XACT_ABORT ON`, a runtime error in a transaction causes statement-level rollback only. The transaction remains open with the first INSERT still pending. This can lead to partial commits if the CATCH block doesn't explicitly ROLLBACK. Always use `SET XACT_ABORT ON` in stored procedures to ensure errors cause a full transaction rollback. Check `XACT_STATE()` in the CATCH block to determine whether the transaction can be committed or must be rolled back.
 
+---
+
 ## Key Takeaways
 
 - Correlated subqueries run once per outer row — use `EXISTS` for existence checks, `APPLY` for row-level TVF calls
@@ -356,10 +396,14 @@ D. The transaction is committed up to the point of the error
 - `TRY_CONVERT` and `TRY_PARSE` return NULL on failure — lightweight alternative to TRY/CATCH for type validation
 - `SET XACT_ABORT ON` guarantees full transaction rollback on any error; check `XACT_STATE()` in CATCH to handle doomed transactions
 
+---
+
 ## Related Topics
 
 - [03-Stored Procedures](../02-programmability-objects/03-stored-procedures.md)
 - [01-CTEs & Window Functions](./01-ctes-window-functions.md)
+
+---
 
 ## Official Documentation
 

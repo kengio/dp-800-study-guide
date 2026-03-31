@@ -206,7 +206,7 @@ ORDER BY ft.RANK DESC;
 
 > [!info] Hybrid search combines vector and full-text results using Reciprocal Rank Fusion for better relevance than either alone.
 
-Reciprocal Rank Fusion (RRF) combines rankings from multiple search methods.
+**Reciprocal Rank Fusion** (RRF) combines rankings from multiple search methods.
 
 ```sql
 -- Step 1: Vector search results
@@ -354,6 +354,30 @@ SELECT JSON_VALUE(@response, '$.result.choices[0].message.content') AS Answer;
 
 > [!tip] Exam Tip
 > Dimension count must match between stored embeddings and query vector. Mismatched dimensions cause runtime errors.
+
+---
+
+## Gotchas & Traps
+
+- **DiskANN metric must match** — the metric set on the DiskANN index (`cosine`, `dot`, or `euclidean`) must exactly match the metric used in `VECTOR_SEARCH`. Mismatched metrics cause an error at query time.
+- **VECTOR_SEARCH is approximate** — it can miss the true nearest neighbor for speed. Use `VECTOR_DISTANCE` when perfect accuracy matters; use `VECTOR_SEARCH` when scale matters.
+- **Normalize before dot product** — `VECTOR_NORMALIZE` (norm2) is required before you can use dot product distance as a cosine similarity proxy. Without normalization, dot product reflects magnitude, not direction.
+- **Embedding model dimensions matter** — text-embedding-3-small = 1536 dims; text-embedding-3-large = 3072 dims; ada-002 = 1536 dims. Changing models requires regenerating ALL embeddings — old and new vectors are incompatible.
+- **sp_invoke_external_rest_endpoint needs a CREDENTIAL** — the Azure OpenAI API key goes in a `DATABASE SCOPED CREDENTIAL`, not hard-coded in the procedure.
+- **RAG ≠ fine-tuning** — RAG injects context at inference time. The model's weights do not change.
+- **Chunking overlap is not redundancy** — overlap prevents a sentence split across a chunk boundary from being unretrievable. It is not wasteful duplication.
+
+---
+
+## Before the Exam, I Can…
+
+- [ ] Explain the difference between `VECTOR_DISTANCE` (ENN, exact) and `VECTOR_SEARCH` (ANN, approximate via DiskANN) and choose correctly given a scenario
+- [ ] State which distance metrics DiskANN supports (`cosine`, `dot`, `euclidean`) and explain why the index metric must match the query metric
+- [ ] Explain why `VECTOR_NORMALIZE` is needed before using dot product as cosine similarity
+- [ ] Recall dimensions for text-embedding-3-small (1536), text-embedding-3-large (3072), ada-002 (1536)
+- [ ] Describe the end-to-end RAG pattern: embed query → vector+FTS search → retrieve top-K → augment prompt → call LLM → return grounded response
+- [ ] Explain how `sp_invoke_external_rest_endpoint` calls Azure OpenAI and how the API key is stored
+- [ ] Describe RRF: combines FTS + vector result ranks using `1/(k + rank)`; k=60 default; higher score = more relevant
 
 ---
 

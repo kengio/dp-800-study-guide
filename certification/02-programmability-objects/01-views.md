@@ -14,6 +14,18 @@ tags:
 
 Views are stored SELECT statements that act as virtual tables. SQL Server supports standard views, schema-bound views, and indexed (materialized) views — each with different performance and maintenance characteristics.
 
+> [!abstract]
+> - Covers standard views, indexed views, and updatable views
+> - Views are virtual tables; indexed views materialize results with a unique clustered index
+> - Key exam topics: indexed view requirements (SCHEMABINDING + UNIQUE CLUSTERED INDEX), updatable view rules, WITH CHECK OPTION
+
+> [!tip] What the Exam Tests
+> - Indexed views require `WITH SCHEMABINDING` on the view AND a `UNIQUE CLUSTERED INDEX` on it — both are mandatory
+> - `WITH CHECK OPTION` ensures INSERT/UPDATE through a view stays within the view's WHERE clause filter
+> - Non-deterministic functions (GETDATE, NEWID) are forbidden in indexed views
+
+---
+
 ## Creating Views
 
 ```sql
@@ -35,6 +47,8 @@ JOIN dbo.Customers c ON c.CustomerId = o.CustomerId
 JOIN dbo.OrderItems oi ON oi.OrderId = o.OrderId
 GROUP BY o.OrderId, c.Name, o.OrderDate;
 ```
+
+---
 
 ## Schema Binding
 
@@ -59,9 +73,14 @@ With `SCHEMABINDING`:
 - Blocks `DROP TABLE` and column modifications on referenced objects
 - Two-part naming (`dbo.TableName`) is required; unqualified names are rejected
 
+> [!warning] Common Mistake
+> You cannot create an indexed view without first creating the view WITH SCHEMABINDING. SCHEMABINDING prevents the underlying tables from being modified in ways that would break the view — it must come first.
+
+---
+
 ## Indexed Views (Materialized Views)
 
-An indexed view has a unique clustered index created on it, which physically stores the result set on disk. This makes it functionally equivalent to a materialized view in other database systems.
+An **indexed view** has a unique clustered index created on it, which physically stores the result set on disk. This makes it functionally equivalent to a materialized view in other database systems.
 
 ```sql
 -- Create indexed view
@@ -99,6 +118,8 @@ FROM dbo.vw_SalesByProduct WITH (NOEXPAND)
 WHERE ProductId = 42;
 ```
 
+---
+
 ## Updatable Views
 
 Simple views (single base table, no aggregation, no `DISTINCT`, no `TOP`, no `ROWNUM`) support INSERT/UPDATE/DELETE against the underlying table.
@@ -130,16 +151,20 @@ UPDATE dbo.vw_ActiveProducts SET Price = 19.99 WHERE ProductId = 5;
 
 Use `INSTEAD OF` triggers on views for complex update logic involving multiple base tables.
 
+---
+
 ## View Limitations
 
 | Limitation | Detail |
 |---|---|
-| ORDER BY | Only allowed with TOP, OFFSET-FETCH, or FOR XML/JSON |
+| ORDER BY | ==Only allowed with TOP, OFFSET-FETCH, or FOR XML/JSON== |
 | Subqueries in FROM | Allowed in regular views; indexed views cannot use them |
 | CTEs | Regular views can use CTEs; indexed views cannot |
 | DISTINCT | Allowed in regular views; not in indexed views |
 | Outer joins | Allowed in regular views; not in indexed views |
 | System tables | Can be referenced; schema changes may silently break the view |
+
+---
 
 ## Use Cases
 
@@ -148,15 +173,19 @@ Use `INSTEAD OF` triggers on views for complex update logic involving multiple b
 - **Indexed views**: Pre-compute aggregations for reporting dashboards
 - **Updatable abstraction**: Expose a filtered subset of a table while enforcing constraints via `WITH CHECK OPTION`
 
+---
+
 ## Common Issues & Errors
 
 | Issue | Cause | Resolution |
 | :--- | :--- | :--- |
 | Cannot drop table | View uses `SCHEMABINDING` | Drop the view first, or use `ALTER VIEW` to remove schemabinding |
-| Indexed view not used | Not Enterprise, no `NOEXPAND` | Add `WITH (NOEXPAND)` hint |
+| Indexed view not used | Not Enterprise, no `NOEXPAND` | ==Add `WITH (NOEXPAND)` hint== |
 | View returns stale data | Underlying table changed | Views are always live (except indexed views) — check base tables |
 | Index creation fails | Non-deterministic function in view | Replace `GETDATE()`, `NEWID()`, etc. with deterministic alternatives |
 | DML through view fails | View spans multiple tables or has aggregation | Use `INSTEAD OF` trigger or target base table directly |
+
+---
 
 ## Best Practices
 
@@ -166,13 +195,18 @@ Use `INSTEAD OF` triggers on views for complex update logic involving multiple b
 - Avoid `SELECT *` in view definitions — explicitly list columns so that adding columns to the base table does not silently change the view's output.
 - For non-Enterprise editions, always add `WITH (NOEXPAND)` when querying indexed views to guarantee the materialized data is used.
 
+---
+
 ## Exam Tips
 
-- Indexed views require `WITH SCHEMABINDING` and a `UNIQUE CLUSTERED` index as the first index
-- `COUNT_BIG(*)` is required in grouped indexed views — `COUNT(*)` is not allowed
-- On non-Enterprise editions, use `WITH (NOEXPAND)` to force the optimizer to use the indexed view
-- Non-deterministic functions (`GETDATE()`, `NEWID()`, `RAND()`) block index creation on a view
-- `WITH CHECK OPTION` prevents DML that would cause rows to fall outside the view's filter — without it, "disappearing rows" can occur after insert/update
+> [!tip] Exam Tips
+> - Indexed views require `WITH SCHEMABINDING` and a `UNIQUE CLUSTERED` index as the first index
+> - `COUNT_BIG(*)` is required in grouped indexed views — `COUNT(*)` is not allowed
+> - On non-Enterprise editions, use `WITH (NOEXPAND)` to force the optimizer to use the indexed view
+> - Non-deterministic functions (`GETDATE()`, `NEWID()`, `RAND()`) block index creation on a view
+> - `WITH CHECK OPTION` prevents DML that would cause rows to fall outside the view's filter — without it, "disappearing rows" can occur after insert/update
+
+---
 
 ## Key Takeaways
 
@@ -180,6 +214,8 @@ Use `INSTEAD OF` triggers on views for complex update logic involving multiple b
 - `SCHEMABINDING` prevents accidental schema changes and enables indexing
 - Indexed views materialize query results and can dramatically speed up aggregation queries
 - `WITH CHECK OPTION` enforces that DML through a view keeps rows visible through the same view
+
+---
 
 ## Practice Questions
 
@@ -197,10 +233,14 @@ D. The underlying table has a columnstore index
 >
 > Indexed views require all functions to be deterministic (same output for same input). GETDATE(), NEWID(), RAND() are non-deterministic and prevent index creation. INNER JOINs (B) are allowed in indexed views. Including the PK (C) is fine. Columnstore indexes (D) on the base table do not affect view indexability.
 
+---
+
 ## Related Topics
 
 - [02-Functions](./02-functions.md)
 - [03-Stored Procedures](./03-stored-procedures.md)
+
+---
 
 ## Official Documentation
 

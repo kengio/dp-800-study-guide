@@ -15,6 +15,33 @@ status: draft
 
 Database configuration recommendations, concurrency controls, and query performance investigation using execution plans, DMVs, Query Store, and Query Performance Insight.
 
+---
+
+## Quick Recall
+
+```mermaid
+mindmap
+  root((Performance))
+    Configuration
+      MAXDOP - parallelism
+      Cost threshold
+      Auto-stats
+    Isolation Levels
+      READ COMMITTED default
+      SNAPSHOT - optimistic
+      RCSI - DB-level setting
+    Query Store
+      Persists plans + stats
+      Force plan
+      Plan regression detection
+    Diagnostics
+      sys.dm_exec_requests
+      sys.dm_os_wait_stats
+      Missing index DMVs
+```
+
+---
+
 ## Topics Overview
 
 ```mermaid

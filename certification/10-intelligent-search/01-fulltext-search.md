@@ -13,7 +13,19 @@ tags:
 
 ## Overview
 
-Full-text search (FTS) enables linguistic searching of character-based data — matching words, phrases, proximity, and inflected forms. Unlike LIKE queries (which do character pattern matching), FTS uses an inverted index and understands language semantics (stems, synonyms, stop words). The key predicates are `CONTAINS` (precise term matching) and `FREETEXT` (natural language matching).
+Full-text search (FTS) enables linguistic searching of character-based data — matching words, phrases, proximity, and inflected forms. Unlike LIKE queries (which do character pattern matching), FTS uses an **inverted index** and understands language semantics (stems, synonyms, stop words). The key predicates are `CONTAINS` (precise term matching) and `FREETEXT` (natural language matching).
+
+> [!abstract]
+> - Covers full-text search in Azure SQL: CONTAINS, FREETEXT, CONTAINSTABLE, FREETEXTTABLE, and full-text indexes
+> - Full-text search enables linguistic and proximity searches beyond LIKE pattern matching
+> - Key exam topics: CONTAINS vs FREETEXT use cases, full-text index requirement, ranked results with TABLE variants
+
+> [!tip] What the Exam Tests
+> - `CONTAINS` = **precision**: exact terms, prefix (`"data*"`), proximity (`NEAR`), weighted terms (`ISABOUT`)
+> - `FREETEXT` = **recall**: natural language query, inflections and synonyms, broader match
+> - `CONTAINSTABLE` / `FREETEXTTABLE` return a table with a `RANK` column (0–1000) — use when you need ranked results or want to join with other tables
+
+---
 
 ## Full-Text Catalogs and Indexes
 
@@ -53,7 +65,7 @@ SELECT * FROM sys.fulltext_index_columns;
 
 | Option | Behavior |
 | :--- | :--- |
-| `AUTO` | SQL Server automatically updates the FTS index when rows change |
+| `AUTO` | ==SQL Server automatically updates the FTS index when rows change== |
 | `MANUAL` | Updates only when you call `ALTER FULLTEXT INDEX ... START UPDATE POPULATION` |
 | `OFF` | No change tracking; manual full population only |
 
@@ -74,6 +86,8 @@ SELECT FULLTEXTCATALOGPROPERTY('ProductCatalog', 'PopulateStatus') AS Status;
 SELECT OBJECTPROPERTYEX(OBJECT_ID('dbo.Products'), 'TableFulltextPopulateStatus');
 ```
 
+---
+
 ## Stop Lists
 
 Stop words (common words like "the", "and", "is") are excluded from the index:
@@ -93,6 +107,8 @@ ALTER FULLTEXT INDEX ON dbo.Products SET STOPLIST = [MyStopList];
 SELECT * FROM sys.fulltext_stopwords WHERE stoplist_id =
     (SELECT stoplist_id FROM sys.fulltext_stoplists WHERE name = 'MyStopList');
 ```
+
+---
 
 ## CONTAINS — Precise Search Predicate
 
@@ -196,6 +212,8 @@ WHERE CONTAINS(Description, 'FORMSOF(THESAURUS, "fast")');
 -- Matches: fast, quick, rapid, speedy (depending on thesaurus configuration)
 ```
 
+---
+
 ## FREETEXT — Natural Language Search
 
 `FREETEXT` breaks the input string into words and searches for any of them and their linguistic variations. It is less precise than CONTAINS but more natural-language friendly.
@@ -212,6 +230,8 @@ WHERE FREETEXT(Description, 'fast wireless audio headphones');
 -- 3. Expands to thesaurus synonyms (if thesaurus configured)
 -- 4. Uses OR logic (any of the words can match)
 ```
+
+---
 
 ## CONTAINSTABLE and FREETEXTTABLE — Ranked Results
 
@@ -259,6 +279,8 @@ ORDER BY ftt.[RANK] DESC;
 -- The 4th parameter (10) limits results inside the FTS engine
 ```
 
+---
+
 ## Language Support
 
 ```sql
@@ -275,12 +297,16 @@ SELECT lcid, name FROM sys.fulltext_languages ORDER BY name;
 -- Common: 1033=English, 1031=German, 1036=French, 1041=Japanese
 ```
 
+---
+
 ## Use Cases
 
 - **Product search**: Match product names and descriptions for keyword-based search in e-commerce
 - **Document library search**: Find articles containing specific terms or phrases
 - **Knowledge base**: Search FAQ or support articles using natural language queries
 - **FREETEXTTABLE for ranking**: Return results ordered by relevance, not just presence of keywords
+
+---
 
 ## Common Issues & Errors
 
@@ -292,14 +318,19 @@ SELECT lcid, name FROM sys.fulltext_languages ORDER BY name;
 | FORMSOF THESAURUS returns nothing | Thesaurus file not configured | Edit the thesaurus XML file for the language |
 | CONTAINS syntax error | Quotes missing around phrases | Phrase searches require double quotes: `'"noise cancelling"'` |
 
+---
+
 ## Exam Tips
 
-- `CONTAINS` returns a boolean match — use in WHERE clause; `CONTAINSTABLE` returns ranked results — use as a table
-- `FREETEXT` is for natural language; `CONTAINS` is for precise control (prefix, proximity, boolean)
-- **Stop words** can suppress expected results — if "product" is in the stop list, searching for "product" returns nothing
-- `CHANGE_TRACKING = AUTO` keeps the FTS index current; `MANUAL` requires explicit repopulation
-- `FORMSOF(INFLECTIONAL, ...)` — great for verb forms (search "run" finds "running", "ran", "runs")
-- `RANK` from CONTAINSTABLE/FREETEXTTABLE is 1–1000 — useful for relevance-based ordering
+> [!tip] Exam Tips
+> - `CONTAINS` returns a boolean match — use in WHERE clause; `CONTAINSTABLE` returns ranked results — use as a table
+> - `FREETEXT` is for natural language; `CONTAINS` is for precise control (prefix, proximity, boolean)
+> - **Stop words** can suppress expected results — if "product" is in the stop list, searching for "product" returns nothing
+> - `CHANGE_TRACKING = AUTO` keeps the FTS index current; `MANUAL` requires explicit repopulation
+> - `FORMSOF(INFLECTIONAL, ...)` — great for verb forms (search "run" finds "running", "ran", "runs")
+> - `RANK` from CONTAINSTABLE/FREETEXTTABLE is 1–1000 — useful for relevance-based ordering
+
+---
 
 ## Key Takeaways
 
@@ -308,11 +339,15 @@ SELECT lcid, name FROM sys.fulltext_languages ORDER BY name;
 - `FREETEXT`/`FREETEXTTABLE` for natural language searches that automatically handle variations
 - Use `FREETEXTTABLE` when you need relevance-ranked results for search UIs
 
+---
+
 ## Related Topics
 
 - [02-Vector Search](./02-vector-search.md)
 - [03-Hybrid Search & RRF](./03-hybrid-search-rrf.md)
 - [03-Chunking & Generation](../09-models-embeddings/03-chunking-generation.md)
+
+---
 
 ## Official Documentation
 

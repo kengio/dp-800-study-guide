@@ -14,6 +14,18 @@ tags:
 
 Table and index partitioning divides large tables into smaller, manageable chunks based on a partition key — typically a date column. This enables partition elimination, efficient data archiving (partition switching), and parallel operations across partitions.
 
+> [!abstract]
+> - Covers table and index partitioning: partition functions, partition schemes, and partition switching
+> - Partitioning improves manageability and query performance on large tables by physically separating data ranges
+> - Key exam topics: function vs scheme (two separate objects), $PARTITION, partition switching for bulk operations
+
+> [!tip] What the Exam Tests
+> - **Partition function** defines value boundaries (ranges); **partition scheme** maps those ranges to filegroups — they are two distinct objects
+> - `$PARTITION.FunctionName(column)` returns the partition number for a given value
+> - **Partition switching** (`ALTER TABLE … SWITCH`) moves an entire partition instantly — used for bulk load staging and archiving
+
+---
+
 ## Partitioning Components
 
 Partitioning requires three objects:
@@ -23,6 +35,8 @@ Partitioning requires three objects:
 3. **Partitioned Table/Index** — table or index created `ON` the partition scheme
 
 ### Partition Function
+
+A **partition function** defines the boundary values and direction (RANGE LEFT or RANGE RIGHT) that determine which rows go into each partition.
 
 ```sql
 -- RANGE LEFT: boundary value belongs to the LEFT partition
@@ -38,11 +52,15 @@ AS RANGE RIGHT FOR VALUES (
 -- Creates 14 partitions: 1 before Jan 2025, 12 monthly, 1 after Jan 2026
 ```
 
+> [!warning] Common Mistake
+> Creating a partition function is not enough — you must also create a partition scheme that maps the function's ranges to filegroups, then create the table ON that scheme. The exam may ask you to identify which step is missing.
+
 **RANGE LEFT vs RANGE RIGHT:**
 
-- `RANGE LEFT`: boundary value is the last value in the left partition (≤ boundary)
-- `RANGE RIGHT`: boundary value is the first value in the right partition (≥ boundary)
-- For date ranges, `RANGE RIGHT` is more intuitive (e.g., `'2025-01-01'` starts the January partition)
+| Direction | Boundary value belongs to | Typical use |
+| :--- | :--- | :--- |
+| `RANGE LEFT` | Left (lower) partition (≤ boundary) | Numeric ranges |
+| `RANGE RIGHT` | ==Right (upper) partition (≥ boundary)== | Date ranges — boundary starts the new period |
 
 ### Partition Scheme
 
@@ -73,6 +91,8 @@ CREATE TABLE dbo.Sales (
 ) ON PS_SalesByMonth (SaleDate);  -- partitioned on SaleDate
 ```
 
+---
+
 ## Partition Switching
 
 Partition switching is a near-instant metadata-only operation — SQL Server reassigns the data pages from one table to another without physically moving any rows.
@@ -100,6 +120,8 @@ FROM sys.partitions
 WHERE object_id = OBJECT_ID('Orders') AND index_id <= 1;
 ```
 
+---
+
 ## Sliding Window Pattern
 
 The sliding window pattern continuously adds new partitions for incoming data and removes old ones, keeping a rolling window (e.g., last 12 months) without unbounded table growth.
@@ -124,6 +146,8 @@ MERGE RANGE ('2024-01-01');
 ```
 
 **Key tip:** Always SPLIT before loading new data, and always switch out the old partition before merging its boundary. SPLIT on an empty partition is instantaneous; SPLIT on a populated partition causes data movement.
+
+---
 
 ## Managing Partitions
 
@@ -154,9 +178,11 @@ WHERE pf.name = 'PF_SalesByMonth'
 ORDER BY p.partition_number;
 ```
 
+---
+
 ## Partition Elimination
 
-Partition elimination is the optimizer behavior of skipping partitions that cannot contain rows matching the query's WHERE clause. It is one of the primary performance benefits of partitioning.
+**Partition elimination** is the optimizer behavior of skipping partitions that cannot contain rows matching the query's WHERE clause. It is one of the primary performance benefits of partitioning.
 
 **Requirement:** The query filter must reference the partition column directly. Implicit conversions or computed expressions on the column can prevent elimination.
 
@@ -180,6 +206,8 @@ WHERE CustomerID = 12345;
 
 If your queries commonly filter on a column other than the partition key, partitioning on that key provides no elimination benefit and may add overhead.
 
+---
+
 ## Aligned vs Non-Aligned Indexes
 
 An **aligned index** uses the same partition function as the base table, so each index partition maps to the same rows as the corresponding table partition.
@@ -194,6 +222,8 @@ A **non-aligned index** has a different partitioning scheme (or is not partition
 
 **Recommendation:** Always create indexes using the same partition scheme as the base table. When designing a partitioned table, define the partition scheme first, then all indexes on it.
 
+---
+
 ## Use Cases
 
 - **Date-based tables**: Orders, transactions, logs — partition by month or year
@@ -201,15 +231,19 @@ A **non-aligned index** has a different partitioning scheme (or is not partition
 - **Parallel operations**: Maintenance tasks (rebuild, statistics) run per partition
 - **Data lifecycle**: Drop old data by switching out a partition then truncating it
 
+---
+
 ## Common Issues & Errors
 
 | Issue | Cause | Resolution |
 | :--- | :--- | :--- |
 | Switch fails: not on same filegroup | Partition scheme maps to different FG | Use `ALL TO [PRIMARY]` for simplicity |
-| Switch fails: target not empty | Staging/archive partition has rows | Truncate or move target partition first |
+| Switch fails: target not empty | Staging/archive partition has rows | ==Truncate or move target partition first== |
 | No partition elimination | WHERE clause doesn't use partition key | Ensure filter is on the partition column directly |
 | SPLIT/MERGE slow | Large data movement between partitions | Keep the new/merged partition empty before SPLIT |
 | Switch fails: non-aligned index | Table has an index on a different scheme | Rebuild the index ON the same partition scheme |
+
+---
 
 ## Best Practices
 
@@ -219,14 +253,19 @@ A **non-aligned index** has a different partitioning scheme (or is not partition
 - Align all indexes (clustered and nonclustered) with the table's partition scheme so that `SWITCH` operations succeed without rebuilding indexes.
 - Automate the sliding window cycle (SPLIT → SWITCH → MERGE) in a stored procedure or SQL Agent job to ensure consistent execution each period.
 
+---
+
 ## Exam Tips
 
-- **Partition function** defines the rules; **partition scheme** maps to filegroups
-- `RANGE RIGHT` is standard for date partitioning — boundary value starts the new partition
-- Partition switching is a **metadata-only operation** — extremely fast even for billions of rows
-- Adding a new partition requires `ALTER PARTITION SCHEME ... NEXT USED` first, then `SPLIT`
-- Partition elimination only occurs when the WHERE clause filters **directly on the partition column**
-- All indexes must be **aligned** (same partition scheme) for `SWITCH` to succeed
+> [!tip] Exam Tips
+> - **Partition function** defines the rules; **partition scheme** maps to filegroups
+> - `RANGE RIGHT` is standard for date partitioning — boundary value starts the new partition
+> - Partition switching is a **metadata-only operation** — extremely fast even for billions of rows
+> - Adding a new partition requires `ALTER PARTITION SCHEME ... NEXT USED` first, then `SPLIT`
+> - Partition elimination only occurs when the WHERE clause filters **directly on the partition column**
+> - All indexes must be **aligned** (same partition scheme) for `SWITCH` to succeed
+
+---
 
 ## Key Takeaways
 
@@ -235,6 +274,8 @@ A **non-aligned index** has a different partitioning scheme (or is not partition
 - SPLIT and MERGE modify partition boundaries; SWITCH moves data between tables
 - The sliding window pattern (SPLIT → SWITCH → MERGE) manages a rolling data window efficiently
 - Aligned indexes are required for partition switching and enable partition elimination on index seeks
+
+---
 
 ## Practice Question
 
@@ -250,10 +291,14 @@ D. ALTER PARTITION FUNCTION MERGE RANGE on the oldest boundary
 >
 > Partition SWITCH is a metadata-only operation that completes near-instantly with minimal locking — it simply reassigns the partition's data pages to the target table. INSERT/DELETE (A) physically moves data and holds locks. CREATE TABLE AS SELECT (C) is not valid T-SQL syntax. MERGE RANGE (D) removes a boundary but doesn't move data to an archive.
 
+---
+
 ## Related Topics
 
 - [01-Tables & Indexes](./01-tables-indexes.md)
 - [06-Performance Optimization](../06-performance-optimization/README.md)
+
+---
 
 ## Official Documentation
 

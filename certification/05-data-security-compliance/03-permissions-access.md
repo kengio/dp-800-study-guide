@@ -16,12 +16,28 @@ tags:
 
 SQL Server uses a layered permission system: server-level logins, database-level users, roles, and object-level GRANT/DENY/REVOKE. Azure SQL extends this with Azure Active Directory authentication and Managed Identity for passwordless access.
 
+> [!abstract]
+> - Covers GRANT/DENY/REVOKE, database roles, ownership chaining, and EXECUTE AS context
+> - SQL Server uses a hierarchical permission system: server → database → schema → object
+> - Key exam topics: DENY/GRANT precedence, fixed database roles, ownership chaining behavior
+
+> [!tip] What the Exam Tests
+> - **DENY always wins** over GRANT — even if a GRANT came through role membership, an explicit DENY on the principal blocks access
+> - **REVOKE** removes a previously granted or denied permission — it does NOT itself deny access
+> - Fixed roles: `db_datareader` = SELECT on all tables; `db_datawriter` = INSERT/UPDATE/DELETE; `db_owner` = full control; `db_ddladmin` = DDL only
+
+---
+
+---
+
 ## Permission Hierarchy
 
 ```text
 Server Level → Database Level → Schema Level → Object Level
     Login         User/Role       Schema perms    GRANT/DENY
 ```
+
+---
 
 ## Server and Database Principals
 
@@ -42,6 +58,8 @@ CREATE USER [app-service-identity] FROM EXTERNAL PROVIDER;
 CREATE USER ReportUser WITH PASSWORD = 'Report#2025!';
 ```
 
+---
+
 ## Database Roles
 
 ```sql
@@ -56,6 +74,8 @@ GRANT SELECT ON SCHEMA::dbo TO OrdersReadOnly;
 DENY  SELECT ON dbo.CustomerPayments TO OrdersReadOnly;
 ALTER ROLE OrdersReadOnly ADD MEMBER [analyst@contoso.com];
 ```
+
+---
 
 ## Object-Level Permissions
 
@@ -82,16 +102,21 @@ SELECT * FROM fn_my_permissions('dbo.Orders', 'OBJECT');
 SELECT * FROM sys.database_permissions WHERE grantee_principal_id = USER_ID('ReportUser');
 ```
 
+> [!warning] Common Mistake
+> REVOKE ≠ DENY. REVOKE removes a permission entry (the user falls back to inherited permissions). DENY explicitly blocks access. If you GRANT access through a role and then REVOKE from the role, the user may still have access through another path. To explicitly block, use DENY.
+
+---
+
 ## Passwordless Access — Managed Identity
 
-Managed Identity eliminates the need for credentials by using Azure AD tokens.
+**Managed Identity** eliminates the need for credentials by using Azure AD tokens.
 
 ### Types of Managed Identity
 
 | Type | Lifecycle | Use Case |
 | :--- | :--- | :--- |
 | **System-assigned** | Tied to the Azure resource | Single-service authentication |
-| **User-assigned** | Independent resource | Multiple services sharing an identity |
+| **User-assigned** | Independent resource | ==Multiple services sharing an identity== |
 
 ### Configuring Managed Identity for Azure SQL
 
@@ -117,6 +142,8 @@ var connectionString = "Server=myserver.database.windows.net;Database=mydb;Authe
 | `Active Directory Service Principal` | Apps with client ID + certificate/secret |
 | `Active Directory Default` | Tries multiple auth methods in order |
 
+---
+
 ## Principle of Least Privilege
 
 ```sql
@@ -128,6 +155,8 @@ GRANT SELECT ON dbo.Products TO AppUser;
 GRANT EXECUTE ON dbo.usp_PlaceOrder TO AppUser;
 GRANT INSERT ON dbo.OrderItems TO AppUser;
 ```
+
+---
 
 ## Contained Database Users
 
@@ -162,6 +191,8 @@ ALTER ROLE db_datareader ADD MEMBER AppUser;
 CREATE USER [user@domain.com] FROM EXTERNAL PROVIDER;  -- AAD user
 ```
 
+---
+
 ## EXECUTE AS Context
 
 `EXECUTE AS` temporarily impersonates a different security principal for the duration of a batch or stored procedure. This is used to test permissions, elevate privileges in a controlled way, or run module code as a specific identity.
@@ -173,7 +204,7 @@ CREATE USER [user@domain.com] FROM EXTERNAL PROVIDER;  -- AAD user
 | `EXECUTE AS USER` | Database | Impersonate a database user |
 | `EXECUTE AS LOGIN` | Server | Impersonate a server login |
 | `EXECUTE AS CALLER` | Module | Use caller's identity (default) |
-| `EXECUTE AS OWNER` | Module | Use the object owner's identity |
+| `EXECUTE AS OWNER` | Module | ==Use the object owner's identity== |
 | `EXECUTE AS SELF` | Module | Use the identity of the user who defined the object |
 
 `REVERT` restores the original security context after impersonation.
@@ -192,6 +223,8 @@ AS SELECT * FROM dbo.SalaryData;
 -- Check current execution context
 SELECT ORIGINAL_LOGIN(), SUSER_SNAME(), USER_NAME();
 ```
+
+---
 
 ## Ownership Chaining
 
@@ -215,11 +248,13 @@ CREATE PROCEDURE dbo.sp_GetHRData AS SELECT * FROM hr.Employees;
 -- User needs EXECUTE on proc AND SELECT on hr.Employees
 ```
 
+---
+
 ## Database vs Server-Level Roles
 
 | Role | Scope | Permissions |
 | :--- | :--- | :--- |
-| `db_owner` | Database | Full control of database |
+| `db_owner` | Database | ==Full control of database== |
 | `db_datareader` | Database | SELECT on all tables/views |
 | `db_datawriter` | Database | INSERT/UPDATE/DELETE on all tables |
 | `db_ddladmin` | Database | CREATE/ALTER/DROP schema objects |
@@ -229,6 +264,8 @@ CREATE PROCEDURE dbo.sp_GetHRData AS SELECT * FROM hr.Employees;
 | `serveradmin` | Server | Server configuration |
 | `securityadmin` | Server | Manage server logins |
 
+---
+
 ## Use Cases
 
 - **Managed Identity**: App Services, Azure Functions, ADF pipelines accessing Azure SQL
@@ -236,6 +273,8 @@ CREATE PROCEDURE dbo.sp_GetHRData AS SELECT * FROM hr.Employees;
 - **Schema-level grants**: Grant access to all objects in a schema at once for application accounts
 - **Contained users**: Simplify user management in elastic pools or geo-replicated databases
 - **EXECUTE AS OWNER**: Grant controlled access to sensitive tables through procedures without direct table permissions
+
+---
 
 ## Common Issues & Errors
 
@@ -247,6 +286,8 @@ CREATE PROCEDURE dbo.sp_GetHRData AS SELECT * FROM hr.Employees;
 | Contained user auth fails | Containment not enabled | Run `sp_configure 'contained database authentication', 1` |
 | Cross-owner proc fails | Ownership chain broken | Grant explicit table permission or use `WITH EXECUTE AS OWNER` |
 
+---
+
 ## Best Practices
 
 - Prefer **Azure AD / Managed Identity** over SQL logins for all Azure-hosted workloads; eliminate stored passwords entirely.
@@ -255,15 +296,20 @@ CREATE PROCEDURE dbo.sp_GetHRData AS SELECT * FROM hr.Employees;
 - Avoid placing application identities in `db_owner` or `sysadmin`; grant only the minimum permissions needed per object or schema.
 - Audit role membership regularly using `sys.database_role_members` and `sys.server_role_members` — accumulated role grants are a common source of privilege creep.
 
+---
+
 ## Exam Tips
 
-- `DENY` always wins — it overrides GRANT even when inherited through a role
-- Managed Identity authentication uses `FROM EXTERNAL PROVIDER` syntax in SQL
-- Always use **Managed Identity** over connection string credentials for Azure services
-- `fn_my_permissions` shows effective permissions for the current user
-- Ownership chaining skips permission checks only when **consecutive objects share the same owner** — a different owner breaks the chain
-- `EXECUTE AS OWNER` is the standard fix for cross-owner chain breaks
-- Contained database users require `SET CONTAINMENT = PARTIAL` on on-premises SQL Server; Azure SQL uses partial containment by default
+> [!tip] Exam Tips
+> - `DENY` always wins — it overrides GRANT even when inherited through a role
+> - Managed Identity authentication uses `FROM EXTERNAL PROVIDER` syntax in SQL
+> - Always use **Managed Identity** over connection string credentials for Azure services
+> - `fn_my_permissions` shows effective permissions for the current user
+> - Ownership chaining skips permission checks only when **consecutive objects share the same owner** — a different owner breaks the chain
+> - `EXECUTE AS OWNER` is the standard fix for cross-owner chain breaks
+> - Contained database users require `SET CONTAINMENT = PARTIAL` on on-premises SQL Server; Azure SQL uses partial containment by default
+
+---
 
 ## Key Takeaways
 
@@ -273,6 +319,8 @@ CREATE PROCEDURE dbo.sp_GetHRData AS SELECT * FROM hr.Employees;
 - Contained users travel with the database; no server-level login dependency
 - Ownership chaining reduces permission grants but breaks across different owners
 - `EXECUTE AS` enables controlled impersonation; always `REVERT` after use
+
+---
 
 ## Practice Questions
 
@@ -290,11 +338,15 @@ D. The procedure runs only if the user has db_datareader role
 >
 > Ownership chaining only skips permission checks when the calling object and the called object share the same owner. When the procedure (owned by `dbo`) calls a table owned by a different principal (`hr_schema` owner), the chain breaks and the caller needs explicit permission on the table. To fix: use `WITH EXECUTE AS OWNER` on the procedure, grant the table permission to the procedure's owner, or grant the permission directly to the user.
 
+---
+
 ## Related Topics
 
 - [04-Auditing](./04-auditing.md)
 - [05-Secure Endpoints](./05-secure-endpoints.md)
 - [03-MCP Server Endpoints](../04-ai-assisted-tools/03-mcp-server-endpoints.md)
+
+---
 
 ## Official Documentation
 

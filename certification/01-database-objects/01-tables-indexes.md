@@ -15,6 +15,18 @@ tags:
 
 Designing and implementing tables is foundational to the DP-800 exam. This covers choosing appropriate data types, designing clustered and non-clustered indexes, and when to use column store indexes for analytical workloads.
 
+> [!abstract]
+> - Covers B-tree indexes (clustered, non-clustered), columnstore indexes (CCI, NCCI), and index maintenance
+> - Heap tables have no clustered index; adding a CI converts the heap
+> - Key exam topics: choosing index type for OLTP vs analytics, fill factor, index fragmentation
+
+> [!tip] What the Exam Tests
+> - Choose between **clustered columnstore (CCI)** and clustered B-tree based on workload: CCI = analytics/bulk-load; B-tree = OLTP point lookups
+> - Recognize that a **non-clustered columnstore index (NCCI)** can be added to an existing rowstore table for mixed workloads
+> - Know that **fill factor** reduces page splits by leaving space in leaf pages — lower fill factor = less splits, more space used
+
+---
+
 ## Table Design
 
 ### Choosing Data Types
@@ -24,7 +36,7 @@ Designing and implementing tables is foundational to the DP-800 exam. This cover
 | **Integer** | `tinyint`, `smallint`, `int`, `bigint` | Use the smallest type that fits the range |
 | **Decimal** | `decimal(p,s)`, `numeric(p,s)` | Use for financial data; avoid `float`/`real` for exact values |
 | **Character** | `char(n)`, `varchar(n)`, `nvarchar(n)` | Use `nvarchar` for Unicode; `varchar(max)` up to 2 GB |
-| **Date/Time** | `date`, `time`, `datetime2`, `datetimeoffset` | Prefer `datetime2` over legacy `datetime` |
+| **Date/Time** | `date`, `time`, `datetime2`, `datetimeoffset` | ==Prefer `datetime2` over legacy `datetime`== |
 | **Binary** | `varbinary(n)`, `varbinary(max)` | For BLOBs; consider Azure Blob Storage for very large objects |
 | **Other** | `uniqueidentifier`, `bit`, `xml`, `json` (via `nvarchar`) | `uniqueidentifier` for GUIDs |
 
@@ -44,6 +56,8 @@ CREATE TABLE dbo.Orders (
 - `nvarchar(max)` prevents row compression and some index features; use explicit size when possible
 - `varchar(max)` / `varbinary(max)` columns stored off-row when > 8000 bytes
 - Use `SPARSE` columns for columns that are mostly NULL (must be a supported type)
+
+---
 
 ## Index Types
 
@@ -73,11 +87,11 @@ INCLUDE (OrderDate, TotalAmount);
 
 ### Column Store Index
 
-Column store indexes store data by column rather than by row, enabling high-compression and vectorized execution — ideal for analytical queries scanning large datasets.
+**Columnstore indexes** store data by column rather than by row, enabling high-compression and vectorized execution — ideal for analytical queries scanning large datasets.
 
 | Type | Use Case |
 | :--- | :--- |
-| **Clustered Columnstore Index (CCI)** | Full analytical/DW tables; replaces B-tree clustered index |
+| **Clustered Columnstore Index (CCI)** | ==Full analytical/DW tables; replaces B-tree clustered index== |
 | **Non-Clustered Columnstore Index (NCCI)** | Add analytical capability to OLTP tables without replacing the rowstore |
 
 ```sql
@@ -97,19 +111,26 @@ ON dbo.Orders (OrderDate, CustomerId, TotalAmount);
 - Row group elimination — skips compressed row groups where min/max don't match the filter
 - Not suitable for single-row lookups; combine with rowstore for mixed workloads
 
+> [!warning] Common Mistake
+> A CCI on an OLTP table with frequent single-row updates has high write overhead — the delta rowstore helps but it's not free. Don't recommend CCI for pure OLTP scenarios on the exam.
+
+---
+
 ## Heap vs Clustered Table
 
 | Aspect | Heap (no clustered index) | Clustered Table |
 | :--- | :--- | :--- |
 | **Storage** | IAM + data pages in any order | Sorted B-tree pages |
 | **INSERT** | Fast (append) | May cause page splits |
-| **SELECT by PK** | Full scan (no order) | Efficient seek |
+| **SELECT by PK** | Full scan (no order) | ==Efficient seek== |
 | **Forwarding pointers** | Yes (after UPDATEs) | No |
 | **Best for** | Staging/bulk load, then index | Most OLTP tables |
 
+---
+
 ## Filtered Indexes
 
-A filtered index is a non-clustered index with a `WHERE` clause predicate, indexing only the rows that satisfy the filter. This reduces index size and maintenance overhead compared to a full non-clustered index.
+A **filtered index** is a non-clustered index with a `WHERE` clause predicate, indexing only the rows that satisfy the filter. This reduces index size and maintenance overhead compared to a full non-clustered index.
 
 **When to use:**
 
@@ -137,6 +158,8 @@ WHERE ManagerID IS NOT NULL;
 - Cannot be used as a covering index for queries that also need rows outside the filter
 - Not supported in all scenarios (e.g., cannot be used with `OR` predicates in some cases)
 
+---
+
 ## Included Columns
 
 The `INCLUDE` clause adds non-key columns to the leaf level of a non-clustered index, creating a **covering index** that satisfies a query entirely from the index without a key lookup back to the base table.
@@ -146,7 +169,7 @@ The `INCLUDE` clause adds non-key columns to the leaf level of a non-clustered i
 | Aspect | Key Column | Included Column |
 | :--- | :--- | :--- |
 | **Sorted** | Yes — in B-tree order | No — stored only at leaf level |
-| **16-key limit** | Counts toward limit | Does not count |
+| **16-key limit** | Counts toward limit | ==Does not count== |
 | **Use for** | WHERE, JOIN ON, ORDER BY | SELECT output columns only |
 | **Index size** | Affects all B-tree levels | Affects leaf level only |
 
@@ -158,6 +181,8 @@ INCLUDE (TotalAmount, Status, ShipDate);
 ```
 
 > **Exam tip:** Included columns eliminate key lookups (shown as RID Lookup or Key Lookup operators in execution plans). When a query selects columns not in the index key, SQL Server performs a key lookup for each row — adding those columns to `INCLUDE` removes this extra operation.
+
+---
 
 ## Index Compression
 
@@ -188,6 +213,8 @@ ALTER TABLE Orders REBUILD WITH (DATA_COMPRESSION = PAGE);
 ALTER INDEX IX_Orders_Customer ON Orders REBUILD WITH (DATA_COMPRESSION = ROW);
 ```
 
+---
+
 ## Index Design Considerations
 
 Choosing which columns to index — and how — has a significant impact on query performance and write overhead.
@@ -198,6 +225,8 @@ Choosing which columns to index — and how — has a significant impact on quer
 - **Statistics** — SQL Server automatically creates statistics for indexed columns; these statistics drive cardinality estimates in the query optimizer
 - **Index key order matters** — for composite indexes, put the most selective (highest cardinality) equality columns first, then range columns
 
+---
+
 ## Use Cases
 
 - **Column store indexes**: Data warehouse fact tables, reporting aggregations over millions of rows
@@ -206,16 +235,20 @@ Choosing which columns to index — and how — has a significant impact on quer
 - **Filtered indexes**: Active-record patterns, nullable foreign keys, partial dataset queries
 - **Index compression**: Large tables with repetitive data where I/O is the bottleneck
 
+---
+
 ## Common Issues & Errors
 
 | Issue | Cause | Resolution |
 | :--- | :--- | :--- |
 | Index fragmentation | Frequent INSERT/UPDATE/DELETE | Rebuild (`ALTER INDEX ... REBUILD`) or reorganize |
-| Page splits | Sequential GUID PKs cause random inserts | Use `NEWSEQUENTIALID()` or `INT IDENTITY` |
+| Page splits | Sequential GUID PKs cause random inserts | ==Use `NEWSEQUENTIALID()` or `INT IDENTITY`== |
 | Delta store large | Low row count inserts into columnstore | Batch inserts to fill row groups (min 102,400 rows) |
 | `nvarchar(max)` off-row | Value exceeds 8000 bytes | Expected behavior; consider chunking large text |
 | Filtered index not used | Query uses variable/parameter instead of literal | Rewrite query to use literal value or use `OPTION (RECOMPILE)` |
 | Key lookup in plan | Index missing SELECT columns | Add missing columns to `INCLUDE` clause |
+
+---
 
 ## Best Practices
 
@@ -225,14 +258,19 @@ Choosing which columns to index — and how — has a significant impact on quer
 - Use filtered indexes on low-cardinality flag columns (e.g., `IsActive`, `Status`) rather than full indexes
 - Review execution plans for Key Lookup and RID Lookup operators — these indicate missing covered columns
 
+---
+
 ## Exam Tips
 
-- Know the difference between **clustered columnstore** (replaces rowstore) vs **non-clustered columnstore** (supplements rowstore)
-- Batch mode execution is available with columnstore indexes — a key performance differentiator
-- `datetime2` is preferred over `datetime` for new development (greater precision, more range)
-- `INCLUDE` columns in non-clustered indexes create covering indexes without widening the key
-- Filtered indexes are not used by the optimizer when the filter column is compared to a variable or parameter — only literals match reliably
-- PAGE compression = ROW compression + prefix + dictionary; always estimate savings first with `sp_estimate_data_compression_savings`
+> [!tip] Exam Tips
+> - Know the difference between **clustered columnstore** (replaces rowstore) vs **non-clustered columnstore** (supplements rowstore)
+> - Batch mode execution is available with columnstore indexes — a key performance differentiator
+> - `datetime2` is preferred over `datetime` for new development (greater precision, more range)
+> - `INCLUDE` columns in non-clustered indexes create covering indexes without widening the key
+> - Filtered indexes are not used by the optimizer when the filter column is compared to a variable or parameter — only literals match reliably
+> - PAGE compression = ROW compression + prefix + dictionary; always estimate savings first with `sp_estimate_data_compression_savings`
+
+---
 
 ## Key Takeaways
 
@@ -243,6 +281,8 @@ Choosing which columns to index — and how — has a significant impact on quer
 - Filtered indexes reduce index size by covering only a subset of rows
 - INCLUDE columns eliminate key lookups by creating covering indexes at the leaf level
 - ROW and PAGE compression reduce storage/I/O at the cost of slight CPU overhead
+
+---
 
 ## Practice Questions
 
@@ -260,11 +300,15 @@ D. Create a second clustered index on Status
 >
 > Including the SELECT columns (CustomerID, TotalAmount) in the index creates a covering index — the query engine finds everything it needs at the leaf level without a key lookup. A filtered index (A) would help selectivity but doesn't eliminate the key lookup. You cannot have two clustered indexes (D).
 
+---
+
 ## Related Topics
 
 - [02-Specialized Tables](./02-specialized-tables.md)
 - [04-Constraints & Sequences](./04-constraints-sequences.md)
 - [05-Partitioning](./05-partitioning.md)
+
+---
 
 ## Official Documentation
 

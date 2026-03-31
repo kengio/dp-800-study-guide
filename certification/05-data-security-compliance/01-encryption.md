@@ -15,6 +15,18 @@ tags:
 
 SQL Server provides multiple encryption layers: Transparent Data Encryption (TDE) for data at rest, Always Encrypted for client-side column-level encryption, and server-side column encryption using certificates and asymmetric keys.
 
+> [!abstract]
+> - Covers TDE (at rest, database-wide), Always Encrypted (in memory, column-level), and column-level encryption (manual)
+> - The three encryption methods differ in threat model: who/what is the data protected from
+> - Key exam topics: which encryption method for which threat, CMK/CEK hierarchy, TDE default-on behavior in Azure SQL
+
+> [!tip] What the Exam Tests
+> - **TDE**: protects at rest (stolen backup/disk); server sees plaintext; zero app changes; on by default in Azure SQL
+> - **Always Encrypted**: server NEVER sees plaintext; CMK client-side in Key Vault; driver handles encrypt/decrypt; app must use Always Encrypted-aware driver
+> - **Column-level** (`ENCRYPTBYKEY`): manual encrypt/decrypt in app or T-SQL; server sees plaintext; most flexible but most effort
+
+---
+
 ## Transparent Data Encryption (TDE)
 
 TDE encrypts database files at rest — transparent to applications, no code changes needed.
@@ -55,9 +67,11 @@ FROM sys.dm_database_encryption_keys;
 
 > Azure SQL Database and SQL Managed Instance have TDE enabled by default.
 
+---
+
 ## Always Encrypted
 
-Always Encrypted encrypts data **on the client side** — the database engine never sees plaintext. This protects against DBAs and cloud operators.
+**Always Encrypted** encrypts data on the client side — the database engine never sees plaintext. This protects against DBAs and cloud operators.
 
 ### Key Hierarchy
 
@@ -109,7 +123,12 @@ CREATE TABLE dbo.Patients (
 | Type | Operations Supported | Security Level |
 | :--- | :--- | :--- |
 | **DETERMINISTIC** | `=`, `IN`, `JOIN`, `GROUP BY` | Lower (same plaintext = same ciphertext) |
-| **RANDOMIZED** | None (value is opaque) | Higher (same plaintext = different ciphertext) |
+| **RANDOMIZED** | None (value is opaque) | ==Higher (same plaintext = different ciphertext)== |
+
+> [!warning] Common Mistake
+> TDE and Always Encrypted are often confused on the exam. TDE: server DOES see plaintext (it decrypts to run queries). Always Encrypted: server NEVER sees plaintext (encryption/decryption happens in the client driver). The key differentiator in exam scenarios is whether the database administrator (DBA) should be prevented from seeing the data.
+
+---
 
 ### Querying Always Encrypted Columns
 
@@ -125,6 +144,8 @@ Client must have access to the CMK and use a driver with Always Encrypted enable
 -- These queries only work from a client with CMK access:
 SELECT * FROM dbo.Patients WHERE SSN = '123-45-6789';  -- works with DETERMINISTIC
 ```
+
+---
 
 ## Always Encrypted with Secure Enclaves
 
@@ -169,6 +190,8 @@ ALTER COLUMN SSN NVARCHAR(11) ENCRYPTED WITH (
     COLUMN_ENCRYPTION_KEY = EnclaveCEK
 ) WITH (ONLINE = ON);
 ```
+
+---
 
 ## Key Rotation Procedures
 
@@ -220,6 +243,8 @@ DROP VALUE (COLUMN_MASTER_KEY = OldCMK);
 DROP COLUMN MASTER KEY OldCMK;
 ```
 
+---
+
 ## Transparent Data Encryption (TDE) — Certificate Backup
 
 Backing up the TDE certificate is critical. If the certificate is lost, database backups become permanently unreadable.
@@ -239,6 +264,8 @@ WITH PRIVATE KEY (
 ```
 
 > Store the backup file and password separately. Both are required to restore on another server.
+
+---
 
 ## Server-Side Column Encryption
 
@@ -265,6 +292,8 @@ FROM dbo.Users;
 CLOSE SYMMETRIC KEY MySymKey;
 ```
 
+---
+
 ## Encryption Comparison Summary
 
 | Feature | TDE | Always Encrypted | Column-Level Encryption (ENCRYPTBYKEY) |
@@ -276,12 +305,16 @@ CLOSE SYMMETRIC KEY MySymKey;
 | Range query support | N/A | Enclave only | No |
 | Exam relevance | Always Encrypted vs TDE distinction | Column-level use cases | Legacy approach |
 
+---
+
 ## Use Cases
 
 - **TDE**: Compliance baseline for data at rest — healthcare, finance
 - **Always Encrypted**: High-sensitivity columns (SSN, credit card) where DBAs must be excluded
 - **Always Encrypted + Enclaves**: When DBAs must be excluded AND range/LIKE queries are needed
 - **Column Encryption**: Application-managed encryption with server-side storage
+
+---
 
 ## Common Issues & Errors
 
@@ -290,8 +323,10 @@ CLOSE SYMMETRIC KEY MySymKey;
 | Cannot query encrypted column | Wrong encryption type or no CMK access | Use DETERMINISTIC for searchable; grant CMK access to app |
 | TDE backup restore fails | Certificate not in target server | Backup and restore the TDE certificate first |
 | Always Encrypted driver error | Driver doesn't support Always Encrypted | Use SqlClient with `Column Encryption Setting=enabled` |
-| Range query fails on encrypted column | No secure enclave configured | Enable enclave-enabled CEK and configure attestation |
+| Range query fails on encrypted column | No secure enclave configured | ==Enable enclave-enabled CEK and configure attestation== |
 | Key rotation fails mid-process | Both CMK values must coexist during rotation | Complete rotation before removing old CMK |
+
+---
 
 ## Best Practices
 
@@ -301,15 +336,20 @@ CLOSE SYMMETRIC KEY MySymKey;
 - Rotate Column Master Keys at least annually or immediately upon suspected compromise
 - Test Always Encrypted column queries from application code before deploying — T-SQL alone cannot verify driver compatibility
 
+---
+
 ## Exam Tips
 
-- **Always Encrypted**: encryption happens client-side; SQL Server only sees ciphertext
-- **DETERMINISTIC** allows `=` comparisons; **RANDOMIZED** allows no comparisons without a secure enclave
-- **Secure enclaves** unlock range queries and LIKE on RANDOMIZED encrypted columns
-- TDE protects files on disk — does NOT protect against a user with `SELECT` permission
-- Always Encrypted requires the Column Master Key to be accessible from the client
-- Losing the TDE certificate means losing access to all backups encrypted under it
-- CMK rotation is metadata-only; CEK rotation requires re-encrypting actual column data
+> [!tip] Exam Tips
+> - **Always Encrypted**: encryption happens client-side; SQL Server only sees ciphertext
+> - **DETERMINISTIC** allows `=` comparisons; **RANDOMIZED** allows no comparisons without a secure enclave
+> - **Secure enclaves** unlock range queries and LIKE on RANDOMIZED encrypted columns
+> - TDE protects files on disk — does NOT protect against a user with `SELECT` permission
+> - Always Encrypted requires the Column Master Key to be accessible from the client
+> - Losing the TDE certificate means losing access to all backups encrypted under it
+> - CMK rotation is metadata-only; CEK rotation requires re-encrypting actual column data
+
+---
 
 ## Key Takeaways
 
@@ -318,6 +358,8 @@ CLOSE SYMMETRIC KEY MySymKey;
 - Use DETERMINISTIC encryption when you need to search/filter; RANDOMIZED for maximum security
 - Secure enclaves extend Always Encrypted to support range queries and LIKE on RANDOMIZED columns
 - Back up TDE certificates — losing them makes database backups unrestorable
+
+---
 
 ## Practice Question
 
@@ -333,10 +375,14 @@ D. TDE with customer-managed keys in Azure Key Vault
 >
 > Standard Always Encrypted with randomized encryption cannot perform range queries. Secure enclaves allow the encrypted data to be processed inside an isolated computation environment on the server, enabling range queries (BETWEEN, <, >) while still keeping plaintext away from the database engine. Deterministic encryption (A) allows equality only, not ranges. TDE (D) protects data at rest but doesn't encrypt column values from DBAs.
 
+---
+
 ## Related Topics
 
 - [02-Dynamic Data Masking & RLS](./02-dynamic-data-masking-rls.md)
 - [03-Permissions & Access](./03-permissions-access.md)
+
+---
 
 ## Official Documentation
 

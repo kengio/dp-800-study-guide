@@ -15,6 +15,18 @@ tags:
 
 T-SQL functions encapsulate reusable logic. SQL Server supports scalar functions (return a single value) and table-valued functions (return a result set) — both inline and multi-statement variants.
 
+> [!abstract]
+> - Covers scalar UDFs, inline TVFs, multi-statement TVFs, and determinism
+> - Inline TVFs are expanded like views (optimizer-transparent); multi-statement TVFs are black boxes
+> - Key exam topics: inline vs multi-statement TVF performance, deterministic vs non-deterministic, SCHEMABINDING
+
+> [!tip] What the Exam Tests
+> - **Inline TVF** = single SELECT statement, expanded like a view, allows parallelism, better cardinality estimates
+> - **Multi-statement TVF** = explicit RETURN TABLE variable, black box to optimizer, no parallelism
+> - Scalar UDFs historically inhibit parallelism — SQL Server 2019+ can inline some scalar UDFs automatically (Intelligent Query Processing)
+
+---
+
 ## Scalar Functions
 
 Scalar functions return a single value and can be used anywhere an expression is valid.
@@ -39,9 +51,14 @@ FROM dbo.Employees;
 
 **Performance warning:** Scalar functions called in WHERE clauses or SELECT lists execute **row by row** — they can prevent parallelism and cause performance issues on large tables. Consider inline TVFs as a performant alternative.
 
+> [!warning] Common Mistake
+> Scalar UDFs called in WHERE clauses or SELECT lists execute once per row and prevent parallelism in older compatibility levels. The exam may ask which function type is best for performance — prefer inline TVFs over scalar UDFs or multi-statement TVFs.
+
+---
+
 ## Inline Table-Valued Functions (iTVF)
 
-Inline TVFs are the most performant function type — they behave like parameterized views and can be inlined by the optimizer.
+**Inline TVFs** are the most performant function type — they behave like parameterized views and can be inlined by the optimizer.
 
 ```sql
 CREATE FUNCTION dbo.fn_GetCustomerOrders (@CustomerId int)
@@ -66,6 +83,8 @@ SELECT c.Name, o.OrderId, o.TotalAmount
 FROM dbo.Customers c
 CROSS APPLY dbo.fn_GetCustomerOrders(c.CustomerId) o;
 ```
+
+---
 
 ## Multi-Statement Table-Valued Functions (mTVF)
 
@@ -95,16 +114,20 @@ BEGIN
 END;
 ```
 
+---
+
 ## Function Comparison
 
 | Aspect | Scalar | Inline TVF | Multi-Statement TVF |
 | :--- | :--- | :--- | :--- |
 | Returns | Single value | Table (single SELECT) | Table (multiple statements) |
-| Optimizer inlining | No | **Yes** | No |
+| Optimizer inlining | No | ==**Yes**== | No |
 | Parallelism | Blocked | Allowed | Limited |
 | `SCHEMABINDING` | Supported | Supported | Supported |
 | Multiple statements | Yes | No | Yes |
 | Performance | Slow at scale | **Best** | Moderate |
+
+---
 
 ## Scalar UDF Inlining
 
@@ -114,6 +137,8 @@ SQL Server 2019+ can automatically inline simple scalar functions — check with
 SELECT is_inlineable FROM sys.sql_modules
 WHERE object_id = OBJECT_ID('dbo.fn_GetFullName');
 ```
+
+---
 
 ## Inline vs. Multi-Statement TVF Performance
 
@@ -159,6 +184,8 @@ BEGIN
 END;
 ```
 
+---
+
 ## APPLY Operator with Table-Valued Functions
 
 `APPLY` evaluates a TVF (or subquery) for each row of the left-side table expression. There are two variants:
@@ -187,6 +214,8 @@ OUTER APPLY dbo.fn_GetLatestOrder(c.CustomerID) latest;
 
 `CROSS APPLY` with a subquery replaces correlated subqueries that reference outer columns and is the idiomatic way to join a TVF to a table.
 
+---
+
 ## Function Determinism
 
 A function is **deterministic** if it always returns the same result given the same inputs and the same database state. A function is **non-deterministic** if its result can vary.
@@ -194,7 +223,7 @@ A function is **deterministic** if it always returns the same result given the s
 | Category | Examples |
 | :--- | :--- |
 | Deterministic | `LEN`, `DATEADD`, `ROUND`, `UPPER`, `ABS` |
-| Non-deterministic | `GETDATE`, `NEWID`, `RAND`, `@@ROWCOUNT` |
+| Non-deterministic | ==`GETDATE`, `NEWID`, `RAND`, `@@ROWCOUNT`== |
 
 **Why it matters:**
 
@@ -210,6 +239,8 @@ SELECT OBJECTPROPERTY(OBJECT_ID('dbo.MyFunc'), 'IsDeterministic');
 ```
 
 `SCHEMABINDING` is required for a UDF to be considered deterministic by SQL Server — without it, the engine assumes the function might reference non-bound objects and marks it non-deterministic.
+
+---
 
 ## SCHEMABINDING for Functions
 
@@ -237,20 +268,26 @@ BEGIN
 END;
 ```
 
+---
+
 ## Use Cases
 
 - **Scalar**: Format strings, calculate values, encapsulate business rules
 - **Inline TVF**: Parameterized views, replacing `CROSS APPLY` complex subqueries
 - **Multi-statement TVF**: Complex multi-step result sets not expressible in a single SELECT
 
+---
+
 ## Common Issues & Errors
 
 | Issue | Cause | Resolution |
 | :--- | :--- | :--- |
-| Slow query with scalar function | Row-by-row execution, no parallelism | Rewrite as inline TVF or inline the logic |
+| Slow query with scalar function | Row-by-row execution, no parallelism | ==Rewrite as inline TVF or inline the logic== |
 | mTVF performance poor | No statistics on table variable | Upgrade to SQL 2019+ (table variable deferred compilation) or use `OPTION (RECOMPILE)` |
 | Cannot create index on computed column | Function not deterministic or missing SCHEMABINDING | Add `WITH SCHEMABINDING` and ensure all referenced objects use two-part names |
 | CROSS APPLY returns fewer rows than expected | Using CROSS APPLY instead of OUTER APPLY | Switch to OUTER APPLY to preserve rows where the TVF returns no results |
+
+---
 
 ## Best Practices
 
@@ -260,13 +297,18 @@ END;
 - Use **CROSS APPLY** (not a correlated subquery) when calling a TVF for each row of a driving table — it's cleaner and often faster
 - Test function determinism with `OBJECTPROPERTY` before relying on a UDF in an indexed computed column
 
+---
+
 ## Exam Tips
 
-- **Inline TVF is the preferred function type** — it's inlined by the optimizer
-- Scalar functions **prevent parallelism** when used in DML or large queries
-- Multi-statement TVFs have a fixed cardinality estimate (1 row) by default unless using deferred compilation (SQL 2019+)
-- `SCHEMABINDING` is required for a UDF to be used in an indexed computed column or indexed view
-- `CROSS APPLY` returns only matched rows (like INNER JOIN); `OUTER APPLY` returns all left rows (like LEFT JOIN)
+> [!tip] Exam Tips
+> - **Inline TVF is the preferred function type** — it's inlined by the optimizer
+> - Scalar functions **prevent parallelism** when used in DML or large queries
+> - Multi-statement TVFs have a fixed cardinality estimate (1 row) by default unless using deferred compilation (SQL 2019+)
+> - `SCHEMABINDING` is required for a UDF to be used in an indexed computed column or indexed view
+> - `CROSS APPLY` returns only matched rows (like INNER JOIN); `OUTER APPLY` returns all left rows (like LEFT JOIN)
+
+---
 
 ## Key Takeaways
 
@@ -275,6 +317,8 @@ END;
 - Scalar UDF inlining (SQL 2019+) can automatically optimize simple scalar functions
 - MSTVFs cause cardinality estimation problems because the optimizer cannot see inside them
 - `APPLY` (CROSS or OUTER) is the standard way to invoke a TVF per row of a driving table
+
+---
 
 ## Practice Question
 
@@ -292,11 +336,15 @@ D. The TVF is missing a clustered index on its return table variable
 >
 > MSTVFs are a "black box" to the optimizer — it cannot see the SELECT logic inside and uses a fixed estimate (100 rows in SQL Server 2014–2016, 1 row in earlier versions). This causes cardinality misestimation and poor plan choices downstream. Consider rewriting as an inline TVF (ITVF) where possible. CROSS APPLY (C) is the correct join mechanism for TVFs but doesn't cause the row count issue.
 
+---
+
 ## Related Topics
 
 - [01-Views](./01-views.md)
 - [03-Stored Procedures](./03-stored-procedures.md)
 - [01-CTEs & Window Functions](../03-advanced-tsql/01-ctes-window-functions.md)
+
+---
 
 ## Official Documentation
 

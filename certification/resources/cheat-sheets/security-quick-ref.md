@@ -126,7 +126,7 @@ CREATE TABLE dbo.Patients (
 
 ## Dynamic Data Masking (DDM)
 
-> [!info] DDM hides sensitive data from non-privileged users at query time without changing stored values.
+> [!info] **Dynamic Data Masking** hides sensitive data from non-privileged users at query time without changing stored values.
 
 ### Masking Functions
 
@@ -211,7 +211,7 @@ EXEC sp_set_session_context @key = N'TenantID', @value = 42;
 
 | Predicate | Effect |
 | :--- | :--- |
-| FILTER | Silently filters rows from SELECT, UPDATE, DELETE |
+| FILTER | ==Silently filters rows from SELECT, UPDATE, DELETE== |
 | BLOCK AFTER INSERT | Prevents inserting rows that fail predicate |
 | BLOCK AFTER UPDATE | Prevents updating rows to values that fail predicate |
 | BLOCK BEFORE UPDATE | Prevents updating rows that currently fail predicate |
@@ -361,6 +361,30 @@ FROM sys.fn_get_audit_file('C:\Audits\*.sqlaudit', DEFAULT, DEFAULT);
 | Track data access | Azure SQL Auditing |
 | Avoid SQL injection | Parameterized queries, sp_executesql |
 | Secure connections | TLS 1.2+, minimum TLS version setting |
+
+---
+
+## Gotchas & Traps
+
+- **DDM ≠ encryption** — Dynamic Data Masking hides values at query time; data is stored plaintext. Users with `UNMASK` or elevated permissions see everything.
+- **Always Encrypted: server never sees plaintext** — the CMK lives in Key Vault (client-side), not in SQL Server. The server only holds the encrypted CEK.
+- **DENY overrides GRANT** — even if a GRANT came through role membership, an explicit DENY on the same principal blocks access. REVOKE removes a permission; it does not itself deny.
+- **TDE protects at rest only** — TDE does NOT protect data in transit. Use TLS for in-transit protection; they are separate concerns.
+- **RLS is transparent** — the filtered user has no indication that rows are hidden. A query on a 1000-row table might return 50 rows with no error.
+- **Filter vs block predicates** — filter predicate silently limits SELECT results; block predicate prevents INSERT/UPDATE/DELETE that would violate the policy.
+- **CMK → CEK → column** — the Column Master Key encrypts the Column Encryption Key. The CEK encrypts column data. Rotating the CMK requires re-encrypting the CEK, not the column data.
+
+---
+
+## Before the Exam, I Can…
+
+- [ ] Explain the difference between TDE, Always Encrypted, and column-level encryption — and choose the right one given a scenario (at-rest-only vs in-memory vs manual)
+- [ ] Describe what Dynamic Data Masking does and what it does NOT do (stores plaintext, does not encrypt)
+- [ ] Explain how RLS works: create a predicate function → attach via CREATE SECURITY POLICY → filter vs block
+- [ ] State the permission precedence rule: DENY > GRANT; REVOKE removes but does not deny
+- [ ] Describe the Always Encrypted key hierarchy: CMK (client/Key Vault) → CEK (encrypted, in DB) → column data
+- [ ] Name the four DDM mask types: default, email, partial, random
+- [ ] Explain where audit logs are written (Storage Account, Log Analytics, Event Hub) and how to query them (sys.fn_get_audit_file or Log Analytics)
 
 ---
 

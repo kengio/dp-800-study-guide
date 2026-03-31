@@ -14,6 +14,20 @@ tags:
 
 CI/CD pipelines automate the build, validation, and deployment of SQL Database Projects. Key concerns include detecting schema drift between the source-controlled dacpac and the live database, managing secrets securely with Azure Key Vault, and controlling deployments through approval gates and branch policies.
 
+> [!abstract]
+> - Covers CI/CD pipeline setup for database projects: build, test, and deploy stages using GitHub Actions or Azure Pipelines
+> - Automated deployment uses SqlPackage.exe with a publish profile for environment-specific settings
+> - Key exam topics: SqlPackage.exe action verbs, publish profile (.publish.xml) purpose, pipeline stage order
+
+> [!tip] What the Exam Tests
+> - `SqlPackage.exe /Action:Publish` deploys a dacpac to a target; `/Action:Extract` creates dacpac from existing DB; `/Action:Export` creates bacpac
+> - **Publish profile** (`.publish.xml`) stores environment-specific connection strings and deployment options — keeps secrets out of pipeline YAML
+> - Pipeline order: Build → (optional) Test → Publish to staging → validate → Publish to production
+
+---
+
+---
+
 ## Pipeline Architecture
 
 ```text
@@ -47,6 +61,8 @@ Developer pushes to feature branch
 │  - sqlpackage       │
 └─────────────────────┘
 ```
+
+---
 
 ## CI Pipeline — Build and Test
 
@@ -101,9 +117,11 @@ steps:
       ArtifactName: 'dacpac'
 ```
 
+---
+
 ## Detecting Schema Drift
 
-Schema drift occurs when the live database has been changed outside of the CI/CD pipeline (e.g., emergency hotfix applied directly). Detect it before deployment to avoid surprises.
+**Schema drift** occurs when the live database has been changed outside of the CI/CD pipeline (e.g., emergency hotfix applied directly). Detect it before deployment to avoid surprises.
 
 ```yaml
 # In the deployment pipeline, before deploying:
@@ -158,6 +176,11 @@ sqlpackage /Action:Script \
 # Review planned-changes.sql before approving deployment
 ```
 
+> [!warning] Common Mistake
+> SqlPackage action verbs are frequently tested. Publish = deploy dacpac TO a database. Extract = create dacpac FROM a database. Export = create bacpac (schema+data) FROM a database. Import = deploy bacpac TO a database. Mix these up and you'll get wrong answers.
+
+---
+
 ## Secrets Management with Azure Key Vault
 
 Connection strings and credentials must never be stored in YAML pipeline files or source code.
@@ -208,6 +231,8 @@ steps:
       DeploymentAction: 'Publish'
       DacpacFile: '$(dacpacPath)'
 ```
+
+---
 
 ## Deployment Pipeline Controls
 
@@ -295,12 +320,16 @@ sqlpackage /Action:Publish \
     /p:GenerateSmartDefaults=true
 ```
 
+---
+
 ## Use Cases
 
 - **CI pipeline**: Validates that every PR produces a valid dacpac and passes tests before merging
 - **Schema drift detection**: Alerts when production was modified outside of the pipeline — ensures the next deployment won't be a surprise
 - **Key Vault integration**: Safely injects connection strings into pipelines without hardcoding credentials
 - **Approval gates**: Require DBA sign-off before staging and production deployments
+
+---
 
 ## Common Issues & Errors
 
@@ -309,16 +338,21 @@ sqlpackage /Action:Publish \
 | `BlockOnPossibleDataLoss` fails pipeline | Column dropped or type changed | Review change; migrate data in pre-deployment script first |
 | Key Vault secret not found | Service principal lacks Get/List permissions | Add SP to Key Vault access policy with `get` and `list` |
 | `Environment not configured` | No approval policy on environment | Go to Pipelines → Environments → configure approvals |
-| Drift detected on first run | DB was previously managed manually | Use `DropObjectsNotInSource=false` on first deployment; then clean up manually |
+| Drift detected on first run | DB was previously managed manually | ==Use `DropObjectsNotInSource=false` on first deployment; then clean up manually== |
 | `Authentication failed` in pipeline | Service connection not granted db_owner | Grant the service principal `db_owner` role in the target database |
+
+---
 
 ## Exam Tips
 
-- **Secrets management**: Connection strings in pipelines should always come from Azure Key Vault or service connections — never hardcoded
-- **Approval environments**: Azure DevOps Environments with approval policies are the mechanism for requiring human sign-off before deployment
-- **`/p:BlockOnPossibleDataLoss=true`** is the critical safety flag for production — fail early rather than lose data
-- **Schema drift** detection uses `sqlpackage /Action:DeployReport` to compare current DB against the dacpac
-- Branch policies (required build, required reviewers) are configured on the branch in Azure DevOps, not in the pipeline YAML
+> [!tip] Exam Tips
+> - **Secrets management**: Connection strings in pipelines should always come from Azure Key Vault or service connections — never hardcoded
+> - **Approval environments**: Azure DevOps Environments with approval policies are the mechanism for requiring human sign-off before deployment
+> - **`/p:BlockOnPossibleDataLoss=true`** is the critical safety flag for production — fail early rather than lose data
+> - **Schema drift** detection uses `sqlpackage /Action:DeployReport` to compare current DB against the dacpac
+> - Branch policies (required build, required reviewers) are configured on the branch in Azure DevOps, not in the pipeline YAML
+
+---
 
 ## Key Takeaways
 
@@ -327,11 +361,15 @@ sqlpackage /Action:Publish \
 - Drift detection before deployment prevents unexpected changes from causing failures
 - `IncludeTransactionalScripts=true` wraps each deployment change in a transaction for safer production rollback
 
+---
+
 ## Related Topics
 
 - [02-SQL Database Projects](./02-sql-database-projects.md)
 - [03-Source Control & Branching](./03-source-control-branching.md)
 - [01-Testing Strategy](./01-testing-strategy.md)
+
+---
 
 ## Official Documentation
 

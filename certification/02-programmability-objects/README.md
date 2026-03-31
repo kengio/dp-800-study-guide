@@ -15,6 +15,33 @@ status: draft
 
 Creating and managing T-SQL programmability objects: views, scalar and table-valued functions, stored procedures, and triggers.
 
+---
+
+## Quick Recall
+
+```mermaid
+mindmap
+  root((Programmability))
+    Views
+      Standard - virtual table
+      Indexed - materialized
+      WITH SCHEMABINDING required
+    Functions
+      Scalar UDF - single value
+      Inline TVF - optimizer-transparent
+      Multi-statement TVF - black box
+    Stored Procedures
+      sp_executesql - parameterized
+      OUTPUT parameters
+      TRY/CATCH + XACT_STATE
+    Triggers
+      AFTER - post-DML
+      INSTEAD OF - replace DML
+      INSERTED/DELETED tables
+```
+
+---
+
 ## Topics Overview
 
 ```mermaid
