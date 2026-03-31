@@ -54,6 +54,23 @@ Each topic folder contains a `README.md` index and numbered `.md` topic files.
 - **Practice answers:** Obsidian foldable `> [!success]- Answer` callout
 - **Practice choices:** A/B/C/D on separate lines (no bullets); two trailing spaces for line breaks
 
+### Obsidian Callouts
+
+Use callouts to break up dense text in topic files and cheat sheets. Standard types:
+
+| Callout | Usage |
+| :--- | :--- |
+| `> [!info]` | Section intros, neutral context, "what this is" |
+| `> [!tip] Exam Tips` | Exam-specific advice, things that are commonly tested |
+| `> [!warning] Common Mistake` | Frequent errors, gotchas, "don't confuse X with Y" |
+| `> [!note]` | Extra detail, caveats, "worth knowing but not critical" |
+| `> [!success]- Answer` | Collapsed practice question answers (foldable) |
+| `> [!abstract]` | Quick-reference summaries at top of cheat sheets |
+
+- Use `> [!tip] Exam Tips` blocks instead of bare bullet lists for the **Exam Tips** section in topic files
+- Use `> [!warning]` to highlight traps covered in the **Common Issues** section
+- Highlight key terms in tables with `==text==` (Obsidian highlight syntax)
+
 ### Diagrams & Images
 
 - **Architecture diagrams:** Mermaid (`flowchart`, `sequenceDiagram`, `graph`)
@@ -93,6 +110,9 @@ Required: YAML frontmatter (`title`, `type: certification`, `aliases`, `tags`), 
 ### Topic Folder README (`<topic-folder>/README.md`)
 
 Required: YAML frontmatter (`title`, `type: category`, `tags`, `status`), topic title with exam weight, Topics Overview (Mermaid flowchart), Section Contents table, Key Concepts, Related Resources, Back/Next navigation.
+
+- `status` field values: `draft`, `in-progress`, `complete`
+- Update `status` in each README as sections are completed — do not leave complete sections as `draft`
 
 ## Exam Domain Mapping
 

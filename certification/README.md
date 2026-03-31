@@ -14,6 +14,16 @@ tags:
 
 # Microsoft DP-800: Developing AI-Enabled Database Solutions
 
+## How to Use This Guide
+
+1. **Topic files** (`01-topic-name.md`) — core study material with SQL examples, comparison tables, and practice questions. Start here.
+2. **Section READMEs** — overview flowcharts and topic indexes. Use to orient before diving into a section.
+3. **Cheat sheets** (`resources/cheat-sheets/`) — compact quick-reference for exam day and review. Use after studying a section to reinforce.
+4. **Practice questions** (`resources/practice-questions/`) — 15–20 questions per domain (Domain 2 has 20; Domains 1 and 3 have 15 each), with explanations. Use to test knowledge after each domain.
+5. **Mock exams** (`resources/mock-exam/`, `resources/mock-exam-2/`) — full 45-question timed exams. Take after completing all domains.
+
+> Study path: topic files → cheat sheets → practice questions → mock exams
+
 ## Exam Overview
 
 | Detail             | Information                                               |
@@ -38,29 +48,29 @@ pie title Exam Domain Distribution
 
 ### Domain 1: Design and Develop Database Solutions (35–40%)
 
-| Section | Weight | Topics |
+| Section | Priority | Topics |
 | :--- | :--- | :--- |
-| [01-Database Objects](01-database-objects/README.md) | 35–40% (shared) | Tables, indexes, constraints, partitioning |
-| [02-Programmability Objects](02-programmability-objects/README.md) | 35–40% (shared) | Views, functions, stored procedures, triggers |
-| [03-Advanced T-SQL](03-advanced-tsql/README.md) | 35–40% (shared) | CTEs, window functions, JSON, regex, graph |
-| [04-AI-Assisted Tools](04-ai-assisted-tools/README.md) | 35–40% (shared) | GitHub Copilot, MCP servers, AI security |
+| [01-Database Objects](01-database-objects/README.md) | High | Tables, indexes, constraints, partitioning |
+| [02-Programmability Objects](02-programmability-objects/README.md) | High | Views, functions, stored procedures, triggers |
+| [03-Advanced T-SQL](03-advanced-tsql/README.md) | High | CTEs, window functions, JSON, regex, graph |
+| [04-AI-Assisted Tools](04-ai-assisted-tools/README.md) | Medium | GitHub Copilot, MCP servers, AI security |
 
 ### Domain 2: Secure, Optimize, and Deploy (35–40%)
 
-| Section | Weight | Topics |
+| Section | Priority | Topics |
 | :--- | :--- | :--- |
-| [05-Data Security & Compliance](05-data-security-compliance/README.md) | 35–40% (shared) | Encryption, masking, RLS, auditing |
-| [06-Performance Optimization](06-performance-optimization/README.md) | 35–40% (shared) | Query plans, DMVs, Query Store, blocking |
-| [07-CI/CD Database Projects](07-cicd-database-projects/README.md) | 35–40% (shared) | SQL DB Projects, source control, deployment |
-| [08-Azure Services Integration](08-azure-services-integration/README.md) | 35–40% (shared) | DAB, REST/GraphQL, monitoring, CDC |
+| [05-Data Security & Compliance](05-data-security-compliance/README.md) | High | Encryption, masking, RLS, auditing |
+| [06-Performance Optimization](06-performance-optimization/README.md) | High | Query plans, DMVs, Query Store, blocking |
+| [07-CI/CD Database Projects](07-cicd-database-projects/README.md) | Medium | SQL DB Projects, source control, deployment |
+| [08-Azure Services Integration](08-azure-services-integration/README.md) | Medium | DAB, REST/GraphQL, monitoring, CDC |
 
 ### Domain 3: Implement AI Capabilities (25–30%)
 
-| Section | Weight | Topics |
+| Section | Priority | Topics |
 | :--- | :--- | :--- |
-| [09-Models & Embeddings](09-models-embeddings/README.md) | 25–30% (shared) | External models, embedding maintenance |
-| [10-Intelligent Search](10-intelligent-search/README.md) | 25–30% (shared) | Full-text, vector, hybrid search |
-| [11-RAG](11-rag/README.md) | 25–30% (shared) | Retrieval-augmented generation |
+| [09-Models & Embeddings](09-models-embeddings/README.md) | High | External models, embedding maintenance |
+| [10-Intelligent Search](10-intelligent-search/README.md) | High | Full-text, vector, hybrid search |
+| [11-RAG](11-rag/README.md) | High | Retrieval-augmented generation |
 
 ### Practice & Resources
 
