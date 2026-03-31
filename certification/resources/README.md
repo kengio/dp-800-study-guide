@@ -15,6 +15,7 @@ Preparation materials for the Microsoft DP-800: Developing AI-Enabled Database S
 
 | Resource | Description |
 | :--- | :--- |
+| [Final Review](./final-review.md) | 20-minute exam-morning scan: highest-probability facts + last-minute traps |
 | [Practice Questions](./practice-questions/README.md) | Domain-specific practice questions |
 | [Mock Exam 1](./mock-exam/README.md) | Full-length practice exam |
 | [Mock Exam 2](./mock-exam-2/README.md) | Alternative practice exam |
