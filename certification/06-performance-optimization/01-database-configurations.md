@@ -43,7 +43,7 @@ Database configuration choices — service tier, compatibility level, memory gra
 | :--- | :--- | :--- |
 | **General Purpose** | Most business workloads | Remote storage, auto-pause option |
 | **Business Critical** | Low latency, In-Memory OLTP | Local SSD, built-in HA replica |
-| **Hyperscale** | Very large databases (up to 100 TB) | Rapid scaling, distributed architecture |
+| **Hyperscale** | Very large databases (up to 100 TB) | ==Rapid scaling, distributed architecture== |
 
 **Serverless (General Purpose only):** Auto-pause when idle, auto-scale compute — good for intermittent workloads:
 
@@ -53,6 +53,8 @@ Azure SQL → Configure → Serverless
 - Max vCores: 4
 - Auto-pause delay: 60 minutes
 ```
+
+---
 
 ## Database Compatibility Level
 
@@ -74,6 +76,8 @@ ALTER DATABASE MyDB SET COMPATIBILITY_LEVEL = 160;  -- SQL Server 2022
 | 150 | 2019 | Scalar UDF inlining, table variable deferred compilation, batch mode on rowstore |
 | 140 | 2017 | Adaptive query processing (adaptive joins, interleaved execution) |
 | 130 | 2016 | Batch mode for aggregates, parallel `INSERT INTO ... SELECT` |
+
+---
 
 ## Database-Scoped Configurations
 
@@ -99,6 +103,8 @@ EXEC sp_configure 'optimize for ad hoc workloads', 1;
 RECONFIGURE;
 ```
 
+---
+
 ## Memory and Resource Configuration
 
 ```sql
@@ -120,6 +126,8 @@ WHERE name IN ('max server memory (MB)', 'min server memory (MB)',
 | `MAXDOP` | Equal to physical CPU count or 8 (whichever is lower) |
 | `cost threshold for parallelism` | Increase from default 5 to 25–50 to reduce unnecessary parallelism |
 
+---
+
 ## Automatic Tuning (Azure SQL)
 
 Azure SQL can automatically create, verify, and drop indexes based on query performance:
@@ -133,6 +141,8 @@ ALTER DATABASE MyDB SET AUTOMATIC_TUNING (DROP_INDEX = ON);
 -- View recommendations
 SELECT * FROM sys.dm_db_tuning_recommendations;
 ```
+
+---
 
 ## MAXDOP and Parallelism Settings
 
@@ -175,6 +185,8 @@ FROM sys.configurations
 WHERE name IN ('max degree of parallelism', 'cost threshold for parallelism');
 ```
 
+---
+
 ## Memory Grant Configuration
 
 A **memory grant** is memory pre-allocated before a query executes to support sort and hash join operations. If the grant is too small, SQL Server spills to tempdb (hurting performance); if too large, other queries are starved.
@@ -211,6 +223,8 @@ OPTION(MIN_GRANT_PERCENT = 10);
 | `used_memory_kb` | Memory consumed at query completion |
 | `wait_time_ms` | Time spent waiting for a grant (> 0 means memory pressure) |
 
+---
+
 ## Query Store Configuration
 
 **Query Store** captures a history of queries, execution plans, and runtime statistics. It is the primary tool for diagnosing plan regressions, forcing good plans, and analyzing workload trends.
@@ -229,7 +243,7 @@ OPTION(MIN_GRANT_PERCENT = 10);
 | `OPERATION_MODE` | READ_WRITE collects data; READ_ONLY stops collection | READ_WRITE |
 | `MAX_STORAGE_SIZE_MB` | Max disk space for Query Store data | 1024–2048 MB |
 | `INTERVAL_LENGTH_MINUTES` | Aggregation window for runtime stats | 60 minutes |
-| `QUERY_CAPTURE_MODE` | ALL, AUTO (significant queries), CUSTOM, NONE | AUTO |
+| `QUERY_CAPTURE_MODE` | ALL, AUTO (significant queries), CUSTOM, NONE | ==AUTO== |
 | `SIZE_BASED_CLEANUP_MODE` | Auto-purge oldest data when near capacity | AUTO |
 
 ```sql
@@ -266,6 +280,8 @@ EXEC sp_query_store_force_plan @query_id = 42, @plan_id = 1;
 - Top Resource Consuming Queries — ranked by CPU, duration, I/O, or memory
 - Plan Summary — all plans for a single query with performance comparison
 
+---
+
 ## Database Compatibility Level Impact
 
 **Compatibility level** determines which version of the query optimizer's cardinality estimator (CE) is active and which adaptive query processing features are available. It is the primary control for balancing access to new features against regression risk after an upgrade.
@@ -300,6 +316,8 @@ SELECT * FROM Orders WHERE CustomerID = @CustID
 OPTION(USE HINT('ENABLE_QUERY_OPTIMIZER_HOTFIXES'));
 ```
 
+---
+
 ## Use Cases
 
 - **Business Critical tier**: Latency-sensitive workloads, In-Memory OLTP, read scale-out
@@ -308,13 +326,17 @@ OPTION(USE HINT('ENABLE_QUERY_OPTIMIZER_HOTFIXES'));
 - **Query Store**: Regression detection and plan forcing after upgrades or compatibility level changes
 - **MAXDOP 1**: Reporting queries on high-concurrency OLTP systems to limit CPU consumption
 
+---
+
 ## Common Issues & Errors
 
 - **Memory spills to tempdb**: `granted_memory_kb` much lower than `ideal_memory_kb` — increase grant hint or enable memory grant feedback (compat level 140+)
-- **Query Store goes READ_ONLY unexpectedly**: Storage cap reached — increase `MAX_STORAGE_SIZE_MB` or enable `SIZE_BASED_CLEANUP_MODE = AUTO`
+- **Query Store goes READ_ONLY unexpectedly**: ==Storage cap reached — increase `MAX_STORAGE_SIZE_MB` or enable `SIZE_BASED_CLEANUP_MODE = AUTO`==
 - **Plan regression after compat level change**: Use Query Store Regressed Queries report and `sp_query_store_force_plan` to restore the previous good plan
 - **Excessive parallelism on OLTP**: CXPACKET waits dominate — raise cost threshold for parallelism to 40–50 and consider MAXDOP 4 or lower at DB scope
 - **Automatic tuning not creating indexes**: `CREATE_INDEX` must be explicitly enabled; verify the feature is ON and check `sys.dm_db_tuning_recommendations` for blocked recommendations
+
+---
 
 ## Best Practices
 
@@ -323,6 +345,8 @@ OPTION(USE HINT('ENABLE_QUERY_OPTIMIZER_HOTFIXES'));
 - Raise `cost threshold for parallelism` to 40–50 on OLTP workloads — the default of 5 causes unnecessary parallelism for cheap queries
 - Use database-scoped `MAXDOP` settings in Azure SQL Database rather than server-level, since the instance may host multiple databases with different workload profiles
 - Always test compatibility level changes in a non-production environment with a representative Query Store workload before promoting to production
+
+---
 
 ## Exam Tips
 
@@ -334,6 +358,8 @@ OPTION(USE HINT('ENABLE_QUERY_OPTIMIZER_HOTFIXES'));
 - **Memory grant feedback** (compat level 140+) self-corrects over-/under-grants automatically — prefer it over manual grant hints for stable workloads
 - `OPTION(MAXDOP 1)` is a valid query-level override and is often the right choice for long-running reports on busy OLTP systems
 
+---
+
 ## Key Takeaways
 
 - Match service tier to workload: General Purpose for most, Business Critical for low-latency
@@ -341,6 +367,8 @@ OPTION(USE HINT('ENABLE_QUERY_OPTIMIZER_HOTFIXES'));
 - Query Store should always be enabled — it is the foundation for plan forcing and regression detection
 - MAXDOP and cost threshold for parallelism settings prevent parallelism from degrading OLTP concurrency
 - Compatibility level upgrades unlock new optimizer features but carry plan regression risk — always use Query Store as a safety net
+
+---
 
 ## Practice Question
 
@@ -356,10 +384,14 @@ D. Increase the cost threshold for parallelism to 100
 >
 > Query Store captures plans before and after the compatibility level change. The Regressed Queries report shows queries whose performance degraded. You can force the previously good plan while investigating root cause. Reverting (A) gives up the benefits of the new CE. MAXDOP 1 (C) and high cost threshold (D) are blunt instruments that don't address the plan regression.
 
+---
+
 ## Related Topics
 
 - [02-Transaction Isolation & Concurrency](./02-transaction-isolation-concurrency.md)
 - [03-Query Performance Troubleshooting](./03-query-performance-troubleshooting.md)
+
+---
 
 ## Official Documentation
 

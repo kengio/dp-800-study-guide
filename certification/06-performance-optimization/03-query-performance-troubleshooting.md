@@ -52,7 +52,7 @@ SET STATISTICS XML OFF;
 | **Index Seek** | Uses index to find specific rows | Good — efficient |
 | **Index Scan** | Reads entire index | Review if large table |
 | **Table Scan** (Heap) | Reads entire table | Add a clustered index |
-| **Key Lookup** | Fetches extra columns from clustered index | Add INCLUDE columns to covering index |
+| **Key Lookup** | Fetches extra columns from clustered index | ==Add INCLUDE columns to covering index== |
 | **Hash Match** | Join/aggregation using hash table | OK for large datasets; bad with low memory |
 | **Nested Loops** | Iterative join | Efficient for small outer input |
 | **Merge Join** | Sorted inputs joined | Efficient for large, sorted datasets |
@@ -69,6 +69,8 @@ SET STATISTICS XML OFF;
 -- 3. Sort operators (add ordered index)
 -- 4. Hash match with memory grant warnings (statistics may be stale)
 ```
+
+---
 
 ## Dynamic Management Views (DMVs)
 
@@ -136,6 +138,8 @@ WHERE wait_type NOT IN ('SLEEP_TASK','BROKER_TO_FLUSH','CLR_AUTO_EVENT',
 ORDER BY wait_time_ms DESC;
 ```
 
+---
+
 ## Query Store
 
 Query Store captures query plans and performance data — enabling plan forcing and regression detection.
@@ -181,6 +185,8 @@ EXEC sp_query_store_unforce_plan @query_id = 1, @plan_id = 3;
 > [!warning] Common Mistake
 > The plan cache (sys.dm_exec_cached_plans) is volatile — it's cleared on memory pressure and restarts. Query Store persists plans and stats permanently. If a question asks about historical plan analysis or surviving restarts, the answer is Query Store, not the plan cache.
 
+---
+
 ## Query Performance Insight (Azure SQL)
 
 Query Performance Insight in Azure Portal provides a graphical view of Query Store data:
@@ -197,6 +203,8 @@ Azure SQL Database → Intelligent Performance → Query Performance Insight
 - Automatic identification of top resource consumers
 - One-click plan viewing
 - Integration with Azure Advisor for index recommendations
+
+---
 
 ## Plan Forcing and Plan Guides
 
@@ -243,11 +251,13 @@ EXEC sp_control_plan_guide N'DROP', N'PG_GetOrders';
 | :--- | :--- |
 | `SQL` | Ad-hoc or parameterized SQL statements |
 | `OBJECT` | Stored procedures or functions |
-| `TEMPLATE` | Auto-parameterized queries (server-wide template) |
+| `TEMPLATE` | ==Auto-parameterized queries (server-wide template)== |
+
+---
 
 ## Parameter Sniffing Mitigations
 
-Parameter sniffing occurs when SQL Server compiles a stored procedure or parameterized query using a specific parameter value, then reuses that plan for all future executions — even when different parameter values would benefit from a different plan.
+**Parameter sniffing** occurs when SQL Server compiles a stored procedure or parameterized query using a specific parameter value, then reuses that plan for all future executions — even when different parameter values would benefit from a different plan.
 
 ### OPTION(RECOMPILE)
 
@@ -299,6 +309,8 @@ AS
 
 These are automatic in compatibility level 140+ and require no code changes.
 
+---
+
 ## Statistics Maintenance
 
 Statistics are histograms describing the distribution of data values in index and column samples. The query optimizer uses them to estimate row counts (cardinality) and choose execution plans.
@@ -333,6 +345,8 @@ EXEC sp_updatestats;
 
 `modification_counter` shows how many leading-column changes have occurred since the last update — a high value relative to row count signals stale statistics.
 
+---
+
 ## Use Cases
 
 - **DMVs**: Ad-hoc investigation of current performance issues
@@ -342,15 +356,19 @@ EXEC sp_updatestats;
 - **Plan guides**: Fix bad plans from ORMs or third-party apps without code changes
 - **Parameter sniffing mitigations**: Stabilize plans for stored procedures with skewed parameter distributions
 
+---
+
 ## Common Issues & Errors
 
 | Symptom | Likely Cause | Remedy |
 | :--- | :--- | :--- |
 | Query fast first run, slow after | Parameter sniffing | OPTION(RECOMPILE) or OPTIMIZE FOR UNKNOWN |
 | Plan changed after index rebuild | Statistics updated with new distribution | Verify plan; force if needed |
-| Plan guide not applied | Query text mismatch (whitespace, case) | Use `sys.fn_validate_plan_guide` to diagnose |
+| Plan guide not applied | Query text mismatch (whitespace, case) | ==Use `sys.fn_validate_plan_guide` to diagnose== |
 | Query Store full | Max storage size reached | Increase `MAX_STORAGE_SIZE_MB` or change cleanup mode |
 | Stale stats on large table | 20% threshold not reached | Manual `UPDATE STATISTICS WITH FULLSCAN` |
+
+---
 
 ## Best Practices
 
@@ -359,6 +377,8 @@ EXEC sp_updatestats;
 - Use Query Store plan forcing as a short-term fix while diagnosing root cause; do not leave plans forced indefinitely without review.
 - Validate plan guides after deployment using `sys.fn_validate_plan_guide` — a silently invalid plan guide has no effect and is hard to detect.
 - Avoid adding `OPTION(RECOMPILE)` to high-frequency queries; the recompilation overhead can become a CPU bottleneck under load.
+
+---
 
 ## Exam Tips
 
@@ -369,6 +389,8 @@ EXEC sp_updatestats;
 - Plan guides require **exact query text match** — even a single space difference causes the guide to be skipped
 - `OPTION(RECOMPILE)` eliminates parameter sniffing but prevents plan caching; use on infrequent, skewed queries only
 
+---
+
 ## Key Takeaways
 
 - Execution plans show WHERE the query spends its cost — look for scans that should be seeks
@@ -376,6 +398,8 @@ EXEC sp_updatestats;
 - Query Performance Insight (Azure SQL) is the easiest way to identify top resource consumers
 - Plan guides let you inject hints into queries you cannot modify (ORMs, third-party apps)
 - Parameter sniffing produces correct plans for the sniffed value but wrong plans for others — mitigate with OPTIMIZE FOR UNKNOWN or RECOMPILE
+
+---
 
 ## Practice Questions
 
@@ -393,11 +417,15 @@ D. Force a specific plan using sp_query_store_force_plan
 >
 > When you cannot modify the application's SQL, plan guides let you attach hints to specific query patterns. A plan guide matching the ORM's query text can inject OPTION(OPTIMIZE FOR UNKNOWN) to fix parameter sniffing without application changes. OPTION(RECOMPILE) (A) can't be added without modifying the query. Disabling statistics updates (C) makes plans worse over time. Plan forcing (D) locks in a single plan that may not work for all parameter values.
 
+---
+
 ## Related Topics
 
 - [01-Database Configurations](./01-database-configurations.md)
 - [02-Transaction Isolation & Concurrency](./02-transaction-isolation-concurrency.md)
 - [01-Tables & Indexes](../01-database-objects/01-tables-indexes.md)
+
+---
 
 ## Official Documentation
 

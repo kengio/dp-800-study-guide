@@ -42,7 +42,7 @@ SET TRANSACTION ISOLATION LEVEL READ COMMITTED;  -- default
 | `READ COMMITTED` (default) | No | Yes | Yes | Yes |
 | `REPEATABLE READ` | No | No | Yes | Yes |
 | `SERIALIZABLE` | No | No | No | Yes (most) |
-| `SNAPSHOT` | No | No | No | **No** |
+| `SNAPSHOT` | No | No | No | ==**No**== |
 | `READ COMMITTED SNAPSHOT` (RCSI) | No | Yes | Yes | **No** |
 
 **Read phenomena:**
@@ -51,12 +51,16 @@ SET TRANSACTION ISOLATION LEVEL READ COMMITTED;  -- default
 - **Non-repeatable read**: The same row returns different values if re-read (another transaction committed an update)
 - **Phantom read**: A re-executed range query returns new rows (another transaction committed an insert)
 
+---
+
 ## Pessimistic vs Optimistic Concurrency
 
 | Approach | Mechanism | Blocking | Best For |
 | :--- | :--- | :--- | :--- |
 | **Pessimistic** (default) | Shared/exclusive locks | Yes | Write-heavy, short transactions |
 | **Optimistic** (Snapshot/RCSI) | Row versioning | **No** | Read-heavy, mixed OLTP |
+
+---
 
 ## RCSI vs Snapshot Isolation
 
@@ -87,15 +91,19 @@ COMMIT;
 > [!warning] Common Mistake
 > SNAPSHOT isolation and Read Committed Snapshot Isolation (RCSI) are both row-versioning but are activated differently and used differently. SNAPSHOT is an explicit isolation level set by the application. RCSI changes the behavior of the existing READ COMMITTED level transparently — the app doesn't need to change.
 
+---
+
 ## Lock Types and Compatibility
 
 | Lock | Abbrev | Compatible With |
 | :--- | :--- | :--- |
 | Shared | S | Other S locks |
 | Update | U | S locks |
-| Exclusive | X | **Nothing** |
+| Exclusive | X | ==**Nothing**== |
 | Intent Shared | IS | IS, S, IX, SIX, U |
 | Intent Exclusive | IX | IS, IX |
+
+---
 
 ## Blocking Analysis
 
@@ -124,6 +132,8 @@ JOIN sys.dm_tran_session_transactions st ON s.session_id = st.session_id
 JOIN sys.dm_tran_active_transactions t ON t.transaction_id = st.transaction_id
 WHERE DATEDIFF(SECOND, t.transaction_begin_time, GETDATE()) > 30;
 ```
+
+---
 
 ## Lock Escalation
 
@@ -157,9 +167,11 @@ WHERE wait_type LIKE 'LCK%'
 ORDER BY waiting_tasks_count DESC;
 ```
 
+---
+
 ## Rowversion-Based Optimistic Concurrency
 
-`ROWVERSION` (also aliased as `timestamp`) is an 8-byte binary value that SQL Server automatically increments on every `UPDATE` to the row. It provides a lightweight optimistic concurrency mechanism without holding locks between read and update.
+**ROWVERSION** (also aliased as `timestamp`) is an 8-byte binary value that SQL Server automatically increments on every `UPDATE` to the row. It provides a lightweight optimistic concurrency mechanism without holding locks between read and update.
 
 **Pattern:**
 
@@ -193,6 +205,8 @@ IF @@ROWCOUNT = 0
     THROW 50001, 'Concurrency conflict: record was modified by another user', 1;
 ```
 
+---
+
 ## RCSI vs Snapshot Isolation Comparison
 
 Both RCSI and Snapshot Isolation use the version store in tempdb to serve consistent reads without blocking writers. The key difference is the granularity of the snapshot.
@@ -211,12 +225,14 @@ ALTER DATABASE MyDB SET READ_COMMITTED_SNAPSHOT ON;
 | Consistency | Statement-level | Transaction-level |
 | Overhead | Lower | Higher (longer txns hold more versions) |
 | Blocking | Eliminated for readers | Eliminated for readers |
-| Write conflicts | No detection | Detected (update conflict error) |
+| Write conflicts | No detection | ==Detected (update conflict error)== |
 
 **When to choose:**
 
 - **RCSI**: Drop-in improvement for existing READ COMMITTED workloads — no application changes required
 - **Snapshot**: Reports or batch jobs that need a consistent view of data across multiple statements within one transaction
+
+---
 
 ## Deadlock Analysis and Prevention
 
@@ -248,6 +264,8 @@ CROSS APPLY target_data.nodes('//RingBufferTarget/event[@name="xml_deadlock_repo
 4. Add indexes on WHERE clause columns to reduce lock scope (fewer rows locked)
 5. Avoid user interaction inside open transactions
 
+---
+
 ## Deadlock Detection
 
 SQL Server automatically detects and resolves deadlocks by killing one transaction (the deadlock victim):
@@ -276,6 +294,8 @@ CROSS APPLY XmlData.nodes('//RingBufferTarget/event[@name="xml_deadlock_report"]
 3. Use RCSI/Snapshot to eliminate read/write deadlocks
 4. Index columns used in WHERE clauses to reduce lock scope
 
+---
+
 ## Use Cases
 
 - **RCSI**: Default choice for Azure SQL OLTP — eliminates reader/writer blocking
@@ -284,6 +304,8 @@ CROSS APPLY XmlData.nodes('//RingBufferTarget/event[@name="xml_deadlock_report"]
 - **NOLOCK hint**: `WITH (NOLOCK)` = READ UNCOMMITTED; use only for approximate counts/non-critical reads
 - **ROWVERSION**: Disconnected update scenarios where holding locks between read and write is unacceptable
 - **LOCK_ESCALATION = AUTO**: High-throughput partitioned tables where table-lock escalation causes blocking spikes
+
+---
 
 ## Common Issues & Errors
 
@@ -295,6 +317,8 @@ CROSS APPLY XmlData.nodes('//RingBufferTarget/event[@name="xml_deadlock_report"]
 | Unexpected blocking spikes | Lock escalation to table level | Set `LOCK_ESCALATION = AUTO` on partitioned tables or `DISABLE` with caution |
 | Optimistic update silently skips | `@@ROWCOUNT = 0` not checked | Always check `@@ROWCOUNT` after ROWVERSION-based update and raise error |
 
+---
+
 ## Best Practices
 
 - Enable RCSI on Azure SQL databases by default — it eliminates the most common reader/writer blocking with minimal overhead and no application changes.
@@ -302,6 +326,8 @@ CROSS APPLY XmlData.nodes('//RingBufferTarget/event[@name="xml_deadlock_report"]
 - Prefer `LOCK_ESCALATION = AUTO` over `DISABLE` on large partitioned tables — `DISABLE` conserves escalation but can exhaust lock memory under high DML.
 - Use ROWVERSION-based optimistic concurrency for any workflow that holds business logic state between read and update; never hold locks across network round trips or user think time.
 - Monitor `sys.dm_os_wait_stats` for `LCK%` waits and the system_health Extended Events ring buffer for deadlock graphs as part of routine performance reviews.
+
+---
 
 ## Exam Tips
 
@@ -313,6 +339,8 @@ CROSS APPLY XmlData.nodes('//RingBufferTarget/event[@name="xml_deadlock_report"]
 - **RCSI** is statement-level (each statement sees latest committed data); **Snapshot** is transaction-level (entire transaction sees same snapshot)
 - Lock escalation threshold is ~5,000 locks per object; `LOCK_ESCALATION = AUTO` is the safest option for partitioned tables
 
+---
+
 ## Key Takeaways
 
 - RCSI eliminates reader/writer blocking using row versioning — highly recommended for OLTP
@@ -320,6 +348,8 @@ CROSS APPLY XmlData.nodes('//RingBufferTarget/event[@name="xml_deadlock_report"]
 - Always handle error 1205 (deadlock victim) with retry logic in applications
 - Lock escalation can unexpectedly block entire tables — monitor and tune `LOCK_ESCALATION` on high-traffic tables
 - ROWVERSION-based optimistic concurrency is the lowest-blocking pattern for disconnected update scenarios
+
+---
 
 ## Practice Question
 
@@ -337,10 +367,14 @@ D. Enable RCSI and retry on deadlock
 >
 > ROWVERSION allows reading without holding any locks, then detecting concurrent modifications at update time by checking the stored rowversion. If another session modified the row during the business logic period, the UPDATE affects 0 rows and the application can handle the conflict. UPDLOCK (A) holds an update lock for the entire 5 seconds, blocking other readers. Serializable (C) holds range locks throughout, severely impacting concurrency. RCSI (D) prevents read blocking but doesn't detect write conflicts.
 
+---
+
 ## Related Topics
 
 - [01-Database Configurations](./01-database-configurations.md)
 - [03-Query Performance Troubleshooting](./03-query-performance-troubleshooting.md)
+
+---
 
 ## Official Documentation
 
