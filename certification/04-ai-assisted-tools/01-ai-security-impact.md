@@ -420,4 +420,4 @@ D. Use EXECUTE AS OWNER in all generated procedures
 
 ---
 
-**[↑ Back to Section](./README.md) | [Next →](./02-github-copilot-setup.md)**
+**[↑ Back to Section](./ai-assisted-tools.md) | [Next →](./02-github-copilot-setup.md)**

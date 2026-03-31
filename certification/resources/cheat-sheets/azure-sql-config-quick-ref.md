@@ -448,4 +448,4 @@ SELECT * FROM cdc.fn_cdc_get_net_changes_dbo_Orders(
 
 ---
 
-**[← Back to Cheat Sheets](./README.md)**
+**[← Back to Cheat Sheets](./cheat-sheets.md)**

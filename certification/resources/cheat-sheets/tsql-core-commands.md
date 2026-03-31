@@ -472,4 +472,4 @@ SELECT name, compatibility_level FROM sys.databases;
 
 ---
 
-**[← Back to Cheat Sheets](./README.md)**
+**[← Back to Cheat Sheets](./cheat-sheets.md)**

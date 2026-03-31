@@ -357,4 +357,4 @@ D. FAILED_DATABASE_AUTHENTICATION_GROUP
 
 ---
 
-**[← Previous](./03-permissions-access.md) | [↑ Back to Section](./README.md) | [Next →](./05-secure-endpoints.md)**
+**[← Previous](./03-permissions-access.md) | [↑ Back to Section](./data-security-compliance.md) | [Next →](./05-secure-endpoints.md)**

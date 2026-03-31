@@ -415,4 +415,4 @@ D. The transaction is committed up to the point of the error
 
 ---
 
-**[← Previous](./04-graph-queries.md) | [↑ Back to Section](./README.md)**
+**[← Previous](./04-graph-queries.md) | [↑ Back to Section](./advanced-tsql.md)**

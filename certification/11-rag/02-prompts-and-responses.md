@@ -453,4 +453,4 @@ END;
 
 ---
 
-**[← Previous](./01-rag-use-cases.md) | [↑ Back to Section](./README.md)**
+**[← Previous](./01-rag-use-cases.md) | [↑ Back to Section](./rag.md)**

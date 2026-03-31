@@ -346,4 +346,4 @@ ORDER BY end_time DESC;
 
 ---
 
-**[← Back to Cheat Sheets](./README.md)**
+**[← Back to Cheat Sheets](./cheat-sheets.md)**

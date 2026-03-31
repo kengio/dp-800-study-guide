@@ -72,14 +72,14 @@ flowchart TD
 
 ## Related Resources
 
-- [09-Models & Embeddings](../09-models-embeddings/README.md)
-- [11-RAG](../11-rag/README.md)
+- [09-Models & Embeddings](../09-models-embeddings/models-embeddings.md)
+- [11-RAG](../11-rag/rag.md)
 - [Official: Vector Search in Azure SQL](https://learn.microsoft.com/en-us/azure/azure-sql/database/ai-artificial-intelligence-intelligent-insights-overview)
 
 ## Next Steps
 
-Proceed to [11-RAG](../11-rag/README.md) to learn about retrieval-augmented generation.
+Proceed to [11-RAG](../11-rag/rag.md) to learn about retrieval-augmented generation.
 
 ---
 
-**[← Back to Models & Embeddings](../09-models-embeddings/README.md) | [↑ Back to Certification](../README.md)**
+**[← Back to Models & Embeddings](../09-models-embeddings/models-embeddings.md) | [↑ Back to Certification](../dp-800-overview.md)**

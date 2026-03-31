@@ -388,4 +388,4 @@ FROM sys.fn_get_audit_file('C:\Audits\*.sqlaudit', DEFAULT, DEFAULT);
 
 ---
 
-**[← Back to Cheat Sheets](./README.md)**
+**[← Back to Cheat Sheets](./cheat-sheets.md)**

@@ -377,4 +377,4 @@ D. db_owner role membership
 
 ---
 
-**[↑ Back to Section](./README.md) | [Next →](./02-embedding-maintenance.md)**
+**[↑ Back to Section](./models-embeddings.md) | [Next →](./02-embedding-maintenance.md)**

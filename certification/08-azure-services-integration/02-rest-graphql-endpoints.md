@@ -472,4 +472,4 @@ GraphQL pagination response:
 
 ---
 
-**[← Previous](./01-data-api-builder.md) | [↑ Back to Section](./README.md) | [Next →](./03-monitoring.md)**
+**[← Previous](./01-data-api-builder.md) | [↑ Back to Section](./azure-services-integration.md) | [Next →](./03-monitoring.md)**

@@ -7,7 +7,7 @@ Study notes for the Microsoft DP-800: Developing AI-Enabled Database Solutions c
 ```text
 dp-800-study-guide/
 ├── certification/
-│   ├── README.md               # Certification index with exam overview and progress tracker
+│   ├── dp-800-overview.md      # Certification index with exam overview and progress tracker
 │   ├── 01-database-objects/    # Design and implement database objects
 │   ├── 02-programmability-objects/ # Views, functions, stored procedures, triggers
 │   ├── 03-advanced-tsql/       # CTEs, window functions, JSON, regex, graph queries
@@ -22,7 +22,7 @@ dp-800-study-guide/
 │   └── resources/              # Practice questions, mock exams, exam tips, code examples, appendix, cheat sheets
 ```
 
-Each topic folder contains a `README.md` index and numbered `.md` topic files.
+Each topic folder contains a named index file (e.g., `database-objects.md`, `advanced-tsql.md`) and numbered `.md` topic files.
 
 ## Content Guidelines
 
@@ -45,7 +45,7 @@ Each topic folder contains a `README.md` index and numbered `.md` topic files.
   1. Same number prefix; append `-part1` / `-part2`
   2. Each part gets own YAML frontmatter and intro
   3. Terminal sections (Use Cases → Official Docs) go in **Part 2 only**; Part 1 ends with forward link
-  4. Update topic `README.md` index; delete original; fix all links repo-wide
+  4. Update topic index file; delete original; fix all links repo-wide
 
 ### Markdown Conventions
 
@@ -81,8 +81,9 @@ Use callouts to break up dense text in topic files and cheat sheets. Standard ty
 
 ### Links
 
-- **Link to files, not folders** (`path/to/README.md`, not `path/to/`)
-- **Always `./README.md`** for local READMEs — bare `README.md` resolves ambiguously in Obsidian
+- **Link to files, not folders** (`path/to/database-objects.md`, not `path/to/`)
+- **Topic index files** are named after their folder (e.g., `./database-objects.md`, `./advanced-tsql.md`) — never `README.md`
+- **Always use `./filename.md`** for same-folder links — bare filenames resolve ambiguously in Obsidian
 - Verify target files exist after edits
 
 ### Section Ordering (End of Topic Files)
@@ -98,23 +99,25 @@ Terminal sections in this exact order:
 7. `## Official Documentation`
 8. `---` separator + navigation link (always last)
 
-**Nav format:** `**[← Previous](./NN-prev.md) | [↑ Back to Section](./README.md) | [Next →](./NN-next.md)**`
+**Nav format:** `**[← Previous](./NN-prev.md) | [↑ Back to Section](./topic-index.md) | [Next →](./NN-next.md)**`
+
+where `topic-index.md` is the folder's named index file (e.g., `./database-objects.md`, `./advanced-tsql.md`)
 
 - Part 1 files: end with only forward link to Part 2
 - Part 2 files: full three-way nav
 
-## README Standards
+## Index File Standards
 
-### Certification README (`certification/README.md`)
+### Certification Index (`certification/dp-800-overview.md`)
 
 Required: YAML frontmatter (`title`, `type: certification`, `aliases`, `tags`), How to Use This Guide (numbered steps including `final-review.md`), Exam Overview table, Domain Weights (Mermaid pie), Study Topics table with weights, Practice & Resources table (must include `Final Review` row), Study Progress Tracker (checkboxes).
 
-### Topic Folder README (`<topic-folder>/README.md`)
+### Topic Folder Index (`<topic-folder>/<topic-name>.md`)
 
 Required: YAML frontmatter (`title`, `type: category`, `tags`, `status`), topic title with exam weight, `## Quick Recall` Mermaid mindmap (first section, before Topics Overview), Topics Overview (Mermaid flowchart), Section Contents table, Key Concepts, Related Resources, Back/Next navigation.
 
 - `status` field values: `draft`, `in-progress`, `complete`
-- Update `status` in each README as sections are completed — do not leave complete sections as `draft`
+- Update `status` in each topic index as sections are completed — do not leave complete sections as `draft`
 - `## Quick Recall` mindmap lists the 3–6 most testable facts per section — use `mindmap` diagram type
 
 ### Topic File Structure (Top of File)

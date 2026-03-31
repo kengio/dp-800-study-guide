@@ -74,14 +74,14 @@ flowchart TD
 
 ## Related Resources
 
-- [05-Data Security & Compliance](../05-data-security-compliance/README.md)
-- [07-CI/CD Database Projects](../07-cicd-database-projects/README.md)
+- [05-Data Security & Compliance](../05-data-security-compliance/data-security-compliance.md)
+- [07-CI/CD Database Projects](../07-cicd-database-projects/cicd-database-projects.md)
 - [Official: Query Store](https://learn.microsoft.com/en-us/sql/relational-databases/performance/monitoring-performance-by-using-the-query-store)
 
 ## Next Steps
 
-Proceed to [07-CI/CD Database Projects](../07-cicd-database-projects/README.md) to learn about SQL Database Projects and deployment pipelines.
+Proceed to [07-CI/CD Database Projects](../07-cicd-database-projects/cicd-database-projects.md) to learn about SQL Database Projects and deployment pipelines.
 
 ---
 
-**[← Back to Data Security](../05-data-security-compliance/README.md) | [↑ Back to Certification](../README.md)**
+**[← Back to Data Security](../05-data-security-compliance/data-security-compliance.md) | [↑ Back to Certification](../dp-800-overview.md)**

@@ -364,4 +364,4 @@ GROUP BY c.CustomerID;
 
 ---
 
-**[← Back to Cheat Sheets](./README.md)**
+**[← Back to Cheat Sheets](./cheat-sheets.md)**

@@ -68,19 +68,19 @@ flowchart TD
 
 ## Related Resources
 
-- [10-Intelligent Search](../10-intelligent-search/README.md)
-- [09-Models & Embeddings](../09-models-embeddings/README.md)
+- [10-Intelligent Search](../10-intelligent-search/intelligent-search.md)
+- [09-Models & Embeddings](../09-models-embeddings/models-embeddings.md)
 - [Official: sp_invoke_external_rest_endpoint](https://learn.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sp-invoke-external-rest-endpoint-transact-sql)
 
 ## Next Steps
 
 This is the final domain section. After completing RAG:
 
-1. Review the [Cheat Sheets](../resources/cheat-sheets/README.md) for all three domains
+1. Review the [Cheat Sheets](../resources/cheat-sheets/cheat-sheets.md) for all three domains
 2. Complete [Domain 3 Practice Questions](../resources/practice-questions/03-ai-capabilities.md)
-3. Take [Mock Exam 1](../resources/mock-exam/README.md) under timed conditions
-4. Review weak areas, then take [Mock Exam 2](../resources/mock-exam-2/README.md)
+3. Take [Mock Exam 1](../resources/mock-exam/mock-exam-1.md) under timed conditions
+4. Review weak areas, then take [Mock Exam 2](../resources/mock-exam-2/mock-exam-2.md)
 
 ---
 
-**[← Back to Intelligent Search](../10-intelligent-search/README.md) | [↑ Back to Certification](../README.md)**
+**[← Back to Intelligent Search](../10-intelligent-search/intelligent-search.md) | [↑ Back to Certification](../dp-800-overview.md)**

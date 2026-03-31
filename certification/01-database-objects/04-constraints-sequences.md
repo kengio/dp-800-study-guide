@@ -377,4 +377,4 @@ D. A concurrent transaction consumed values 451-500
 
 ---
 
-**[← Previous](./03-json-columns.md) | [↑ Back to Section](./README.md) | [Next →](./05-partitioning.md)**
+**[← Previous](./03-json-columns.md) | [↑ Back to Section](./database-objects.md) | [Next →](./05-partitioning.md)**

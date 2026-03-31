@@ -408,4 +408,4 @@ CREATE INDEX IX_Orders_Shipping ON Orders (ShippingCountry, ShippingCity);
 
 ---
 
-**[← Back to Code Examples](./README.md) | [↑ Back to Certification](../../../README.md)**
+**[← Back to Code Examples](./tsql-code-examples.md) | [↑ Back to Certification](../../../dp-800-overview.md)**

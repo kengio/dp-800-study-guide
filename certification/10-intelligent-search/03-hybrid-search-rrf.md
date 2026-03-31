@@ -334,4 +334,4 @@ Larger k → more uniform distribution across ranks
 
 ---
 
-**[← Previous](./02-vector-search.md) | [↑ Back to Section](./README.md)**
+**[← Previous](./02-vector-search.md) | [↑ Back to Section](./intelligent-search.md)**

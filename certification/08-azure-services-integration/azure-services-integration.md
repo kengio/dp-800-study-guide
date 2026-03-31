@@ -76,14 +76,14 @@ flowchart TD
 
 ## Related Resources
 
-- [07-CI/CD Database Projects](../07-cicd-database-projects/README.md)
-- [09-Models & Embeddings](../09-models-embeddings/README.md)
+- [07-CI/CD Database Projects](../07-cicd-database-projects/cicd-database-projects.md)
+- [09-Models & Embeddings](../09-models-embeddings/models-embeddings.md)
 - [Official: Data API Builder](https://learn.microsoft.com/en-us/azure/data-api-builder/overview-to-data-api-builder)
 
 ## Next Steps
 
-Proceed to [09-Models & Embeddings](../09-models-embeddings/README.md) to start exploring AI capabilities.
+Proceed to [09-Models & Embeddings](../09-models-embeddings/models-embeddings.md) to start exploring AI capabilities.
 
 ---
 
-**[← Back to CI/CD Database Projects](../07-cicd-database-projects/README.md) | [↑ Back to Certification](../README.md)**
+**[← Back to CI/CD Database Projects](../07-cicd-database-projects/cicd-database-projects.md) | [↑ Back to Certification](../dp-800-overview.md)**

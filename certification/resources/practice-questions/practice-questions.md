@@ -27,4 +27,4 @@ Domain-specific practice questions to test your knowledge before the exam.
 
 ---
 
-**[← Back to Resources](../README.md)**
+**[← Back to Resources](../exam-resources.md)**

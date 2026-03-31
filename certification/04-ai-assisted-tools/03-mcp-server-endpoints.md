@@ -449,4 +449,4 @@ D. GitHub Copilot does not support MCP servers for database access
 
 ---
 
-**[← Previous](./02-github-copilot-setup.md) | [↑ Back to Section](./README.md)**
+**[← Previous](./02-github-copilot-setup.md) | [↑ Back to Section](./ai-assisted-tools.md)**

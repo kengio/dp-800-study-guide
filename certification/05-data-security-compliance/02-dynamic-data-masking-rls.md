@@ -245,4 +245,4 @@ SELECT * FROM sys.security_predicates;
 
 ---
 
-**[← Previous](./01-encryption.md) | [↑ Back to Section](./README.md) | [Next →](./03-permissions-access.md)**
+**[← Previous](./01-encryption.md) | [↑ Back to Section](./data-security-compliance.md) | [Next →](./03-permissions-access.md)**

@@ -51,41 +51,41 @@ pie title Exam Domain Distribution
 
 | Section | Priority | Topics |
 | :--- | :--- | :--- |
-| [01-Database Objects](01-database-objects/README.md) | High | Tables, indexes, constraints, partitioning |
-| [02-Programmability Objects](02-programmability-objects/README.md) | High | Views, functions, stored procedures, triggers |
-| [03-Advanced T-SQL](03-advanced-tsql/README.md) | High | CTEs, window functions, JSON, regex, graph |
-| [04-AI-Assisted Tools](04-ai-assisted-tools/README.md) | Medium | GitHub Copilot, MCP servers, AI security |
+| [01-Database Objects](01-database-objects/database-objects.md) | High | Tables, indexes, constraints, partitioning |
+| [02-Programmability Objects](02-programmability-objects/programmability-objects.md) | High | Views, functions, stored procedures, triggers |
+| [03-Advanced T-SQL](03-advanced-tsql/advanced-tsql.md) | High | CTEs, window functions, JSON, regex, graph |
+| [04-AI-Assisted Tools](04-ai-assisted-tools/ai-assisted-tools.md) | Medium | GitHub Copilot, MCP servers, AI security |
 
 ### Domain 2: Secure, Optimize, and Deploy (35–40%)
 
 | Section | Priority | Topics |
 | :--- | :--- | :--- |
-| [05-Data Security & Compliance](05-data-security-compliance/README.md) | High | Encryption, masking, RLS, auditing |
-| [06-Performance Optimization](06-performance-optimization/README.md) | High | Query plans, DMVs, Query Store, blocking |
-| [07-CI/CD Database Projects](07-cicd-database-projects/README.md) | Medium | SQL DB Projects, source control, deployment |
-| [08-Azure Services Integration](08-azure-services-integration/README.md) | Medium | DAB, REST/GraphQL, monitoring, CDC |
+| [05-Data Security & Compliance](05-data-security-compliance/data-security-compliance.md) | High | Encryption, masking, RLS, auditing |
+| [06-Performance Optimization](06-performance-optimization/performance-optimization.md) | High | Query plans, DMVs, Query Store, blocking |
+| [07-CI/CD Database Projects](07-cicd-database-projects/cicd-database-projects.md) | Medium | SQL DB Projects, source control, deployment |
+| [08-Azure Services Integration](08-azure-services-integration/azure-services-integration.md) | Medium | DAB, REST/GraphQL, monitoring, CDC |
 
 ### Domain 3: Implement AI Capabilities (25–30%)
 
 | Section | Priority | Topics |
 | :--- | :--- | :--- |
-| [09-Models & Embeddings](09-models-embeddings/README.md) | High | External models, embedding maintenance |
-| [10-Intelligent Search](10-intelligent-search/README.md) | High | Full-text, vector, hybrid search |
-| [11-RAG](11-rag/README.md) | High | Retrieval-augmented generation |
+| [09-Models & Embeddings](09-models-embeddings/models-embeddings.md) | High | External models, embedding maintenance |
+| [10-Intelligent Search](10-intelligent-search/intelligent-search.md) | High | Full-text, vector, hybrid search |
+| [11-RAG](11-rag/rag.md) | High | Retrieval-augmented generation |
 
 ### Practice & Resources
 
 | Resource | Description |
 | :--- | :--- |
-| [Practice Questions](resources/practice-questions/README.md) | Domain-specific practice questions |
-| [Mock Exam 1](resources/mock-exam/README.md) | Full-length practice exam |
-| [Mock Exam 2](resources/mock-exam-2/README.md) | Alternative practice exam |
+| [Practice Questions](resources/practice-questions/practice-questions.md) | Domain-specific practice questions |
+| [Mock Exam 1](resources/mock-exam/mock-exam-1.md) | Full-length practice exam |
+| [Mock Exam 2](resources/mock-exam-2/mock-exam-2.md) | Alternative practice exam |
 | [Exam Tips](resources/exam-tips.md) | Strategies and exam format guide |
 | [Official Links](resources/official-links.md) | Microsoft documentation and registration |
-| [Code Examples](resources/code-examples/tsql/README.md) | Standalone T-SQL code example files |
-| [Cheat Sheets](resources/cheat-sheets/README.md) | Quick-reference guides for exam topics (each includes Gotchas & Traps + Before the Exam checklist) |
+| [Code Examples](resources/code-examples/tsql/tsql-code-examples.md) | Standalone T-SQL code example files |
+| [Cheat Sheets](resources/cheat-sheets/cheat-sheets.md) | Quick-reference guides for exam topics (each includes Gotchas & Traps + Before the Exam checklist) |
 | [Final Review](resources/final-review.md) | 20-minute exam-morning scan: top facts and last-minute traps for all three domains |
-| [Appendix](resources/appendix/README.md) | Glossary, comparison tables, error messages |
+| [Appendix](resources/appendix/appendix.md) | Glossary, comparison tables, error messages |
 
 ## Study Progress Tracker
 

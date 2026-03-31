@@ -74,14 +74,14 @@ flowchart TD
 
 ## Related Resources
 
-- [04-AI-Assisted Tools](../04-ai-assisted-tools/README.md)
-- [06-Performance Optimization](../06-performance-optimization/README.md)
+- [04-AI-Assisted Tools](../04-ai-assisted-tools/ai-assisted-tools.md)
+- [06-Performance Optimization](../06-performance-optimization/performance-optimization.md)
 - [Official: Always Encrypted](https://learn.microsoft.com/en-us/sql/relational-databases/security/encryption/always-encrypted-database-engine)
 
 ## Next Steps
 
-Proceed to [06-Performance Optimization](../06-performance-optimization/README.md) to learn about query tuning and performance monitoring.
+Proceed to [06-Performance Optimization](../06-performance-optimization/performance-optimization.md) to learn about query tuning and performance monitoring.
 
 ---
 
-**[← Back to AI-Assisted Tools](../04-ai-assisted-tools/README.md) | [↑ Back to Certification](../README.md)**
+**[← Back to AI-Assisted Tools](../04-ai-assisted-tools/ai-assisted-tools.md) | [↑ Back to Certification](../dp-800-overview.md)**

@@ -356,4 +356,4 @@ D. Enable Managed Identity authentication to replace password-based access
 
 ---
 
-**[← Previous](./04-auditing.md) | [↑ Back to Section](./README.md)**
+**[← Previous](./04-auditing.md) | [↑ Back to Section](./data-security-compliance.md)**

@@ -347,4 +347,4 @@ Advantages: Managed search service with built-in RRF; scales independently of da
 
 ---
 
-**[↑ Back to Section](./README.md) | [Next →](./02-prompts-and-responses.md)**
+**[↑ Back to Section](./rag.md) | [Next →](./02-prompts-and-responses.md)**

@@ -1,12 +1,12 @@
 ---
-title: DP-800 Mock Exam 2
+title: DP-800 Mock Exam 1
 type: practice-questions
 tags:
   - dp-800
   - mock-exam
 ---
 
-# DP-800 Mock Exam 2
+# DP-800 Mock Exam 1
 
 ## Instructions
 
@@ -16,7 +16,7 @@ tags:
 - **Scoring**: Check answers only after completing all 45 questions
 - **Review**: For any incorrect answers, revisit the corresponding study notes
 
-> This exam uses entirely different questions from Mock Exam 1. Complete Mock Exam 1 first for best results.
+> Treat this as a real exam attempt. Resist the urge to look up answers mid-session.
 
 ---
 
@@ -48,4 +48,4 @@ tags:
 ## Links
 
 - **[Start the exam → questions.md](./questions.md)**
-- **[← Back to Resources](../README.md)**
+- **[← Back to Resources](../exam-resources.md)**
