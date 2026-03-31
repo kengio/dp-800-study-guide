@@ -19,12 +19,12 @@ Vector search finds rows whose vector embeddings are mathematically similar to a
 > [!abstract]
 > - Covers the VECTOR data type, VECTOR_DISTANCE (exact search), VECTOR_SEARCH (approximate search), and DiskANN indexing
 > - Vector search enables semantic similarity queries — finding conceptually related content, not just keyword matches
-> - Key exam topics: ENN vs ANN distinction, DiskANN metric restrictions, VECTOR_NORMALIZE requirement
+> - Key exam topics: ENN vs ANN distinction, choosing the right distance metric, VECTOR_NORMALIZE requirement
 
 > [!tip] What the Exam Tests
 > - `VECTOR_DISTANCE('cosine', v1, v2)` = **exact** nearest neighbor (ENN) — compares all rows; use when accuracy > speed
 > - `VECTOR_SEARCH(TABLE, VECTOR(col), JSON_ARRAY(query_vector), top_n)` = **approximate** (ANN) via DiskANN — faster at scale
-> - **DiskANN** supports only `cosine` and `dot` metrics — **euclidean is NOT supported** for ANN indexes
+> - DiskANN supports `cosine`, `dot`, and `euclidean` metrics — the index metric **must match** the metric used in `VECTOR_SEARCH`
 
 ---
 

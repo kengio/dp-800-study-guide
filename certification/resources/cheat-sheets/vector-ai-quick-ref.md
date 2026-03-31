@@ -359,7 +359,7 @@ SELECT JSON_VALUE(@response, '$.result.choices[0].message.content') AS Answer;
 
 ## Gotchas & Traps
 
-- **DiskANN does NOT support euclidean** — `VECTOR_SEARCH` with a DiskANN index only supports `cosine` and `dot` metrics. The exam will offer euclidean as a distractor.
+- **DiskANN metric must match** — the metric set on the DiskANN index (`cosine`, `dot`, or `euclidean`) must exactly match the metric used in `VECTOR_SEARCH`. Mismatched metrics cause an error at query time.
 - **VECTOR_SEARCH is approximate** — it can miss the true nearest neighbor for speed. Use `VECTOR_DISTANCE` when perfect accuracy matters; use `VECTOR_SEARCH` when scale matters.
 - **Normalize before dot product** — `VECTOR_NORMALIZE` (norm2) is required before you can use dot product distance as a cosine similarity proxy. Without normalization, dot product reflects magnitude, not direction.
 - **Embedding model dimensions matter** — text-embedding-3-small = 1536 dims; text-embedding-3-large = 3072 dims; ada-002 = 1536 dims. Changing models requires regenerating ALL embeddings — old and new vectors are incompatible.
@@ -372,7 +372,7 @@ SELECT JSON_VALUE(@response, '$.result.choices[0].message.content') AS Answer;
 ## Before the Exam, I Can…
 
 - [ ] Explain the difference between `VECTOR_DISTANCE` (ENN, exact) and `VECTOR_SEARCH` (ANN, approximate via DiskANN) and choose correctly given a scenario
-- [ ] State which distance metrics DiskANN supports (`cosine`, `dot`) and which it does NOT (`euclidean`)
+- [ ] State which distance metrics DiskANN supports (`cosine`, `dot`, `euclidean`) and explain why the index metric must match the query metric
 - [ ] Explain why `VECTOR_NORMALIZE` is needed before using dot product as cosine similarity
 - [ ] Recall dimensions for text-embedding-3-small (1536), text-embedding-3-large (3072), ada-002 (1536)
 - [ ] Describe the end-to-end RAG pattern: embed query → vector+FTS search → retrieve top-K → augment prompt → call LLM → return grounded response

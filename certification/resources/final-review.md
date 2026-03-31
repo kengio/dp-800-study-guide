@@ -41,7 +41,7 @@ tags:
 - **RLS (Row-Level Security):** security predicate function returns a filter; attached to table via `CREATE SECURITY POLICY`. Transparent to the user — they don't know rows are hidden. Filter predicate (SELECT) vs block predicate (INSERT/UPDATE/DELETE).
 - **Permission precedence:** `DENY` always wins over `GRANT`, even if GRANT comes through a role. `REVOKE` removes a prior GRANT or DENY — it does not itself deny.
 - **Query Store:** persists query plans and runtime stats across restarts. Force a plan: `sp_query_store_force_plan`. Unforce: `sp_query_store_unforce_plan`. Detects plan regressions via Automatic Plan Correction.
-- **Isolation levels:** `READ COMMITTED` = default; `READ UNCOMMITTED` = dirty reads; `REPEATABLE READ` = no phantom rows; `SERIALIZABLE` = full isolation; `SNAPSHOT` = optimistic, row versioning, database-level; `RCSI` (Read Committed Snapshot Isolation) = row-version READ COMMITTED — set `READ_COMMITTED_SNAPSHOT ON`.
+- **Isolation levels:** `READ COMMITTED` = default; `READ UNCOMMITTED` = dirty reads; `REPEATABLE READ` = no phantom rows; `SERIALIZABLE` = full isolation; `SNAPSHOT` = optimistic, row versioning, per-transaction opt-in (requires `ALLOW_SNAPSHOT_ISOLATION ON`); `RCSI` (Read Committed Snapshot Isolation) = database-level setting that changes default READ COMMITTED behavior — set `READ_COMMITTED_SNAPSHOT ON`.
 - **Blocking vs deadlock:** blocking = one session waits for lock held by another (resolves when lock released); deadlock = circular wait (SQL Server auto-kills one victim). Check with `sys.dm_exec_requests` and `sys.dm_os_waiting_tasks`.
 - **SQL DB Projects:** `.sqlproj` file; `Build` → `.dacpac`; `Publish` (via SqlPackage.exe) → deploys diff to target. Pre/post-deployment scripts run outside the diff. `SqlPackage.exe /Action:Publish` deploys; `/Action:Extract` creates dacpac from existing DB.
 - **DAB (Data API Builder):** config file maps entities to DB objects; generates REST (`/api/{Entity}`) and GraphQL (`/graphql`) endpoints; no custom code. Permissions: anonymous, authenticated, role-based.
@@ -54,7 +54,7 @@ tags:
 
 - **VECTOR data type:** `VECTOR(n)` — fixed-dimension float array. `VECTOR(1536)` = text-embedding-3-small or ada-002; `VECTOR(3072)` = text-embedding-3-large.
 - **VECTOR_DISTANCE:** exact nearest neighbor (ENN); syntax: `VECTOR_DISTANCE('cosine', v1, v2)`; metrics: `cosine`, `euclidean`, `dot`. Smaller value = more similar (except dot where larger = more similar).
-- **VECTOR_SEARCH:** approximate nearest neighbor (ANN) via DiskANN index; faster at scale; only `cosine` and `dot` metrics — **euclidean NOT supported** for ANN indexes.
+- **VECTOR_SEARCH:** approximate nearest neighbor (ANN) via DiskANN index; faster at scale; supports `cosine`, `dot`, and `euclidean` — the **index metric must match** the metric used in `VECTOR_SEARCH`.
 - **VECTOR_NORMALIZE:** normalizes to unit length (L2 norm = 1); after normalization, dot product equals cosine similarity. Required before using dot as cosine proxy.
 - **Full-text search:** `CONTAINS` = precision (exact terms, proximity, weighted); `FREETEXT` = recall (natural language, broader); both require a full-text index. `CONTAINSTABLE`/`FREETEXTTABLE` return ranked results.
 - **Hybrid search with RRF:** Reciprocal Rank Fusion combines FTS + vector result sets. Formula: `score = Σ 1/(k + rank)` where `k=60` by default. Higher RRF score = better. Not a score average — a rank-combination algorithm.
@@ -69,7 +69,7 @@ tags:
 ## Last-Minute Traps
 
 1. **JSON_VALUE on an object/array path returns NULL** — not an error. Use `JSON_QUERY` to extract objects or arrays.
-2. **DiskANN (VECTOR_SEARCH) does NOT support euclidean** — only `cosine` and `dot`. The exam will offer euclidean as a distractor.
+2. **DiskANN index metric must match the query metric** — DiskANN supports `cosine`, `dot`, and `euclidean`, but the metric on the index must match what you pass to `VECTOR_SEARCH`. Mixing metrics causes an error.
 3. **DENY always overrides GRANT** — even if the GRANT came through a role. There is no way to "un-deny" except REVOKE of the DENY.
 4. **DDM ≠ encryption** — DDM hides values at display time; the data is stored in plaintext. Users with `UNMASK` or admin rights see everything.
 5. **SNAPSHOT isolation ≠ RCSI** — SNAPSHOT = application sets it per transaction; RCSI = database setting that changes the *default* READ COMMITTED behavior to row-versioning.

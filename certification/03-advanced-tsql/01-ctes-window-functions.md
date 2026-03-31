@@ -22,7 +22,7 @@ Common Table Expressions (CTEs) provide named temporary result sets for readable
 
 > [!tip] What the Exam Tests
 > - Tie behavior: `ROW_NUMBER` = unique (arbitrary tiebreak); `RANK` = gaps after tie (1,1,3); `DENSE_RANK` = no gaps (1,1,2)
-> - Recursive CTE: **anchor member** (runs once) `UNION ALL` **recursive member** (runs until no rows). Must have `MAXRECURSION` to prevent infinite loop
+> - Recursive CTE: **anchor member** (runs once) `UNION ALL` **recursive member** (runs until no rows). Default limit is 100; use `OPTION (MAXRECURSION n)` to override (0 = unlimited, use with caution)
 > - `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` = running total; `RANGE` uses logical range (can include ties)
 
 ---
