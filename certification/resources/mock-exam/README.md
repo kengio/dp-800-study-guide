@@ -40,7 +40,7 @@ tags:
 |--------|-------|-----------|-----------|
 | Domain 1 | Design and Develop Database Solutions | ~17 | 35–40% |
 | Domain 2 | Secure, Optimize, and Deploy | ~17 | 35–40% |
-| Domain 3 | Implement AI Capabilities | ~11 | 20–25% |
+| Domain 3 | Implement AI Capabilities | ~11 | 25–30% |
 | **Total** | | **45** | **100%** |
 
 ---
