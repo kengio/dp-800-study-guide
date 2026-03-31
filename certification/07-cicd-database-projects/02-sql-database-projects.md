@@ -14,6 +14,18 @@ tags:
 
 SQL Database Projects allow you to version-control your entire database schema as T-SQL source files and build a deployable dacpac artifact. The modern SDK-style `.sqlproj` format (using `Microsoft.Build.Sql`) integrates with standard `dotnet` tooling and CI/CD pipelines. A dacpac captures the desired state of a database schema — deployment calculates and applies the diff.
 
+> [!abstract]
+> - Covers SQL Database Projects (.sqlproj), the dacpac build artifact, publishing, and pre/post-deployment scripts
+> - SQL DB Projects bring code-first, source-controlled schema management to SQL Server and Azure SQL
+> - Key exam topics: project structure, dacpac vs bacpac distinction, pre/post-deployment script role
+
+> [!tip] What the Exam Tests
+> - Build produces a `.dacpac` (schema only); `SqlPackage /Action:Publish` deploys the diff (compares target and applies changes)
+> - **dacpac** = schema-only; **bacpac** = schema + data (for import/export, not CI/CD deployment)
+> - Pre/post-deployment scripts run outside the dacpac diff — used for data migrations, seed data, one-time operations
+
+---
+
 ## SDK-Style Project Format
 
 The SDK-style project file is minimal compared to the legacy format:
@@ -221,6 +233,9 @@ sqlpackage /Action:Export \
     /TargetFile:./database-backup.bacpac \
     /SourceConnectionString:"..."
 ```
+
+> [!warning] Common Mistake
+> dacpac and bacpac are not interchangeable. Use dacpac for CI/CD deployments (schema changes). Use bacpac for migrating data between environments (schema + data export). Publishing a dacpac does NOT import data.
 
 ## NuGet Package References
 

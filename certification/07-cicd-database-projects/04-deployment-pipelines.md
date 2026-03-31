@@ -14,6 +14,18 @@ tags:
 
 CI/CD pipelines automate the build, validation, and deployment of SQL Database Projects. Key concerns include detecting schema drift between the source-controlled dacpac and the live database, managing secrets securely with Azure Key Vault, and controlling deployments through approval gates and branch policies.
 
+> [!abstract]
+> - Covers CI/CD pipeline setup for database projects: build, test, and deploy stages using GitHub Actions or Azure Pipelines
+> - Automated deployment uses SqlPackage.exe with a publish profile for environment-specific settings
+> - Key exam topics: SqlPackage.exe action verbs, publish profile (.publish.xml) purpose, pipeline stage order
+
+> [!tip] What the Exam Tests
+> - `SqlPackage.exe /Action:Publish` deploys a dacpac to a target; `/Action:Extract` creates dacpac from existing DB; `/Action:Export` creates bacpac
+> - **Publish profile** (`.publish.xml`) stores environment-specific connection strings and deployment options — keeps secrets out of pipeline YAML
+> - Pipeline order: Build → (optional) Test → Publish to staging → validate → Publish to production
+
+---
+
 ## Pipeline Architecture
 
 ```text
@@ -157,6 +169,9 @@ sqlpackage /Action:Script \
 
 # Review planned-changes.sql before approving deployment
 ```
+
+> [!warning] Common Mistake
+> SqlPackage action verbs are frequently tested. Publish = deploy dacpac TO a database. Extract = create dacpac FROM a database. Export = create bacpac (schema+data) FROM a database. Import = deploy bacpac TO a database. Mix these up and you'll get wrong answers.
 
 ## Secrets Management with Azure Key Vault
 

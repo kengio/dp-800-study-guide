@@ -17,6 +17,18 @@ Data API Builder (DAB) is an open-source tool from Microsoft that automatically 
 
 DAB supports Azure SQL, SQL Server, Azure Cosmos DB, and MySQL/PostgreSQL, and can be deployed as a container or hosted in Azure Static Web Apps or Azure App Service.
 
+> [!abstract]
+> - Covers Data API Builder (DAB): what it is, config file structure, entity mapping, and permissions
+> - DAB generates REST and GraphQL endpoints from a config file — no custom controller code required
+> - Key exam topics: DAB config structure, entity-to-DB-object mapping, REST vs GraphQL endpoint paths, permission roles
+
+> [!tip] What the Exam Tests
+> - DAB requires **zero custom code** — the config file maps database entities to REST/GraphQL endpoints
+> - REST path: `/api/{EntityName}/{pk}`; GraphQL endpoint: `/graphql` (single endpoint, all operations)
+> - Permissions in DAB: `anonymous` (unauthenticated), `authenticated` (any signed-in user), named roles (custom)
+
+---
+
 ## DAB Configuration File Structure
 
 The `dab-config.json` file controls everything DAB does:
@@ -112,6 +124,9 @@ For SQL Database in Fabric (or Azure SQL), use a connection string like:
 ```text
 Server=myserver.database.windows.net;Database=MyDB;Authentication=Active Directory Default;
 ```
+
+> [!warning] Common Mistake
+> DAB is not a custom API layer you write — it is a runtime that reads a config file and serves endpoints. If the exam asks "what do you write to expose a SQL table as a REST endpoint using DAB," the answer is a config file entry, not code.
 
 ## Entity Configuration
 

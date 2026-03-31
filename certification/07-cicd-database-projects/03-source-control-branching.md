@@ -14,6 +14,18 @@ tags:
 
 Storing SQL Database Projects in Git enables collaboration, history tracking, and structured review of schema changes. Branching strategies control how schema changes move from development to production, while branch policies and pull requests enforce quality gates before changes are merged.
 
+> [!abstract]
+> - Covers Git-based source control for database schema files, branching strategies, and merge conflict resolution
+> - Database schema files (.sql) in a project are treated the same as application code — same Git workflows apply
+> - Key exam topics: feature branch workflow, PR-based review, handling schema file merge conflicts
+
+> [!tip] What the Exam Tests
+> - Database schema changes go through the same feature branch → PR → merge → deploy workflow as application code
+> - Merge conflicts in schema `.sql` files must be resolved manually — Git cannot auto-resolve SQL syntax conflicts
+> - The `.sqlproj` file itself can have conflicts if two branches add different objects
+
+---
+
 ## Configuring Source Control for SQL Database Projects
 
 ### Repository Structure

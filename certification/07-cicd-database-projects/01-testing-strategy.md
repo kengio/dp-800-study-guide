@@ -14,6 +14,18 @@ tags:
 
 A robust testing strategy for database projects combines unit tests (isolated, fast, using mock data) with integration tests (end-to-end, using real data flows). The tSQLt framework is the standard unit testing framework for T-SQL, while reference/static data should be version-controlled alongside schema objects.
 
+> [!abstract]
+> - Covers testing approaches for database code: unit tests (tSQLt), integration tests, and end-to-end tests
+> - tSQLt is the standard T-SQL unit testing framework — tests run inside transactions that are rolled back
+> - Key exam topics: tSQLt test isolation mechanism, test doubles (fakes/mocks), assertion functions
+
+> [!tip] What the Exam Tests
+> - tSQLt tests run **inside transactions that are always rolled back** — no permanent data changes from test runs
+> - `tSQLt.FakeTable` replaces a real table with an empty copy for test isolation
+> - `tSQLt.AssertEquals`, `tSQLt.AssertEqualsTable`, `tSQLt.ExpectException` are the core assertion functions
+
+---
+
 ## tSQLt Unit Testing Framework
 
 tSQLt is a T-SQL unit testing framework that runs entirely inside SQL Server. Tests are organized into schemas (test classes), and each test is a stored procedure beginning with the word "test".

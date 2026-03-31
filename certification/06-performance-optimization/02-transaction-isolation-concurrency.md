@@ -17,6 +17,18 @@ tags:
 
 Transaction isolation levels control how concurrent transactions see each other's changes. Choosing the right level balances data consistency against concurrency and blocking.
 
+> [!abstract]
+> - Covers all six isolation levels, optimistic vs pessimistic concurrency, blocking, and deadlocks
+> - Isolation level determines what data a transaction can see and what locks it takes
+> - Key exam topics: SNAPSHOT vs RCSI distinction, which isolation level prevents which anomaly, deadlock detection
+
+> [!tip] What the Exam Tests
+> - **SNAPSHOT** = application sets per-transaction; `SET TRANSACTION ISOLATION LEVEL SNAPSHOT`; requires `ALLOW_SNAPSHOT_ISOLATION ON`
+> - **RCSI** = database setting; changes default READ COMMITTED to row-versioning; `ALTER DATABASE db SET READ_COMMITTED_SNAPSHOT ON`
+> - Isolation anomalies: dirty read = READ UNCOMMITTED; non-repeatable read = READ COMMITTED; phantom read = REPEATABLE READ; all prevented by SERIALIZABLE and SNAPSHOT
+
+---
+
 ## Isolation Levels Overview
 
 ```sql
@@ -71,6 +83,9 @@ BEGIN TRANSACTION;
 SELECT Balance FROM dbo.Accounts WHERE AccountId = 1;
 COMMIT;
 ```
+
+> [!warning] Common Mistake
+> SNAPSHOT isolation and Read Committed Snapshot Isolation (RCSI) are both row-versioning but are activated differently and used differently. SNAPSHOT is an explicit isolation level set by the application. RCSI changes the behavior of the existing READ COMMITTED level transparently — the app doesn't need to change.
 
 ## Lock Types and Compatibility
 

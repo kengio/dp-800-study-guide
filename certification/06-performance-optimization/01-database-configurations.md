@@ -15,6 +15,18 @@ tags:
 
 Database configuration choices — service tier, compatibility level, memory grants, and database-scoped options — significantly impact performance. The DP-800 exam tests recommending appropriate configurations for specific workloads.
 
+> [!abstract]
+> - Covers database-scoped configurations (MAXDOP, cost threshold, auto-stats), compatibility levels, and Query Store setup
+> - Configuration changes affect all queries unless overridden at the query level with hints
+> - Key exam topics: MAXDOP values, compatibility level effects, auto-create/update statistics behavior
+
+> [!tip] What the Exam Tests
+> - `MAXDOP = 0` = use all CPUs; `MAXDOP = 1` = disable parallelism; override per query with `OPTION (MAXDOP n)`
+> - `ALTER DATABASE SCOPED CONFIGURATION SET MAXDOP = n` sets the database default (does not affect server default)
+> - **Compatibility level** controls optimizer behavior and feature availability — independent of the SQL Server engine version
+
+---
+
 ## Azure SQL Service Tiers
 
 ### DTU-Based (Simpler Pricing)
@@ -133,6 +145,9 @@ SELECT * FROM sys.dm_db_tuning_recommendations;
 3. Server-level: `sp_configure 'max degree of parallelism'`
 
 **Cost threshold for parallelism:** The estimated query cost (in seconds on a reference machine) must exceed this threshold before SQL Server considers a parallel plan. The default of 5 is very low — most queries on modern hardware are cheap enough to go parallel unnecessarily. Raising it to 40–50 reduces context-switch overhead for OLTP workloads.
+
+> [!warning] Common Mistake
+> MAXDOP 0 does NOT disable parallelism — it means "use all available CPUs." MAXDOP 1 disables parallelism. This is a classic exam trap.
 
 **When parallel plans hurt:**
 

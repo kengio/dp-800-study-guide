@@ -15,6 +15,18 @@ tags:
 
 SQL Server provides multiple encryption layers: Transparent Data Encryption (TDE) for data at rest, Always Encrypted for client-side column-level encryption, and server-side column encryption using certificates and asymmetric keys.
 
+> [!abstract]
+> - Covers TDE (at rest, database-wide), Always Encrypted (in memory, column-level), and column-level encryption (manual)
+> - The three encryption methods differ in threat model: who/what is the data protected from
+> - Key exam topics: which encryption method for which threat, CMK/CEK hierarchy, TDE default-on behavior in Azure SQL
+
+> [!tip] What the Exam Tests
+> - **TDE**: protects at rest (stolen backup/disk); server sees plaintext; zero app changes; on by default in Azure SQL
+> - **Always Encrypted**: server NEVER sees plaintext; CMK client-side in Key Vault; driver handles encrypt/decrypt; app must use Always Encrypted-aware driver
+> - **Column-level** (`ENCRYPTBYKEY`): manual encrypt/decrypt in app or T-SQL; server sees plaintext; most flexible but most effort
+
+---
+
 ## Transparent Data Encryption (TDE)
 
 TDE encrypts database files at rest — transparent to applications, no code changes needed.
@@ -110,6 +122,9 @@ CREATE TABLE dbo.Patients (
 | :--- | :--- | :--- |
 | **DETERMINISTIC** | `=`, `IN`, `JOIN`, `GROUP BY` | Lower (same plaintext = same ciphertext) |
 | **RANDOMIZED** | None (value is opaque) | Higher (same plaintext = different ciphertext) |
+
+> [!warning] Common Mistake
+> TDE and Always Encrypted are often confused on the exam. TDE: server DOES see plaintext (it decrypts to run queries). Always Encrypted: server NEVER sees plaintext (encryption/decryption happens in the client driver). The key differentiator in exam scenarios is whether the database administrator (DBA) should be prevented from seeing the data.
 
 ### Querying Always Encrypted Columns
 

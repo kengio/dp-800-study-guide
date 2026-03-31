@@ -14,6 +14,18 @@ tags:
 
 SQL Server Audit captures database activity events and writes them to a file, Windows Event Log, or Azure Monitor (Log Analytics / Event Hub). Azure SQL has additional managed audit capabilities.
 
+> [!abstract]
+> - Covers SQL Server Audit at the server and database level, audit action groups, and audit log destinations
+> - Auditing captures who did what and when — essential for compliance requirements
+> - Key exam topics: server-level vs database-level audit, audit destinations, querying audit logs
+
+> [!tip] What the Exam Tests
+> - Audit hierarchy: create `SERVER AUDIT` (defines destination) → create `DATABASE AUDIT SPECIFICATION` (defines what to capture)
+> - Audit destinations: **Storage Account** (blob), **Log Analytics** workspace, **Event Hub** — all three are valid
+> - Query audit logs with `sys.fn_get_audit_file()` for storage-based logs, or via Log Analytics KQL queries
+
+---
+
 ## SQL Server Audit Architecture
 
 SQL Server Audit is built from two components:
@@ -200,6 +212,9 @@ WHERE server_principal_name = 'DOMAIN\suspicious_user'
 AND action_id IN ('SL', 'IN', 'UP', 'DL')  -- SELECT, INSERT, UPDATE, DELETE
 ORDER BY event_time;
 ```
+
+> [!warning] Common Mistake
+> Audit logs are NOT queryable from regular DMVs like `sys.dm_exec_sessions` or `sys.dm_audit_actions`. Use `sys.fn_get_audit_file('path\*.sqlaudit', DEFAULT, DEFAULT)` for storage-based logs. The exam may offer DMV queries as distractors.
 
 ### Querying Audit Logs in Log Analytics
 

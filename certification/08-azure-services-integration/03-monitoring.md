@@ -14,6 +14,18 @@ tags:
 
 Azure Monitor is the unified monitoring platform for Azure services. For SQL databases, monitoring covers query performance, resource utilization, errors, and availability. Key components are: **Diagnostic Settings** (send metrics/logs to destinations), **Log Analytics** (query logs with KQL), **Application Insights** (application-level telemetry), and **Query Performance Insight** (query-level analysis).
 
+> [!abstract]
+> - Covers Azure Monitor metrics, DMV-based diagnostics, Query Store for plan monitoring, and alerting setup
+> - Monitoring combines Azure-level metrics (Azure Monitor) with SQL-level diagnostics (DMVs, Query Store)
+> - Key exam topics: which DMV for which scenario, Query Store for regression detection, Azure Monitor alert rules
+
+> [!tip] What the Exam Tests
+> - `sys.dm_exec_requests` = currently running queries + blocking info; `sys.dm_os_wait_stats` = cumulative wait statistics
+> - Query Store detects **plan regressions** automatically with Automatic Plan Correction (`FORCE_LAST_GOOD_PLAN`)
+> - Azure Monitor metrics (CPU, DTU, storage) come from the Azure platform; DMVs come from inside the database engine — both are needed for full visibility
+
+---
+
 ## Azure Monitor for SQL
 
 ### Diagnostic Settings

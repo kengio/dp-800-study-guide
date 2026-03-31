@@ -16,6 +16,18 @@ tags:
 
 SQL Server uses a layered permission system: server-level logins, database-level users, roles, and object-level GRANT/DENY/REVOKE. Azure SQL extends this with Azure Active Directory authentication and Managed Identity for passwordless access.
 
+> [!abstract]
+> - Covers GRANT/DENY/REVOKE, database roles, ownership chaining, and EXECUTE AS context
+> - SQL Server uses a hierarchical permission system: server → database → schema → object
+> - Key exam topics: DENY/GRANT precedence, fixed database roles, ownership chaining behavior
+
+> [!tip] What the Exam Tests
+> - **DENY always wins** over GRANT — even if a GRANT came through role membership, an explicit DENY on the principal blocks access
+> - **REVOKE** removes a previously granted or denied permission — it does NOT itself deny access
+> - Fixed roles: `db_datareader` = SELECT on all tables; `db_datawriter` = INSERT/UPDATE/DELETE; `db_owner` = full control; `db_ddladmin` = DDL only
+
+---
+
 ## Permission Hierarchy
 
 ```text
@@ -81,6 +93,9 @@ GRANT EXECUTE ON SCHEMA::dbo TO AppUser;
 SELECT * FROM fn_my_permissions('dbo.Orders', 'OBJECT');
 SELECT * FROM sys.database_permissions WHERE grantee_principal_id = USER_ID('ReportUser');
 ```
+
+> [!warning] Common Mistake
+> REVOKE ≠ DENY. REVOKE removes a permission entry (the user falls back to inherited permissions). DENY explicitly blocks access. If you GRANT access through a role and then REVOKE from the role, the user may still have access through another path. To explicitly block, use DENY.
 
 ## Passwordless Access — Managed Identity
 

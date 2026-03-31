@@ -15,6 +15,18 @@ tags:
 
 Reacting to data changes is fundamental to building event-driven systems. SQL Server and Azure SQL offer several mechanisms at different granularities: **Change Tracking** (did a row change?), **CDC** (what did the row change from/to?), and **CES** (Change Event Streaming in Fabric — push-based streaming). These feed downstream systems via Azure Functions SQL trigger binding, Logic Apps, or direct streaming.
 
+> [!abstract]
+> - Covers Change Data Capture (CDC) and Change Tracking (CT): what changed, when, and how to consume it
+> - CDC and CT both track data changes but differ in detail captured and infrastructure required
+> - Key exam topics: CDC vs CT differences, CDC agent dependency, CT lightweight use cases
+
+> [!tip] What the Exam Tests
+> - **CDC**: captures full before/after row values; requires SQL Server Agent; stores changes in capture tables; used for ETL/replication
+> - **Change Tracking**: captures only that a row changed (row ID + operation); no Agent required; used for sync scenarios where you only need to know *what* changed, not *how*
+> - CDC has latency (agent job); CT is synchronous (committed with the transaction)
+
+---
+
 ## Change Data Capture (CDC)
 
 CDC captures row-level INSERT, UPDATE, and DELETE changes with before/after values. Changes are stored in system tables and can be queried.
@@ -159,6 +171,9 @@ SET @sync_version = CHANGE_TRACKING_CURRENT_VERSION();
 | Storage overhead | Low | Medium |
 | Retention | Configurable (days) | Until cleanup job runs |
 | Use case | Sync, replication | Audit, ETL, streaming |
+
+> [!warning] Common Mistake
+> CDC and Change Tracking are often confused. CDC = captures the actual data values before and after change (heavier, requires Agent). CT = captures only that a change happened to a row (lightweight, no Agent). If the scenario requires knowing the old value of a column, the answer is CDC, not CT.
 
 ## Azure Functions SQL Trigger Binding
 
