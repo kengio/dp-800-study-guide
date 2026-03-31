@@ -342,4 +342,26 @@ GROUP BY c.CustomerID;
 
 ---
 
+## Gotchas & Traps
+
+- **JSON_VALUE on an object/array path returns NULL** — not an error. If your path points to `{"specs":{"ram":16}}`, `JSON_VALUE(col, '$.specs')` returns NULL. Use `JSON_QUERY` for objects and arrays.
+- **Lax mode (default) vs strict mode** — lax returns NULL on path errors; strict throws an error. Prefix path with `strict` to fail fast: `JSON_VALUE(col, 'strict $.name')`.
+- **OPENJSON column definition** — without a WITH clause, OPENJSON returns (key, value, type) rows. With a WITH clause, it returns typed columns. The exam tests both forms.
+- **FOR JSON PATH vs FOR JSON AUTO** — PATH gives you full control over nesting with dot-notation aliases; AUTO infers structure from table/column names. AUTO can't produce all structures.
+- **JSON_MODIFY mutates a copy** — it does NOT update the column in place. You must UPDATE the column: `UPDATE t SET col = JSON_MODIFY(col, '$.path', value)`.
+- **ISJSON returns 1/0/NULL** — 1 = valid JSON, 0 = invalid, NULL = input is NULL. Use it in CHECK constraints: `CHECK (ISJSON(col) = 1)`.
+
+---
+
+## Before the Exam, I Can…
+
+- [ ] Explain the difference between JSON_VALUE (scalar), JSON_QUERY (object/array), and OPENJSON (table rows)
+- [ ] Write an OPENJSON query both without a WITH clause (key/value/type) and with a WITH clause (typed columns)
+- [ ] Explain lax vs strict path mode and when each throws vs returns NULL
+- [ ] Write a FOR JSON PATH query with nested objects using dot-notation column aliases
+- [ ] Use JSON_MODIFY to update a specific path in a JSON column via UPDATE
+- [ ] Explain how to index JSON data using a computed column + regular index
+
+---
+
 **[← Back to Cheat Sheets](./README.md)**

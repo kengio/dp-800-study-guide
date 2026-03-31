@@ -324,4 +324,26 @@ ORDER BY end_time DESC;
 
 ---
 
+## Gotchas & Traps
+
+- **sys.dm_os_wait_stats is cumulative** — values accumulate since the last service restart. To trend wait stats, capture a snapshot, wait, capture again, and diff. A single reading is meaningless.
+- **Query Store ≠ plan cache** — plan cache is volatile (cleared on memory pressure, restart); Query Store persists plans and stats across restarts. Forced plans survive restarts too.
+- **sys.dm_exec_query_plan is the current cached plan** — not necessarily the plan that ran for a slow query. Use Query Store for historical plan analysis.
+- **Missing index DMVs are suggestions, not mandates** — `sys.dm_db_missing_index_details` recommends indexes but doesn't account for write overhead or existing similar indexes. Always evaluate before creating.
+- **REBUILD vs REORGANIZE** — REBUILD: offline by default (ONLINE = ON option), full rewrite, resets fragmentation to ~0%; REORGANIZE: always online, leaf-level defrag, less disruptive.
+- **MAXDOP = 0 ≠ no parallelism** — MAXDOP 0 means use all available CPUs. MAXDOP 1 disables parallelism. Override per query with `OPTION (MAXDOP n)`.
+
+---
+
+## Before the Exam, I Can…
+
+- [ ] Name the key DMVs for: top CPU queries, active blocking, wait stats, missing indexes, and index fragmentation
+- [ ] Explain the difference between REBUILD and REORGANIZE and when to use each
+- [ ] Describe Query Store's role: what it captures, how to force a plan, how to unforce it
+- [ ] Explain why sys.dm_os_wait_stats requires a delta approach and what a single snapshot tells you
+- [ ] Explain what MAXDOP 0, 1, and N mean in practice
+- [ ] Describe how to identify a blocking chain using sys.dm_exec_requests and sys.dm_os_waiting_tasks
+
+---
+
 **[← Back to Cheat Sheets](./README.md)**

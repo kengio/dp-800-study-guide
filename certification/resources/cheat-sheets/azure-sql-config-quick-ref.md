@@ -426,4 +426,26 @@ SELECT * FROM cdc.fn_cdc_get_net_changes_dbo_Orders(
 
 ---
 
+## Gotchas & Traps
+
+- **SqlPackage /Action:Extract ≠ Publish** — Extract creates a dacpac FROM an existing database (reverse-engineer). Publish deploys a dacpac TO a database (forward-deploy). The exam tests both.
+- **DAB requires no custom code** — Data API Builder generates REST and GraphQL endpoints purely from the config file. You do not write controller code.
+- **Query Store must be ON before it captures anything** — `ALTER DATABASE db SET QUERY_STORE = ON`. It is on by default for new Azure SQL databases but off for databases migrated from older versions.
+- **SNAPSHOT isolation ≠ RCSI** — SNAPSHOT must be set per-transaction by the application (`SET TRANSACTION ISOLATION LEVEL SNAPSHOT`); RCSI is a database-level setting that changes the default READ COMMITTED behavior.
+- **Compatibility level is NOT the engine version** — you can run SQL Server 2022 engine with compatibility level 130 (SQL Server 2016 behavior). New features like inline scalar UDF are gated by compatibility level.
+- **Auto-tuning Automatic Plan Correction** — enabled with `ALTER DATABASE db SET AUTOMATIC_TUNING (FORCE_LAST_GOOD_PLAN = ON)`. SQL Server reverts to last-known-good plan on regression. Can be monitored in `sys.dm_db_tuning_recommendations`.
+
+---
+
+## Before the Exam, I Can…
+
+- [ ] Explain the difference between SqlPackage /Action:Publish, Extract, Export, and Import
+- [ ] Describe what a DAB config file contains: data source, entities, REST/GraphQL permissions
+- [ ] Explain the difference between SNAPSHOT isolation and RCSI (READ_COMMITTED_SNAPSHOT)
+- [ ] State what compatibility level controls and that it's independent of the SQL Server engine version
+- [ ] Explain how Automatic Plan Correction works and how to enable it
+- [ ] Describe how Query Store captures plans and how to force/unforce a specific plan
+
+---
+
 **[← Back to Cheat Sheets](./README.md)**

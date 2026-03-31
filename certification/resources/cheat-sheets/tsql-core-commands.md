@@ -448,4 +448,28 @@ SELECT name, compatibility_level FROM sys.databases;
 
 ---
 
+## Gotchas & Traps
+
+- **ROW_NUMBER vs RANK vs DENSE_RANK on ties:** ROW_NUMBER = always unique (arbitrary tiebreak); RANK = leaves gaps (1,1,3); DENSE_RANK = no gaps (1,1,2). The exam tests which behaves which way.
+- **Recursive CTE requires UNION ALL** — not UNION. The anchor and recursive members must be combined with UNION ALL. Forgetting MAXRECURSION causes infinite loops.
+- **MERGE requires a unique match** — if multiple source rows match one target row, MERGE throws an error. Deduplicate source before MERGE.
+- **CROSS APPLY vs OUTER APPLY** — CROSS APPLY = like INNER JOIN (drops rows with no result from TVF); OUTER APPLY = like LEFT JOIN (keeps rows even if TVF returns nothing).
+- **sp_executesql is parameterized** — use it instead of EXEC for dynamic SQL to prevent injection and enable plan reuse. `EXEC(@sql)` is not parameterized.
+- **IDENTITY is table-bound; SEQUENCE is independent** — SEQUENCE can be shared across tables, cycled, incremented by any value, and reset. IDENTITY cannot.
+- **TRY/CATCH does not catch all errors** — severity 20+ (fatal) and some compilation errors are not catchable. Always check `XACT_STATE()` inside CATCH: -1 = uncommittable, must ROLLBACK.
+
+---
+
+## Before the Exam, I Can…
+
+- [ ] Write a recursive CTE with anchor member, UNION ALL, and recursive member
+- [ ] Explain the difference between ROW_NUMBER, RANK, and DENSE_RANK when rows tie
+- [ ] Write a window function with PARTITION BY, ORDER BY, and a ROWS/RANGE frame clause
+- [ ] Explain when to use CROSS APPLY vs OUTER APPLY
+- [ ] Write a MERGE statement with WHEN MATCHED, WHEN NOT MATCHED BY TARGET, WHEN NOT MATCHED BY SOURCE
+- [ ] Explain why sp_executesql is preferred over EXEC for dynamic SQL
+- [ ] Describe what XACT_STATE() returns and when to use it in a CATCH block
+
+---
+
 **[← Back to Cheat Sheets](./README.md)**
