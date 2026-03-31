@@ -28,6 +28,8 @@ AI-enabled database solutions expose multiple endpoint types: AI model endpoints
 
 ---
 
+---
+
 ## Securing AI Model Endpoints
 
 ### Using Managed Identity to Call Azure OpenAI
@@ -60,6 +62,8 @@ WITH IDENTITY = 'HTTPEndpointHeaders',
 SECRET = '{"api-key":"your-api-key-here"}';
 ```
 
+---
+
 ## Securing Data API Builder (REST and GraphQL)
 
 ### Authentication Configuration
@@ -84,7 +88,7 @@ SECRET = '{"api-key":"your-api-key-here"}';
 | Provider | Use Case |
 | :--- | :--- |
 | `StaticWebApps` | Azure Static Web Apps (built-in auth) |
-| `AzureAD` | Azure Active Directory / Entra ID |
+| `AzureAD` | ==Azure Active Directory / Entra ID== |
 | `Simulator` | Development and testing only |
 | `Anonymous` | Public data (no auth required) |
 
@@ -120,6 +124,8 @@ SECRET = '{"api-key":"your-api-key-here"}';
 # "graphql": { "depth-limit": 4 }
 ```
 
+---
+
 ## Securing MCP Endpoints
 
 MCP servers expose database schema and query capabilities — secure them like any database connection:
@@ -148,6 +154,8 @@ MCP servers expose database schema and query capabilities — secure them like a
 4. Use Private Link or service endpoints to restrict network access
 5. Enable audit logging on the MCP service account's activities
 
+---
+
 ## Network Security for Endpoints
 
 ```text
@@ -158,10 +166,12 @@ Azure SQL → Networking tab:
 └── Firewall rules: Allow only specific IPs/VNets
 ```
 
+---
+
 ## Private Endpoints vs Service Endpoints
 
 - **Service Endpoint**: extends VNet identity to Azure SQL — traffic stays on Azure backbone, public IP not required, but the SQL server still has a public-facing endpoint accessible from the internet
-- **Private Endpoint**: assigns a private IP from your VNet — SQL server is not reachable from the public internet at all; powered by Azure Private Link
+- **Private Endpoint**: assigns a private IP from your VNet — SQL server is not reachable from the public internet at all; powered by **Azure Private Link**
 
 | Feature | Service Endpoint | Private Endpoint |
 | :--- | :--- | :--- |
@@ -169,10 +179,12 @@ Azure SQL → Networking tab:
 | VNet integration | Traffic via backbone | Private IP in VNet |
 | Cross-region | Limited | Yes (via Private Link) |
 | Cost | Free | Requires Private Link pricing |
-| Exam preferred option | Legacy approach | Modern/recommended |
+| Exam preferred option | Legacy approach | ==Modern/recommended== |
 
 > [!warning] Common Mistake
 > Private endpoint and service endpoint sound similar but work differently. Service endpoint = your VNet traffic stays on Azure backbone, but the SQL Server endpoint is still a public IP (reachable from the internet if firewall allows). Private endpoint = SQL Server gets a private IP in your VNet — fully private, not publicly routable.
+
+---
 
 ## Firewall Rules for Azure SQL
 
@@ -196,6 +208,8 @@ SELECT * FROM sys.database_firewall_rules;
 -- Remove a rule
 EXEC sp_delete_database_firewall_rule @name = N'DevMachine';
 ```
+
+---
 
 ## Managed Identity for Service-to-Service
 
@@ -225,6 +239,8 @@ ALTER ROLE db_datareader ADD MEMBER [my-function-app];
 
 No credentials to rotate or store — the Azure platform manages token acquisition automatically.
 
+---
+
 ## Transport Encryption (TLS)
 
 - Azure SQL always enforces TLS 1.2+ for data in transit; connections using older TLS versions are rejected
@@ -240,6 +256,8 @@ No credentials to rotate or store — the Azure platform manages token acquisiti
 -- Encrypt=True;TrustServerCertificate=False;
 ```
 
+---
+
 ## Microsoft Defender for SQL
 
 Microsoft Defender for SQL provides two capabilities under a single plan:
@@ -253,11 +271,15 @@ Microsoft Defender for SQL provides two capabilities under a single plan:
 - Alert types include: suspicious IP access, anomalous query patterns, potential data exfiltration, and access from unfamiliar locations
 - Enable at the subscription level to cover all SQL resources automatically
 
+---
+
 ## Use Cases
 
 - **Managed Identity**: App Services, Azure Functions, and DAB calling Azure SQL and Azure OpenAI
 - **DAB with AAD**: Enterprise internal apps where users authenticate with corporate identity
 - **Private Link**: Production databases that must never be accessible over the public internet
+
+---
 
 ## Common Issues & Errors
 
@@ -266,6 +288,8 @@ Microsoft Defender for SQL provides two capabilities under a single plan:
 - **`0.0.0.0` firewall rule**: the "Allow Azure services" toggle creates this rule — it permits all Azure-hosted services, not just your own; prefer VNet rules instead
 - **TLS handshake failure**: older drivers may not support TLS 1.2; upgrade the driver or client SDK
 
+---
+
 ## Best Practices
 
 - Disable the public endpoint on Azure SQL for production workloads and use Private Endpoint exclusively
@@ -273,6 +297,8 @@ Microsoft Defender for SQL provides two capabilities under a single plan:
 - Use database-level firewall rules for per-database overrides rather than broadening server-level rules
 - Enable Microsoft Defender for SQL on all production databases for continuous threat monitoring
 - Always set `Encrypt=True;TrustServerCertificate=False` in connection strings to enforce proper TLS validation
+
+---
 
 ## Exam Tips
 
@@ -283,12 +309,16 @@ Microsoft Defender for SQL provides two capabilities under a single plan:
 - `sp_set_database_firewall_rule` targets a single database; server-level rules apply to all databases on the logical server
 - `CREATE USER [name] FROM EXTERNAL PROVIDER` is required before a Managed Identity can log in to a specific database
 
+---
+
 ## Key Takeaways
 
 - Use Managed Identity for all service-to-service authentication (model endpoints, DAB, MCP)
 - Database Scoped Credential stores the identity reference for `sp_invoke_external_rest_endpoint`
 - Restrict network access to endpoints with Private Link or firewall rules
 - Private Endpoint is the modern recommended approach; Service Endpoint is legacy and leaves the public endpoint active
+
+---
 
 ## Practice Question
 
@@ -304,11 +334,15 @@ D. Enable Managed Identity authentication to replace password-based access
 >
 > A private endpoint assigns a private IP to the SQL server within the VNet and, when combined with disabling the public endpoint, makes the SQL server completely unreachable from the internet. Service endpoints (B) keep the SQL server's public endpoint active — they only route VNet traffic over the Azure backbone. Firewall rules (A) reduce exposure but the server still has a public-facing endpoint. Managed Identity (D) improves authentication security but doesn't change network accessibility.
 
+---
+
 ## Related Topics
 
 - [03-Permissions & Access](./03-permissions-access.md)
 - [01-Data API Builder](../08-azure-services-integration/01-data-api-builder.md)
 - [03-MCP Server Endpoints](../04-ai-assisted-tools/03-mcp-server-endpoints.md)
+
+---
 
 ## Official Documentation
 

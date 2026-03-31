@@ -13,7 +13,7 @@ tags:
 
 ## Overview
 
-Dynamic Data Masking (DDM) obfuscates sensitive column values for unauthorized users without changing stored data. Row-Level Security (RLS) controls which rows a user can access based on a security predicate function.
+**Dynamic Data Masking** (DDM) obfuscates sensitive column values for unauthorized users without changing stored data. Row-Level Security (RLS) controls which rows a user can access based on a security predicate function.
 
 > [!abstract]
 > - Covers Dynamic Data Masking (DDM) and Row-Level Security (RLS) — two complementary data access control features
@@ -82,6 +82,8 @@ SELECT * FROM sys.masked_columns;
 > [!warning] Common Mistake
 > DDM is NOT a security boundary for privileged users. Any user with `SELECT` permission AND `UNMASK` permission sees the real data. DDM is a usability feature, not an encryption feature. For true data protection, use Always Encrypted or column-level encryption.
 
+---
+
 ## Row-Level Security (RLS)
 
 RLS controls which rows are returned to a user based on a filter predicate defined as an inline table-valued function.
@@ -139,7 +141,7 @@ WITH (STATE = ON);
 **Predicate types:**
 | Type | Applies To | Blocks |
 | :--- | :--- | :--- |
-| `FILTER` | SELECT, UPDATE, DELETE | Invisible rows (not an error) |
+| `FILTER` | SELECT, UPDATE, DELETE | ==Invisible rows (not an error)== |
 | `BLOCK AFTER INSERT` | INSERT | Inserts that would be invisible |
 | `BLOCK AFTER UPDATE` | UPDATE | Updates that result in invisible rows |
 | `BLOCK BEFORE UPDATE` | UPDATE | Updates on currently invisible rows |
@@ -178,6 +180,8 @@ SELECT * FROM sys.security_policies;
 SELECT * FROM sys.security_predicates;
 ```
 
+---
+
 ## DDM vs RLS Comparison
 
 | Aspect | Dynamic Data Masking | Row-Level Security |
@@ -187,13 +191,17 @@ SELECT * FROM sys.security_predicates;
 | **Prevents inference** | No | Yes |
 | **Implementation** | Column attribute | Inline TVF + security policy |
 | **Impact on performance** | Minimal | Small overhead per query |
-| **Best for** | Data display protection | Multi-tenant isolation |
+| **Best for** | Data display protection | ==Multi-tenant isolation== |
+
+---
 
 ## Use Cases
 
 - **DDM**: Customer support apps — mask PII for agents; developers working on production data copies
 - **RLS Filter**: Multi-tenant SaaS — each tenant sees only their rows
 - **RLS Block**: Prevent users from inserting rows for other tenants
+
+---
 
 ## Common Issues & Errors
 
@@ -203,6 +211,8 @@ SELECT * FROM sys.security_predicates;
 | Infinite recursion in predicate | Predicate queries the protected table | Use a separate security table; never query the filtered table inside the predicate |
 | DDM bypassed | User has UNMASK permission or is db_owner | Review permission grants; DDM doesn't protect from owners |
 
+---
+
 ## Exam Tips
 
 - DDM masks values but **doesn't prevent access** — determined users can infer data
@@ -210,16 +220,22 @@ SELECT * FROM sys.security_predicates;
 - `SESSION_CONTEXT` is the recommended pattern for passing tenant context to RLS
 - RLS `FILTER` predicates are applied to SELECT/UPDATE/DELETE; `BLOCK` predicates prevent writes
 
+---
+
 ## Key Takeaways
 
 - DDM = column-value obfuscation (presentation layer protection)
 - RLS = row-level access control (data isolation)
 - Combine DDM + RLS for comprehensive data protection in multi-tenant apps
 
+---
+
 ## Related Topics
 
 - [01-Encryption](./01-encryption.md)
 - [03-Permissions & Access](./03-permissions-access.md)
+
+---
 
 ## Official Documentation
 
