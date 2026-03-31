@@ -14,7 +14,7 @@ Domain-specific practice questions to test your knowledge before the exam.
 
 | File | Domain | Questions |
 | :--- | :--- | :--- |
-| [01-design-develop.md](./01-design-develop.md) | Design and Develop Database Solutions (35–40%) | 20 questions |
+| [01-design-develop.md](./01-design-develop.md) | Design and Develop Database Solutions (35–40%) | 15 questions |
 | [02-secure-optimize-deploy.md](./02-secure-optimize-deploy.md) | Secure, Optimize, and Deploy (35–40%) | 20 questions |
 | [03-ai-capabilities.md](./03-ai-capabilities.md) | Implement AI Capabilities (25–30%) | 15 questions |
 
