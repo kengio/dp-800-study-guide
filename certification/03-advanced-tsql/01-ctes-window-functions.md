@@ -15,6 +15,16 @@ tags:
 
 Common Table Expressions (CTEs) provide named temporary result sets for readable, reusable queries. Window functions perform calculations across sets of rows related to the current row — without collapsing results like GROUP BY does.
 
+> [!abstract]
+> - Covers CTEs (non-recursive and recursive), window functions (ROW_NUMBER, RANK, DENSE_RANK, LAG, LEAD, SUM OVER), and frame clauses
+> - CTEs improve readability; recursive CTEs traverse hierarchies; window functions compute across related rows without collapsing them
+> - Key exam topics: tie-breaking behavior of ranking functions, recursive CTE structure, ROWS vs RANGE frame
+
+> [!tip] What the Exam Tests
+> - Tie behavior: `ROW_NUMBER` = unique (arbitrary tiebreak); `RANK` = gaps after tie (1,1,3); `DENSE_RANK` = no gaps (1,1,2)
+> - Recursive CTE: **anchor member** (runs once) `UNION ALL` **recursive member** (runs until no rows). Must have `MAXRECURSION` to prevent infinite loop
+> - `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` = running total; `RANGE` uses logical range (can include ties)
+
 ## Common Table Expressions (CTEs)
 
 ### Basic CTE
@@ -161,6 +171,9 @@ SELECT
     RANK()          OVER (PARTITION BY CategoryId ORDER BY Price DESC) AS CategoryRank
 FROM dbo.Products;
 ```
+
+> [!warning] Common Mistake
+> RANK and DENSE_RANK both handle ties, but only DENSE_RANK avoids gaps in the sequence. If a question says "assign sequential ranks with no gaps even when rows tie," the answer is DENSE_RANK, not RANK.
 
 ### Aggregate Window Functions
 

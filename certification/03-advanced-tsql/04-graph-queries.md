@@ -15,6 +15,16 @@ tags:
 
 SQL Server graph tables store node and edge data using special columns (`$node_id`, `$from_id`, `$to_id`) and support graph traversal with the `MATCH` predicate — enabling relationship queries without recursive CTEs.
 
+> [!abstract]
+> - Covers graph database objects (NODE tables, EDGE tables) and graph query syntax (MATCH, SHORTEST_PATH)
+> - SQL graph tables are regular SQL tables with special system-generated columns for graph traversal
+> - Key exam topics: NODE vs EDGE table creation, MATCH clause syntax, when graph outperforms relational (hierarchies)
+
+> [!tip] What the Exam Tests
+> - `CREATE TABLE … AS NODE` and `CREATE TABLE … AS EDGE` — EDGE tables reference NODE tables
+> - `MATCH (Person)-[Knows]->(Person)` syntax is required for graph traversal — you cannot use regular JOINs for graph patterns
+> - `SHORTEST_PATH` inside a `MATCH` clause finds the shortest path between two nodes in a connected graph
+
 ## Graph Table Types
 
 ```sql
@@ -105,6 +115,9 @@ WHERE MATCH(p1-(f)->p2-(l)->r)
   AND p1.Name = 'Alice'
   AND r.Cuisine = 'Japanese';
 ```
+
+> [!warning] Common Mistake
+> Graph tables are still regular SQL tables — they support regular JOINs, indexes, and constraints. The MATCH clause is an additional query capability, not a replacement for all SQL. Don't confuse "graph table" with "NoSQL graph database."
 
 ## SHORTEST_PATH
 

@@ -15,6 +15,16 @@ tags:
 
 Correlated subqueries reference the outer query and execute once per outer row. Error handling with `TRY/CATCH` and `THROW` provides structured exception management comparable to application-level try/catch blocks.
 
+> [!abstract]
+> - Covers correlated subqueries, EXISTS/NOT EXISTS, TRY/CATCH error handling, THROW vs RAISERROR, and transaction state
+> - Correlated subqueries reference the outer query; EXISTS is usually more efficient than IN for large datasets
+> - Key exam topics: XACT_STATE() values, THROW vs RAISERROR behavior, ERROR_* functions inside CATCH
+
+> [!tip] What the Exam Tests
+> - `XACT_STATE() = -1` = uncommittable transaction (must ROLLBACK); `= 1` = active committable transaction; `= 0` = no active transaction
+> - `THROW` re-raises with the original error number and severity; `RAISERROR` creates a new error message (can specify severity)
+> - `EXISTS (SELECT 1 FROM …)` stops scanning as soon as one row is found — more efficient than `IN (SELECT col FROM …)` for correlated checks
+
 ## Correlated Subqueries
 
 A correlated subquery references a column from the outer query — it cannot run independently.
@@ -112,6 +122,9 @@ OUTER APPLY (
     ORDER BY OrderDate DESC
 ) AS last_order;
 ```
+
+> [!warning] Common Mistake
+> Not all errors are catchable in TRY/CATCH — severity 20+ errors (fatal connection-terminating errors) and syntax/compile errors bypass the CATCH block. Always check XACT_STATE() before COMMIT or ROLLBACK inside CATCH; committing with XACT_STATE() = -1 will throw an error.
 
 ## Error Handling with TRY/CATCH
 

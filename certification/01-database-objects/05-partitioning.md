@@ -14,6 +14,16 @@ tags:
 
 Table and index partitioning divides large tables into smaller, manageable chunks based on a partition key — typically a date column. This enables partition elimination, efficient data archiving (partition switching), and parallel operations across partitions.
 
+> [!abstract]
+> - Covers table and index partitioning: partition functions, partition schemes, and partition switching
+> - Partitioning improves manageability and query performance on large tables by physically separating data ranges
+> - Key exam topics: function vs scheme (two separate objects), $PARTITION, partition switching for bulk operations
+
+> [!tip] What the Exam Tests
+> - **Partition function** defines value boundaries (ranges); **partition scheme** maps those ranges to filegroups — they are two distinct objects
+> - `$PARTITION.FunctionName(column)` returns the partition number for a given value
+> - **Partition switching** (`ALTER TABLE … SWITCH`) moves an entire partition instantly — used for bulk load staging and archiving
+
 ## Partitioning Components
 
 Partitioning requires three objects:
@@ -37,6 +47,9 @@ AS RANGE RIGHT FOR VALUES (
 );
 -- Creates 14 partitions: 1 before Jan 2025, 12 monthly, 1 after Jan 2026
 ```
+
+> [!warning] Common Mistake
+> Creating a partition function is not enough — you must also create a partition scheme that maps the function's ranges to filegroups, then create the table ON that scheme. The exam may ask you to identify which step is missing.
 
 **RANGE LEFT vs RANGE RIGHT:**
 

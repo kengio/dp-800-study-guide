@@ -14,6 +14,16 @@ tags:
 
 SQL Server and Azure SQL store JSON data as `nvarchar` columns, but provide native JSON functions, path expressions, and (in newer versions) a dedicated `json` data type with JSON indexes for efficient semi-structured data handling.
 
+> [!abstract]
+> - Covers JSON storage in NVARCHAR columns, all JSON functions, OPENJSON, FOR JSON, and indexing strategies
+> - JSON is not a native type — it is stored as NVARCHAR; validity checked with ISJSON()
+> - Key exam topics: JSON_VALUE vs JSON_QUERY vs OPENJSON, lax vs strict path mode, computed column indexes
+
+> [!tip] What the Exam Tests
+> - `JSON_VALUE` returns a **scalar**; `JSON_QUERY` returns an **object or array fragment** — use JSON_QUERY when the path points to an object
+> - `OPENJSON` without a WITH clause returns (key, value, type) rows; with a WITH clause returns typed columns
+> - Lax mode (default): path errors return NULL. Strict mode: path errors throw an error
+
 ## Storing JSON Data
 
 ```sql
@@ -76,6 +86,9 @@ WITH (
     tags    nvarchar(max)   '$.tags' AS JSON
 );
 ```
+
+> [!warning] Common Mistake
+> `JSON_VALUE(col, '$.product.specs')` returns NULL when `specs` is an object — not an error, and not the object. Use `JSON_QUERY(col, '$.product.specs')` to extract objects or arrays.
 
 ### Building JSON
 

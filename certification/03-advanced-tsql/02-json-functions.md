@@ -15,6 +15,16 @@ tags:
 
 SQL Server provides a comprehensive set of JSON functions for reading, constructing, modifying, and filtering JSON data. These are heavily tested in DP-800 given the exam's focus on semi-structured data and AI payloads.
 
+> [!abstract]
+> - Deep-dive into all T-SQL JSON functions: extraction, modification, parsing, and serialization
+> - JSON is stored as NVARCHAR — all functions operate on string representations
+> - Key exam topics: JSON_VALUE vs JSON_QUERY, OPENJSON WITH clause, FOR JSON PATH vs AUTO, lax vs strict
+
+> [!tip] What the Exam Tests
+> - `JSON_VALUE` = scalar value only; `JSON_QUERY` = object or array fragment; if path points to object, JSON_VALUE returns NULL
+> - `OPENJSON` without WITH = generic (key/value/type rows); with WITH = typed columns matching JSON structure
+> - `FOR JSON PATH` with dot-notation column aliases (`name AS 'product.name'`) creates nested JSON; `FOR JSON AUTO` infers from table aliases
+
 ## Reading JSON
 
 ### JSON_VALUE — Scalar Extraction
@@ -47,6 +57,9 @@ SELECT
     JSON_QUERY(@json, '$.tags')        AS TagsArray;       -- full JSON array
 -- Returns NULL for scalar values (use JSON_VALUE for those)
 ```
+
+> [!warning] Common Mistake
+> `JSON_VALUE(col, '$.product.specs')` silently returns NULL when `specs` is an object — this is lax mode default behavior. In strict mode, it would throw an error. The exam often presents both behaviors as answer choices: know which is default (lax = NULL, not error).
 
 ### OPENJSON — Parse to Rows
 

@@ -16,6 +16,16 @@ tags:
 
 SQL Server and Azure SQL support several specialized table types for specific scenarios: in-memory OLTP tables for high throughput, temporal tables for historical queries, external tables for accessing remote data, ledger tables for tamper-evident auditing, and graph tables for relationship data.
 
+> [!abstract]
+> - Covers temporal tables (system-versioned history), ledger tables (tamper-evident), and memory-optimized tables
+> - Each has distinct syntax and distinct exam scenarios
+> - Key exam topics: temporal query syntax, ledger append-only behavior, memory-optimized DURABILITY options
+
+> [!tip] What the Exam Tests
+> - `FOR SYSTEM_TIME AS OF 'datetime'` is the correct temporal point-in-time syntax — not a WHERE clause on SysStartTime
+> - Ledger tables are **append-only** — no UPDATE or DELETE; `GENERATED ALWAYS AS ROW START/END` columns are system-managed
+> - Memory-optimized `DURABILITY = SCHEMA_ONLY` means data is lost on restart; `SCHEMA_AND_DATA` survives
+
 ## In-Memory (Memory-Optimized) Tables
 
 Memory-optimized tables are stored in memory and use optimistic concurrency without locking for ultra-high-throughput OLTP workloads.
@@ -125,6 +135,9 @@ Each `FOR SYSTEM_TIME` clause has distinct boundary semantics — these differen
 **CONTAINED IN** — Returns only rows whose entire lifetime (start AND end) falls within the specified window. Useful for finding records created and deleted within a period.
 
 **ALL** — Returns every row from both the current table and the history table. Ideal for full audit trails.
+
+> [!warning] Common Mistake
+> `FOR SYSTEM_TIME AS OF` and `FOR SYSTEM_TIME ALL` are different: AS OF returns the point-in-time snapshot; ALL returns all rows including history. Don't confuse temporal tables (audit history) with ledger tables (tamper evidence) — they solve different problems.
 
 ```sql
 -- Point-in-time snapshot: row state as it existed at exactly midnight Jan 1

@@ -15,6 +15,16 @@ tags:
 
 SQL Server (and especially SQL databases in Microsoft Fabric) provide regex functions for pattern-based string matching and fuzzy string matching functions for similarity scoring — essential for data quality, deduplication, and AI-assisted search.
 
+> [!abstract]
+> - Covers pattern matching (LIKE, PATINDEX), phonetic matching (SOUNDEX, DIFFERENCE), and full-text search (CONTAINS, FREETEXT)
+> - T-SQL lacks true regex — LIKE with wildcards is the native pattern tool; full-text search handles natural language
+> - Key exam topics: CONTAINS vs FREETEXT use cases, full-text index requirement, PATINDEX return value
+
+> [!tip] What the Exam Tests
+> - `CONTAINS` = **precision** — exact terms, prefix terms, proximity (`NEAR`), weighted terms
+> - `FREETEXT` = **recall** — natural language, broader match, no exact syntax control
+> - Both `CONTAINS` and `FREETEXT` require a **full-text index** on the column — they will not work on a regular index
+
 ## Regex Functions
 
 Regex functions follow POSIX-style regular expressions.
@@ -141,6 +151,9 @@ FROM dbo.Contacts a
 JOIN dbo.Contacts b ON a.ContactId < b.ContactId
 WHERE JARO_WINKLER_DISTANCE(a.FullName, b.FullName) > 0.92;
 ```
+
+> [!warning] Common Mistake
+> CONTAINS and FREETEXT are not interchangeable. If the question asks for "natural language search that finds synonyms and inflections," use FREETEXT. If it asks for "exact phrase or proximity search," use CONTAINS. Both need a full-text index — forgetting this requirement is a common wrong answer.
 
 ## SOUNDEX and DIFFERENCE Functions
 

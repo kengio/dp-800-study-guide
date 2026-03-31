@@ -15,6 +15,16 @@ tags:
 
 The Model Context Protocol (MCP) is an open standard that allows AI tools (like GitHub Copilot) to connect to external data sources. For DP-800, the key endpoints are the Microsoft SQL Server MCP server and the Fabric lakehouse MCP server.
 
+> [!abstract]
+> - Covers MCP (Model Context Protocol): what it is, how MCP servers expose tools/resources, and connection methods
+> - MCP is a protocol standard — not a specific Azure service — that allows AI models to interact with external tools
+> - Key exam topics: MCP definition, server/client roles, tool vs resource in MCP, connection types (stdio, HTTP+SSE)
+
+> [!tip] What the Exam Tests
+> - **MCP = Model Context Protocol** — an open protocol for AI models to call external tools and access resources
+> - An MCP server **exposes tools** (callable actions) and **resources** (data the model can read)
+> - Connection types: `stdio` (local process) and `HTTP+SSE` (remote server) — the exam may ask which suits which scenario
+
 ## What is MCP?
 
 MCP provides a standardized way for AI assistants to:
@@ -180,6 +190,9 @@ MCP servers are **process-based** for stdio transport: the AI tool spawns the se
 | **SSE** | Server-Sent Events over HTTP | Remote servers, multi-client scenarios |
 
 stdio is the most common for local database MCP servers. SSE (Server-Sent Events) is used when the MCP server is hosted remotely (e.g., the Fabric lakehouse MCP endpoint).
+
+> [!warning] Common Mistake
+> MCP is NOT an Azure service and NOT a Microsoft-specific technology. It is an open protocol. Don't confuse "MCP server" (a server that implements the Model Context Protocol) with Azure API Management or Azure Functions — they are different things.
 
 ### Credential Management
 
