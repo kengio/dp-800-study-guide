@@ -299,4 +299,4 @@ ORDER BY euclidean_similarity DESC;
 
 ---
 
-**[← Back to Code Examples](./README.md) | [↑ Back to Certification](../../certification/README.md)**
+**[← Back to Code Examples](./README.md) | [↑ Back to Certification](../../../README.md)**

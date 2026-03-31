@@ -20,6 +20,9 @@ Preparation materials for the Microsoft DP-800: Developing AI-Enabled Database S
 | [Mock Exam 2](./mock-exam-2/README.md) | Alternative practice exam |
 | [Exam Tips](./exam-tips.md) | Strategies, time management, common pitfalls |
 | [Official Links](./official-links.md) | Microsoft documentation, learning paths, and labs |
+| [Code Examples](./code-examples/tsql/README.md) | Standalone T-SQL code example files |
+| [Cheat Sheets](./cheat-sheets/README.md) | Quick-reference guides for key T-SQL and Azure SQL topics |
+| [Appendix](./appendix/README.md) | Glossary, comparison tables, error messages, troubleshooting |
 
 ---
 

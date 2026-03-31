@@ -389,4 +389,4 @@ WHERE SSN = @ssn;   -- parameterized query — driver handles encryption transpa
 
 ---
 
-**[← Back to Code Examples](./README.md) | [↑ Back to Certification](../../certification/README.md)**
+**[← Back to Code Examples](./README.md) | [↑ Back to Certification](../../../README.md)**
