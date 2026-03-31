@@ -24,6 +24,8 @@ Stored procedures are precompiled T-SQL batches stored in the database. They sup
 > - OUTPUT parameters pass values back to the caller; declared with `@param datatype OUTPUT` in both definition and call
 > - In a CATCH block: `XACT_STATE() = -1` means the transaction is uncommittable — you MUST ROLLBACK before doing anything else
 
+---
+
 ## Creating Stored Procedures
 
 ```sql
@@ -51,6 +53,8 @@ GO
 EXEC dbo.usp_GetCustomerOrders @CustomerId = 42, @StartDate = '2025-01-01';
 ```
 
+---
+
 ## Output Parameters
 
 ```sql
@@ -73,6 +77,8 @@ DECLARE @NewOrderId int;
 EXEC dbo.usp_CreateOrder @CustomerId = 1, @OrderId = @NewOrderId OUTPUT;
 SELECT @NewOrderId AS NewOrderId;
 ```
+
+---
 
 ## Table-Valued Parameters
 
@@ -99,6 +105,8 @@ BEGIN
 END;
 GO
 ```
+
+---
 
 ## Error Handling
 
@@ -130,11 +138,13 @@ GO
 | Function | Returns |
 | :--- | :--- |
 | `ERROR_NUMBER()` | SQL error number |
-| `ERROR_MESSAGE()` | Error description |
+| `ERROR_MESSAGE()` | ==Error description== |
 | `ERROR_SEVERITY()` | Severity level (1-25) |
 | `ERROR_STATE()` | Error state |
 | `ERROR_LINE()` | Line number where error occurred |
 | `ERROR_PROCEDURE()` | Procedure name |
+
+---
 
 ## EXECUTE AS — Security Context
 
@@ -160,6 +170,8 @@ END;
 
 **EXECUTE AS options:** `CALLER` (default), `SELF` (creator), `OWNER` (schema owner), `'username'` (specific user)
 
+---
+
 ## Recompilation
 
 ```sql
@@ -172,9 +184,11 @@ WITH RECOMPILE
 AS ...
 ```
 
+---
+
 ## sp_executesql for Dynamic SQL
 
-Use `sp_executesql` instead of `EXEC(@sql)` for parameterization, plan caching, and SQL injection prevention.
+Use **`sp_executesql`** instead of `EXEC(@sql)` for parameterization, plan caching, and SQL injection prevention.
 
 **Why sp_executesql over EXEC(@sql):**
 
@@ -211,6 +225,8 @@ EXEC sp_executesql @sql;
 > [!warning] Common Mistake
 > Using EXEC(@sql) with concatenated user input is a SQL injection vulnerability. Always use sp_executesql with parameters for dynamic SQL. The exam tests this distinction both as a security question and as a performance question (plan reuse).
 
+---
+
 ## Natively Compiled Stored Procedures
 
 Natively compiled stored procedures are compiled to machine code at creation time, providing extreme performance for OLTP workloads on In-Memory OLTP tables.
@@ -241,6 +257,8 @@ BEGIN ATOMIC WITH (TRANSACTION ISOLATION LEVEL = SNAPSHOT, LANGUAGE = N'English'
 END;
 ```
 
+---
+
 ## Procedure Plan Caching and Recompilation
 
 SQL Server compiles a query plan on the first execution and caches it for reuse. **Parameter sniffing** means the cached plan is optimized for the first parameter values seen.
@@ -257,7 +275,7 @@ SQL Server compiles a query plan on the first execution and caches it for reuse.
 | :--- | :--- | :--- |
 | `OPTION(RECOMPILE)` | Recompile this query every execution | High — no plan reuse |
 | `OPTIMIZE FOR (value)` | Compile plan for a specific value | Low — one plan, may not fit all |
-| `OPTIMIZE FOR UNKNOWN` | Use average statistics, not sniffed value | Low — balanced plan |
+| `OPTIMIZE FOR UNKNOWN` | ==Use average statistics, not sniffed value== | Low — balanced plan |
 | Local variable trick | Assign param to local var before use | Low — breaks sniffing, less sharing |
 | `WITH RECOMPILE` on proc | Recompile entire procedure every call | High — use sparingly |
 
@@ -275,12 +293,16 @@ SELECT * FROM Orders WHERE CustomerID = @CustomerID
 OPTION(OPTIMIZE FOR (@CustomerID UNKNOWN));
 ```
 
+---
+
 ## Use Cases
 
 - **Encapsulation**: Hide complex logic behind a simple interface
 - **Security**: Grant `EXECUTE` on procedure without table access (ownership chaining)
 - **Performance**: Compiled once, reused; reduce network round-trips
 - **Transactions**: Wrap multi-step operations in a single transaction
+
+---
 
 ## Common Issues & Errors
 
@@ -289,8 +311,10 @@ OPTION(OPTIMIZE FOR (@CustomerID UNKNOWN));
 | Parameter sniffing | Cached plan optimized for first parameter value | Use `OPTION (RECOMPILE)` or `OPTIMIZE FOR` |
 | Nested transaction issues | Committing a savepoint vs outer transaction | Track `@@TRANCOUNT`; use `SAVE TRANSACTION` for nested |
 | `SET NOCOUNT ON` missing | Verbose row count messages sent to client | Always add `SET NOCOUNT ON` in procedures |
-| SQL injection via dynamic SQL | User input concatenated into query string | Use `sp_executesql` with parameters; `QUOTENAME` for object names |
+| SQL injection via dynamic SQL | User input concatenated into query string | ==Use `sp_executesql` with parameters; `QUOTENAME` for object names== |
 | Natively compiled proc errors | Using unsupported T-SQL features | Check In-Memory OLTP supported surface area docs |
+
+---
 
 ## Best Practices
 
@@ -300,14 +324,19 @@ OPTION(OPTIMIZE FOR (@CustomerID UNKNOWN));
 - Use `SCOPE_IDENTITY()` rather than `@@IDENTITY` to avoid cross-trigger identity confusion.
 - Add `EXECUTE AS` with least-privilege context when procedures access objects outside the caller's normal permissions.
 
+---
+
 ## Exam Tips
 
-- `THROW` re-raises errors with full fidelity; `RAISERROR` is the older alternative
-- `SCOPE_IDENTITY()` returns the last identity inserted in the **current scope** (safer than `@@IDENTITY`)
-- Table-valued parameters must be declared `READONLY` in the procedure signature
-- `sp_executesql` enables plan reuse for dynamic SQL; `EXEC(@sql)` does not parameterize
-- Natively compiled procedures require `ATOMIC` blocks instead of `TRY/CATCH`
-- `OPTIMIZE FOR UNKNOWN` is the safest general fix for parameter sniffing — avoids extreme plans
+> [!tip] Exam Tips
+> - `THROW` re-raises errors with full fidelity; `RAISERROR` is the older alternative
+> - `SCOPE_IDENTITY()` returns the last identity inserted in the **current scope** (safer than `@@IDENTITY`)
+> - Table-valued parameters must be declared `READONLY` in the procedure signature
+> - `sp_executesql` enables plan reuse for dynamic SQL; `EXEC(@sql)` does not parameterize
+> - Natively compiled procedures require `ATOMIC` blocks instead of `TRY/CATCH`
+> - `OPTIMIZE FOR UNKNOWN` is the safest general fix for parameter sniffing — avoids extreme plans
+
+---
 
 ## Key Takeaways
 
@@ -317,6 +346,8 @@ OPTION(OPTIMIZE FOR (@CustomerID UNKNOWN));
 - `sp_executesql` is always preferred over `EXEC(@sql)` for parameterization and plan caching
 - Parameter sniffing can cause inconsistent performance; `OPTIMIZE FOR UNKNOWN` or `OPTION(RECOMPILE)` are the primary fixes
 - Natively compiled procedures target In-Memory OLTP and use `ATOMIC` blocks instead of `TRY/CATCH`
+
+---
 
 ## Practice Question
 
@@ -332,11 +363,15 @@ D. Use EXEC instead of sp_executesql
 >
 > This is a classic parameter sniffing problem. OPTIMIZE FOR UNKNOWN tells the optimizer to use average statistics rather than the sniffed value, producing a more balanced plan that works reasonably well for all customers. WITH RECOMPILE (A) recompiles every execution which is expensive. Rebuilding indexes (C) doesn't address the plan compilation issue. sp_executesql vs EXEC (D) is about parameterization and injection, not plan selection.
 
+---
+
 ## Related Topics
 
 - [02-Functions](./02-functions.md)
 - [04-Triggers](./04-triggers.md)
 - [05-Correlated Queries & Error Handling](../03-advanced-tsql/05-correlated-queries-error-handling.md)
+
+---
 
 ## Official Documentation
 

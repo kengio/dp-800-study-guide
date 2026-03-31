@@ -25,6 +25,8 @@ Triggers are stored procedures that execute automatically in response to DML (IN
 > - In an UPDATE trigger: `INSERTED` contains **new** values; `DELETED` contains **old** (pre-update) values — both virtual tables are populated
 > - `INSTEAD OF` triggers on views enable updates to non-updatable views (e.g., views joining multiple tables)
 
+---
+
 ## DML Triggers
 
 ### AFTER Triggers
@@ -65,7 +67,7 @@ END;
 | :--- | :--- | :--- |
 | INSERT | New rows | Empty |
 | DELETE | Empty | Old rows |
-| UPDATE | New values | Old values |
+| UPDATE | ==New values== | Old values |
 
 ### INSTEAD OF Triggers
 
@@ -95,6 +97,8 @@ END;
 
 > [!warning] Common Mistake
 > With an INSTEAD OF trigger, the original DML statement does NOT execute. The trigger is responsible for performing the actual data change if desired. Forgetting to include the INSERT/UPDATE/DELETE inside the trigger body means the change is silently lost.
+
+---
 
 ## INSTEAD OF Triggers on Views
 
@@ -132,6 +136,8 @@ BEGIN
     JOIN Customers c ON c.Email = i.Email;
 END;
 ```
+
+---
 
 ## DDL Triggers
 
@@ -200,6 +206,8 @@ BEGIN
 END;
 ```
 
+---
+
 ## Trigger Execution Order
 
 When multiple triggers exist for the same event on the same table, use `sp_settriggerorder` to designate which fires FIRST or LAST. Intermediate triggers fire in an undefined order.
@@ -219,6 +227,8 @@ EXEC sp_settriggerorder
 SELECT name, is_recursive_triggers_on
 FROM sys.databases WHERE name = DB_NAME();
 ```
+
+---
 
 ## Logon Triggers
 
@@ -251,6 +261,8 @@ BEGIN
 END;
 ```
 
+---
+
 ## Managing Triggers
 
 ```sql
@@ -268,6 +280,8 @@ SELECT definition FROM sys.sql_modules
 WHERE object_id = OBJECT_ID('trg_Orders_Audit');
 ```
 
+---
+
 ## Use Cases
 
 - **Auditing**: Track who changed what and when without modifying application code
@@ -276,14 +290,18 @@ WHERE object_id = OBJECT_ID('trg_Orders_Audit');
 - **View DML**: Enable INSERT/UPDATE/DELETE on views with complex logic
 - **Schema governance**: DDL triggers prevent unauthorized drops or changes in production
 
+---
+
 ## Common Issues & Errors
 
 | Issue | Cause | Resolution |
 | :--- | :--- | :--- |
-| Trigger fires once for multi-row DML | `inserted`/`deleted` tables have multiple rows | Write set-based logic, not `SELECT TOP 1` or scalar variables |
+| Trigger fires once for multi-row DML | `inserted`/`deleted` tables have multiple rows | ==Write set-based logic, not `SELECT TOP 1` or scalar variables== |
 | Recursive trigger loop | Trigger updates a table that triggers itself | Check `sys.triggers.is_recursive` or disable recursive triggers |
 | Performance degradation | Trigger runs synchronously on every DML | Move heavy work to async process (Service Broker, queue) |
 | Logon trigger locks everyone out | Faulty ROLLBACK logic in logon trigger | Connect via DAC (`admin:`) to disable or drop the trigger |
+
+---
 
 ## Best Practices
 
@@ -293,15 +311,20 @@ WHERE object_id = OBJECT_ID('trg_Orders_Audit');
 - **Avoid recursive triggers**: Can cause infinite loops; disable with `ALTER DATABASE SET RECURSIVE_TRIGGERS OFF`
 - **Test logon triggers carefully**: A broken logon trigger can lock all users out; always preserve a DAC or `sa` bypass path
 
+---
+
 ## Exam Tips
 
-- AFTER triggers fire **after constraints** — if a constraint fails, the trigger doesn't run
-- INSTEAD OF triggers fire **before constraints** — and replace the DML
-- `EVENTDATA()` returns an XML document with details about DDL events
-- Triggers that use `ROLLBACK` inside a TRY/CATCH require careful transaction management
-- A view joining multiple tables requires an **INSTEAD OF** trigger — AFTER triggers cannot make a non-updatable view accept DML
-- Logon triggers use `ON ALL SERVER` and can disconnect users by calling `ROLLBACK`
-- `sp_settriggerorder` controls which trigger fires FIRST or LAST when multiple triggers exist on the same event
+> [!tip] Exam Tips
+> - AFTER triggers fire **after constraints** — if a constraint fails, the trigger doesn't run
+> - INSTEAD OF triggers fire **before constraints** — and replace the DML
+> - `EVENTDATA()` returns an XML document with details about DDL events
+> - Triggers that use `ROLLBACK` inside a TRY/CATCH require careful transaction management
+> - A view joining multiple tables requires an **INSTEAD OF** trigger — AFTER triggers cannot make a non-updatable view accept DML
+> - Logon triggers use `ON ALL SERVER` and can disconnect users by calling `ROLLBACK`
+> - `sp_settriggerorder` controls which trigger fires FIRST or LAST when multiple triggers exist on the same event
+
+---
 
 ## Key Takeaways
 
@@ -310,6 +333,8 @@ WHERE object_id = OBJECT_ID('trg_Orders_Audit');
 - DDL triggers audit or prevent schema changes using `EVENTDATA()`
 - Logon triggers enforce connection-level policies at the server scope
 - Trigger nesting depth is capped at 32; recursive triggers are off by default
+
+---
 
 ## Practice Question
 
@@ -325,11 +350,15 @@ D. AFTER INSERT trigger on the view
 >
 > INSTEAD OF triggers intercept DML on views and allow you to manually route inserts to the underlying tables. AFTER triggers fire after the DML completes — they cannot make a non-updatable view accept inserts. DDL triggers (C) respond to schema events like CREATE TABLE, not DML. AFTER triggers on views (D) can exist but don't solve the multi-table insert problem.
 
+---
+
 ## Related Topics
 
 - [03-Stored Procedures](./03-stored-procedures.md)
 - [04-Auditing](../05-data-security-compliance/04-auditing.md)
 - [02-Specialized Tables — Ledger](../01-database-objects/02-specialized-tables.md)
+
+---
 
 ## Official Documentation
 
