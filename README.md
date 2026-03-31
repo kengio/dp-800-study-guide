@@ -19,11 +19,12 @@ DP-800 tests expertise in designing and developing AI-enabled database solutions
 
 | Detail            | Information                                   |
 | ----------------- | --------------------------------------------- |
-| **Exam**          | DP-800                                        |
-| **Full Name**     | Developing AI-Enabled Database Solutions      |
-| **Passing Score** | 700 / 1000                                    |
-| **Languages**     | T-SQL                                         |
-| **Platforms**     | SQL Server, Azure SQL, Microsoft Fabric       |
+| **Exam**          | DP-800                                                   |
+| **Full Name**     | Developing AI-Enabled Database Solutions                 |
+| **Passing Score** | 700 / 1000                                               |
+| **Renewal**       | Annual (free online assessment on Microsoft Learn)       |
+| **Languages**     | T-SQL                                                    |
+| **Platforms**     | SQL Server, Azure SQL, SQL databases in Microsoft Fabric |
 
 ## Exam Domains
 
@@ -35,10 +36,15 @@ DP-800 tests expertise in designing and developing AI-enabled database solutions
 
 ## Navigation
 
-- [Start Studying →](./certification/README.md)
-- [Exam Tips](./certification/resources/exam-tips.md)
-- [Practice Questions](./certification/resources/practice-questions/README.md)
-- [Mock Exam 1](./certification/resources/mock-exam/README.md)
+| Resource | Description |
+| :--- | :--- |
+| [Start Studying →](./certification/README.md) | Main index with all 11 study sections and progress tracker |
+| [Cheat Sheets](./certification/resources/cheat-sheets/README.md) | Quick-reference guides for exam day |
+| [Practice Questions](./certification/resources/practice-questions/README.md) | Domain-specific questions with explanations |
+| [Mock Exam 1](./certification/resources/mock-exam/README.md) | Full 45-question timed practice exam |
+| [Mock Exam 2](./certification/resources/mock-exam-2/README.md) | Second full 45-question practice exam |
+| [Exam Tips](./certification/resources/exam-tips.md) | Time management, common traps, and strategy |
+| [Appendix](./certification/resources/appendix/README.md) | Glossary, comparison tables, error reference |
 
 ## Official Resources
 
