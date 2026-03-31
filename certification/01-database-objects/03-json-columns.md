@@ -24,6 +24,8 @@ SQL Server and Azure SQL store JSON data as `nvarchar` columns, but provide nati
 > - `OPENJSON` without a WITH clause returns (key, value, type) rows; with a WITH clause returns typed columns
 > - Lax mode (default): path errors return NULL. Strict mode: path errors throw an error
 
+---
+
 ## Storing JSON Data
 
 ```sql
@@ -41,6 +43,8 @@ CREATE TABLE dbo.Events (
     Payload     json    NULL
 );
 ```
+
+---
 
 ## JSON Path Expressions
 
@@ -65,6 +69,8 @@ SELECT
     JSON_VALUE(@json, '$.tags[0]')            AS FirstTag,
     JSON_VALUE(@json, '$.supplier.name')      AS Supplier;
 ```
+
+---
 
 ## Key JSON Functions
 
@@ -129,6 +135,8 @@ SELECT * FROM dbo.Products
 WHERE JSON_VALUE(Attributes, '$.color') = 'blue';
 ```
 
+---
+
 ## JSON Indexes
 
 To efficiently filter or sort on JSON properties, create a computed column and index it:
@@ -153,11 +161,13 @@ CREATE INDEX IX_Events_UserId
 ON dbo.Events (CAST(JSON_VALUE(Payload, '$.userId') AS int));
 ```
 
+---
+
 ## JSON Computed Columns for Indexing
 
 **Problem:** Using `JSON_VALUE` in a `WHERE` clause causes a table scan — the optimizer cannot index a JSON path expression directly.
 
-**Solution:** Extract the JSON property into a PERSISTED computed column, then create an index on that column.
+**Solution:** Extract the JSON property into a **PERSISTED computed column**, then create an index on that column.
 
 PERSISTED computed columns are physically stored on disk (unlike virtual computed columns), which is required for indexing.
 
@@ -179,6 +189,8 @@ CREATE INDEX IX_Orders_UK_Country
 ON Orders(ShipCountry, TotalAmount)
 WHERE ShipCountry = 'UK';
 ```
+
+---
 
 ## JSON_ARRAYAGG and JSON_OBJECTAGG
 
@@ -213,6 +225,8 @@ JOIN LineItems li ON o.OrderID = li.OrderID
 GROUP BY o.OrderID, o.OrderDate;
 ```
 
+---
+
 ## Strict vs Lax Mode in JSON Paths
 
 JSON path expressions support two modes that control how missing paths are handled.
@@ -240,6 +254,8 @@ FROM StagingJSON j
 WHERE IS_JSON(j.JsonData) = 1;
 ```
 
+---
+
 ## JSON with OPENJSON and Schema Binding
 
 The `OPENJSON` function with the `WITH` clause shreds JSON into typed relational rows. Use the `AS JSON` modifier in the `WITH` clause to preserve nested objects or arrays as JSON fragments for further processing.
@@ -266,6 +282,8 @@ CROSS APPLY OPENJSON(h.Doc, '$.items')
 WITH (SKU NVARCHAR(20) '$.sku', Qty INT '$.qty') li;
 ```
 
+---
+
 ## Use Cases
 
 - **Product catalogs**: Variable attribute sets per product type stored as JSON
@@ -273,15 +291,19 @@ WITH (SKU NVARCHAR(20) '$.sku', Qty INT '$.qty') li;
 - **API integration**: Store and query REST API responses directly in SQL
 - **Configuration tables**: Application settings as structured JSON
 
+---
+
 ## Common Issues & Errors
 
 | Issue | Cause | Resolution |
 | :--- | :--- | :--- |
-| `JSON_VALUE` returns NULL | Path does not exist or value is not scalar | Use `JSON_QUERY` for objects/arrays; verify path |
+| `JSON_VALUE` returns NULL | Path does not exist or value is not scalar | ==Use `JSON_QUERY` for objects/arrays; verify path== |
 | Slow JSON queries | No index on JSON property | Create PERSISTED computed column + index on the property |
 | `ISJSON` returns 0 | Malformed JSON in the column | Add CHECK constraint on insert; validate at application layer |
 | `OPENJSON` returns no rows | JSON is valid but path is wrong | Test path with `JSON_VALUE` first |
 | Error 13608 | Strict mode path not found | Switch to lax mode or fix the JSON to include the required property |
+
+---
 
 ## Best Practices
 
@@ -291,14 +313,19 @@ WITH (SKU NVARCHAR(20) '$.sku', Qty INT '$.qty') li;
 - Use `JSON_ARRAYAGG` / `JSON_OBJECTAGG` (SQL Server 2022+) for aggregating JSON inline instead of post-processing `FOR JSON PATH` results.
 - Shred JSON into relational columns at insert time when the data will be queried frequently; keep JSON for flexible or rarely queried attributes only.
 
+---
+
 ## Exam Tips
 
-- `JSON_VALUE` returns scalars (strings); `JSON_QUERY` returns JSON objects or arrays
-- `OPENJSON` with `WITH` clause provides typed output — preferred for structured parsing
-- To filter efficiently on JSON properties, create a **PERSISTED computed column + index**
-- `JSON_ARRAYAGG` and `JSON_CONTAINS` are newer functions — know which SQL Server version supports them
-- Lax mode is the default; strict mode raises error 13608 on missing paths
-- `AS JSON` in an `OPENJSON WITH` clause preserves nested arrays/objects as JSON strings
+> [!tip] Exam Tips
+> - `JSON_VALUE` returns scalars (strings); `JSON_QUERY` returns JSON objects or arrays
+> - `OPENJSON` with `WITH` clause provides typed output — preferred for structured parsing
+> - To filter efficiently on JSON properties, create a **PERSISTED computed column + index**
+> - `JSON_ARRAYAGG` and `JSON_CONTAINS` are newer functions — know which SQL Server version supports them
+> - Lax mode is the default; strict mode raises error 13608 on missing paths
+> - `AS JSON` in an `OPENJSON WITH` clause preserves nested arrays/objects as JSON strings
+
+---
 
 ## Key Takeaways
 
@@ -308,6 +335,8 @@ WITH (SKU NVARCHAR(20) '$.sku', Qty INT '$.qty') li;
 - `FOR JSON PATH` converts relational results to JSON for API responses
 - `JSON_ARRAYAGG` and `JSON_OBJECTAGG` (SQL Server 2022+) aggregate rows directly into JSON
 - Strict vs lax mode controls whether missing JSON paths raise an error or return NULL
+
+---
 
 ## Practice Question
 
@@ -323,10 +352,14 @@ D. Enable JSON path strict mode
 >
 > The optimizer cannot index a JSON path expression directly. A PERSISTED computed column materializes the extracted value, and an index on that column allows efficient seeks. OPENJSON (C) is for shredding arrays and doesn't help filter performance. Strict mode (D) changes error behavior, not query speed.
 
+---
+
 ## Related Topics
 
 - [02-JSON Functions in Advanced T-SQL](../03-advanced-tsql/02-json-functions.md)
 - [01-Tables & Indexes](./01-tables-indexes.md)
+
+---
 
 ## Official Documentation
 

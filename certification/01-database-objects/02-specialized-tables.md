@@ -26,9 +26,11 @@ SQL Server and Azure SQL support several specialized table types for specific sc
 > - Ledger tables are **append-only** — no UPDATE or DELETE; `GENERATED ALWAYS AS ROW START/END` columns are system-managed
 > - Memory-optimized `DURABILITY = SCHEMA_ONLY` means data is lost on restart; `SCHEMA_AND_DATA` survives
 
+---
+
 ## In-Memory (Memory-Optimized) Tables
 
-Memory-optimized tables are stored in memory and use optimistic concurrency without locking for ultra-high-throughput OLTP workloads.
+**Memory-optimized tables** are stored in memory and use optimistic concurrency without locking for ultra-high-throughput OLTP workloads.
 
 ```sql
 -- Requires a MEMORY_OPTIMIZED_DATA filegroup
@@ -56,6 +58,8 @@ CREATE TABLE dbo.SessionCache (
 - `DURABILITY`: `SCHEMA_AND_DATA` (persisted) or `SCHEMA_ONLY` (lost on restart)
 - Natively compiled stored procedures for maximum throughput
 
+---
+
 ## Memory-Optimized Table Durability Options
 
 The `DURABILITY` option controls whether data survives a server restart.
@@ -63,7 +67,7 @@ The `DURABILITY` option controls whether data survives a server restart.
 | Durability | Survives Restart | Transaction Log | Best For |
 | :--- | :--- | :--- | :--- |
 | `SCHEMA_AND_DATA` | Yes (data + structure) | Yes — fully logged | Orders, financial data, anything requiring persistence |
-| `SCHEMA_ONLY` | Structure only (data lost) | No logging | Session state, caches, temp aggregations |
+| `SCHEMA_ONLY` | ==Structure only (data lost)== | No logging | Session state, caches, temp aggregations |
 
 ```sql
 -- SCHEMA_AND_DATA: durable (default) — data persists through restart
@@ -84,9 +88,11 @@ CREATE TABLE dbo.SessionState (
 
 **Memory-optimized table variables** (declared with `DECLARE @t <type>`) are always in-memory with no durability option — they are scoped to the batch and never persisted.
 
+---
+
 ## Temporal Tables (System-Versioned)
 
-Temporal tables automatically maintain a history of all row changes, enabling time-travel queries.
+**Temporal tables** automatically maintain a history of all row changes, enabling time-travel queries.
 
 ```sql
 CREATE TABLE dbo.Employees (
@@ -116,11 +122,13 @@ ORDER BY ValidFrom;
 
 | Clause | Returns |
 | :--- | :--- |
-| `AS OF <date>` | Row state at exactly that point in time |
+| `AS OF <date>` | ==Row state at exactly that point in time== |
 | `FROM <start> TO <end>` | Rows active during any part of the range |
 | `BETWEEN <start> AND <end>` | Inclusive of the end boundary |
 | `CONTAINED IN (<start>, <end>)` | Rows that started AND ended within the range |
 | `ALL` | All current and historical rows |
+
+---
 
 ## Temporal Table — Versioning Queries
 
@@ -161,6 +169,8 @@ WHERE EmployeeId = 42
 ORDER BY ValidFrom;
 ```
 
+---
+
 ## External Tables
 
 External tables allow querying data outside the database without importing it — on Azure Blob Storage, ADLS, or other SQL instances.
@@ -190,6 +200,8 @@ WITH (
     FILE_FORMAT = ParquetFormat
 );
 ```
+
+---
 
 ## Ledger Tables
 
@@ -226,6 +238,8 @@ SELECT * FROM dbo.MSSQL_LedgerHistoryFor_Salaries;
 
 **Ledger verification** (`sp_verify_database_ledger`) recomputes the hash chain and compares it to stored digests. Any out-of-band modification — even by a DBA — breaks the chain and causes verification to fail, providing cryptographic proof of tampering.
 
+---
+
 ## Graph Tables
 
 Graph tables store nodes (entities) and edges (relationships) for querying connected data.
@@ -256,6 +270,8 @@ AND p1.Name = 'Alice';
 
 See [04-Graph Queries](../03-advanced-tsql/04-graph-queries.md) for advanced MATCH patterns.
 
+---
+
 ## Use Cases
 
 | Table Type | Best For |
@@ -263,8 +279,10 @@ See [04-Graph Queries](../03-advanced-tsql/04-graph-queries.md) for advanced MAT
 | **In-Memory** | Session state, shopping carts, real-time counters |
 | **Temporal** | Audit history, slowly changing dimensions, compliance |
 | **External** | Data virtualization, querying data lake files |
-| **Ledger** | Financial records, regulated audit trails, cryptographic proof |
+| **Ledger** | ==Financial records, regulated audit trails, cryptographic proof== |
 | **Graph** | Social networks, fraud detection, recommendation engines |
+
+---
 
 ## Common Issues & Errors
 
@@ -273,8 +291,10 @@ See [04-Graph Queries](../03-advanced-tsql/04-graph-queries.md) for advanced MAT
 | Memory-optimized table creation fails | No MEMORY_OPTIMIZED_DATA filegroup | Add filegroup before creating table |
 | Temporal history table growing large | High update frequency | Add retention policy: `HISTORY_RETENTION_PERIOD = 1 YEAR` |
 | External table slow | File format mismatch or no statistics | Use `CREATE STATISTICS` on external tables |
-| Ledger verify fails | File tampering or corruption | Report to compliance; evidence of tampering |
+| Ledger verify fails | File tampering or corruption | ==Report to compliance; evidence of tampering== |
 | `CONTAINED IN` returns no rows | Period wider than any row's lifetime | Check ValidFrom/ValidTo range; rows must start AND end inside the window |
+
+---
 
 ## Best Practices
 
@@ -284,14 +304,19 @@ See [04-Graph Queries](../03-advanced-tsql/04-graph-queries.md) for advanced MAT
 - Store ledger database digests in Azure Confidential Ledger or Azure Blob Storage immutable containers so `sp_verify_database_ledger` can use external digests as a trust anchor
 - Use append-only ledger tables for event logs and financial transactions where immutability is a compliance requirement; reserve updatable ledger for master data that legitimately changes
 
+---
+
 ## Exam Tips
 
-- **Temporal** tables need two `datetime2` columns with `PERIOD FOR SYSTEM_TIME` — the database tracks them automatically
-- **In-memory** tables require a `MEMORY_OPTIMIZED_DATA` filegroup first
-- **`CONTAINED IN`** vs **`FROM...TO`**: `CONTAINED IN` requires both ValidFrom and ValidTo to be within the window; `FROM...TO` only requires overlap
-- **Ledger** append-only tables prevent UPDATE and DELETE — useful for immutable audit logs; updatable ledger tables still allow DML but record it all
-- **Graph** tables use `$node_id` and `$edge_id` system columns automatically
-- **`sp_verify_database_ledger`** is the key verb for proving tamper-evidence — know it by name
+> [!tip] Exam Tips
+> - **Temporal** tables need two `datetime2` columns with `PERIOD FOR SYSTEM_TIME` — the database tracks them automatically
+> - **In-memory** tables require a `MEMORY_OPTIMIZED_DATA` filegroup first
+> - **`CONTAINED IN`** vs **`FROM...TO`**: `CONTAINED IN` requires both ValidFrom and ValidTo to be within the window; `FROM...TO` only requires overlap
+> - **Ledger** append-only tables prevent UPDATE and DELETE — useful for immutable audit logs; updatable ledger tables still allow DML but record it all
+> - **Graph** tables use `$node_id` and `$edge_id` system columns automatically
+> - **`sp_verify_database_ledger`** is the key verb for proving tamper-evidence — know it by name
+
+---
 
 ## Key Takeaways
 
@@ -316,11 +341,15 @@ D. Memory-optimized table with DURABILITY = SCHEMA_AND_DATA
 >
 > Ledger tables maintain a cryptographic hash chain over all transactions. `sp_verify_database_ledger` checks this chain to prove that no rows have been tampered with outside of the normal transactional path — even a DBA cannot modify data without detection. Temporal tables (A) record history but don't prevent or detect tampering. APPEND_ONLY ledger (B) prevents updates but the question asks about an existing salary table that needs updates. Memory-optimized tables (D) provide durability, not tamper-evidence.
 
+---
+
 ## Related Topics
 
 - [01-Tables & Indexes](./01-tables-indexes.md)
 - [04-Graph Queries](../03-advanced-tsql/04-graph-queries.md)
 - [04-Auditing](../05-data-security-compliance/04-auditing.md)
+
+---
 
 ## Official Documentation
 
