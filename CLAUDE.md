@@ -107,14 +107,34 @@ Terminal sections in this exact order:
 
 ### Certification README (`certification/README.md`)
 
-Required: YAML frontmatter (`title`, `type: certification`, `aliases`, `tags`), Exam Overview table, Domain Weights (Mermaid pie), Study Topics table with weights, Practice & Resources table, Prerequisites, Study Progress Tracker (checkboxes).
+Required: YAML frontmatter (`title`, `type: certification`, `aliases`, `tags`), How to Use This Guide (numbered steps including `final-review.md`), Exam Overview table, Domain Weights (Mermaid pie), Study Topics table with weights, Practice & Resources table (must include `Final Review` row), Study Progress Tracker (checkboxes).
 
 ### Topic Folder README (`<topic-folder>/README.md`)
 
-Required: YAML frontmatter (`title`, `type: category`, `tags`, `status`), topic title with exam weight, Topics Overview (Mermaid flowchart), Section Contents table, Key Concepts, Related Resources, Back/Next navigation.
+Required: YAML frontmatter (`title`, `type: category`, `tags`, `status`), topic title with exam weight, `## Quick Recall` Mermaid mindmap (first section, before Topics Overview), Topics Overview (Mermaid flowchart), Section Contents table, Key Concepts, Related Resources, Back/Next navigation.
 
 - `status` field values: `draft`, `in-progress`, `complete`
 - Update `status` in each README as sections are completed — do not leave complete sections as `draft`
+- `## Quick Recall` mindmap lists the 3–6 most testable facts per section — use `mindmap` diagram type
+
+### Topic File Structure (Top of File)
+
+Every topic file must open with this pattern, in order, before the first `##` content section:
+
+1. YAML frontmatter
+2. `# Title`
+3. `## Overview` paragraph (1–3 sentences)
+4. `> [!abstract]` callout — 2–4 bullet summary of what the file covers
+5. `> [!tip] What the Exam Tests` callout — 2–4 bullets on specifically what the exam tests from this file
+6. `---` separator
+7. First `##` content section
+
+### Cheat Sheet Structure
+
+Each cheat sheet (`resources/cheat-sheets/`) ends with:
+
+1. `## Gotchas & Traps` — 4–8 bullets on common errors and exam traps specific to the topic
+2. `## Before the Exam, I Can…` — 5–8 unchecked checkboxes (`- [ ]`) the reader should be able to tick before taking the exam
 
 ## Exam Domain Mapping
 
