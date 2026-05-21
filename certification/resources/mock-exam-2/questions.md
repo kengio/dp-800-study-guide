@@ -744,4 +744,101 @@ D. Use `CONTAINS(Category, 'Finance')` inside the VECTOR_SEARCH call
 
 ---
 
+## Case Study: Northwind RAG Product Catalog *(5 linked questions, ~10 minutes)*
+
+> [!info] Case-study format
+> The real DP-800 includes interactive case studies — a multi-paragraph scenario followed by linked questions. Read the whole scenario once, then answer Q46–Q50 in order. You can navigate within the case study, but cannot return to it after submission.
+
+**Scenario**
+
+Northwind is building a semantic product-catalog search and Q&A assistant on **Azure SQL Database**. Requirements:
+
+1. **Catalog**: ~2 million products with `Description nvarchar(max)` (typically 200–1 200 words per product) and a separate `Specifications nvarchar(max)` JSON block with structured attributes.
+2. **Embedding model**: `text-embedding-3-small` (1536 dims) is chosen for cost. Embeddings must stay synchronised whenever `Description` changes — but **write throughput is high (~5 000 updates/min)** and the embedding API must not block writes.
+3. **Search**: customers' natural-language queries should return relevant products even when the query phrasing doesn't match the product description verbatim. The team also wants exact keyword matches ("waterproof", "Wi-Fi 7") to rank well.
+4. **Q&A**: a follow-up assistant generates a 1–2 sentence answer grounded on the top-K retrieved product chunks.
+5. **Production scale**: search latency target is p95 < 200 ms across 2 M products.
+
+---
+
+### Question 46: Chunking strategy *(Medium)*
+
+Product descriptions vary from 200 to 1 200 words. Many products have multi-paragraph descriptions covering specs, materials, and warranty separately. Which chunking strategy fits best?
+
+A. One chunk per product (embed the entire `Description`)
+B. Fixed-size 200-token chunks with 10–20 % overlap
+C. **Paragraph-based chunking with 10–20 % overlap** between adjacent chunks
+D. One chunk per character (max granularity)
+
+> [!success]- Answer
+> **C. Paragraph-based chunking with 10–20 % overlap**
+>
+> Paragraph-based chunking preserves semantic units (specs paragraph vs warranty paragraph) so each embedding represents one coherent thought. Overlap prevents losing a sentence that straddles a paragraph boundary. Option A buries detail (a 1 200-word embedding averages too many topics). Fixed-size chunking can split mid-sentence, degrading retrieval. Single-character chunking is meaningless.
+
+---
+
+### Question 47: Embedding maintenance for high write volume *(Hard)*
+
+With 5 000 updates/min, the team must keep embeddings fresh without blocking writes. Which approach is best suited?
+
+A. A synchronous `AFTER UPDATE` trigger calling `PREDICT` inline
+B. **Change Tracking** with a background job (Azure Functions SQL trigger binding or SQL Agent) that re-embeds changed rows in batches
+C. CDC with a custom .NET consumer
+D. Azure Logic Apps polling every 5 minutes
+
+> [!success]- Answer
+> **B. Change Tracking with a background job (Azure Functions SQL trigger binding) that re-embeds changed rows in batches**
+>
+> Synchronous triggers (A) would add embedding-API latency to every write and timeout under load. Change Tracking is lightweight — captures only the changed row's PK — and the Azure Functions SQL trigger uses CT internally. Batching across multiple rows per invocation amortises the API cost. CDC works but is heavier than needed when you only need to know *which* rows changed (you can read current values from the table). Logic Apps' 5-minute cadence is too slow.
+
+---
+
+### Question 48: Vector index choice and metric *(Medium)*
+
+For the 2 M-row catalog with p95 < 200 ms latency, which index and metric should be configured?
+
+A. No index — use `VECTOR_DISTANCE` in `ORDER BY` (exact kNN)
+B. **DiskANN vector index with `METRIC = 'cosine'`**, and queries use `SELECT TOP (N) ... WITH APPROXIMATE` with cosine
+C. DiskANN with `METRIC = 'dot'`, no normalisation
+D. A traditional B-tree index on the `DescriptionEmbedding` column
+
+> [!success]- Answer
+> **B. DiskANN with `METRIC = 'cosine'`, queries use `SELECT TOP (N) ... WITH APPROXIMATE` with cosine**
+>
+> Exact kNN (A) scans every row — p95 > 200 ms at 2 M rows. DiskANN with `cosine` is the standard choice for text embeddings (magnitude-invariant). The query metric must match the index metric — mismatch logs a warning and silently falls back to exact kNN (perf trap). `dot` (C) needs pre-normalisation to behave like cosine; pick one or the other. B-tree (D) cannot index float arrays.
+
+---
+
+### Question 49: Hybrid search with RRF *(Hard)*
+
+Customers want both semantic relevance AND exact keyword matches to rank well ("waterproof", "Wi-Fi 7"). How should the team combine signals?
+
+A. Run vector search only — semantic embeddings capture keyword meaning
+B. Run full-text `CONTAINS` only — keyword matching is exact
+C. **Run both: vector search (cosine) AND full-text (`CONTAINSTABLE` for RANK), then combine via Reciprocal Rank Fusion (`score = Σ 1/(60 + rank_i)`)**
+D. Run vector search, then run `LIKE '%keyword%'` on the results
+
+> [!success]- Answer
+> **C. Run both vector and full-text, combine via Reciprocal Rank Fusion**
+>
+> RRF is the standard hybrid retrieval pattern: each method ranks documents independently, then ranks (not raw scores — which have different scales) are fused with `1/(k+rank)` where `k=60` is the common default. Higher combined score wins. Pure vector (A) can miss exact terms; pure FTS (B) misses semantic paraphrases; `LIKE` (D) cannot use the full-text index and won't rank well.
+
+---
+
+### Question 50: Q&A grounding and prompt-shape *(Medium)*
+
+The Q&A assistant must answer using only the retrieved chunks. Which combination of model-call settings best minimises hallucination?
+
+A. System prompt: "answer creatively"; temperature 0.9; pass query only
+B. System prompt: "answer using only the provided product excerpts; if not present, say so"; **temperature 0.1**; pass retrieved chunks as a system message; parse with `JSON_VALUE(@resp, '$.result.choices[0].message.content')`
+C. Temperature 0.5; pass the user query but not the retrieved chunks
+D. Use `JSON_VALUE(@resp, '$.choices[0].message.content')` and a high temperature
+
+> [!success]- Answer
+> **B. System message constrains to provided excerpts; temperature 0.1; chunks passed as system message; parse with `$.result.choices[0].message.content`**
+>
+> Low temperature reduces creative drift for grounded Q&A. The system message must say "use only the excerpts" — otherwise the model fills gaps from training data. **`sp_invoke_external_rest_endpoint` wraps the API response under `$.result`** (not `$.choices[0]` as you'd get calling Azure OpenAI directly) — option D's path is the single most-missed RAG detail. Without retrieved chunks (A, C), the model has nothing to ground on.
+
+---
+
 **[← Back to Mock Exam 2](./mock-exam-2.md)**

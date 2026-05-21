@@ -128,6 +128,9 @@ CREATE TABLE dbo.Patients (
 > [!warning] Common Mistake
 > TDE and Always Encrypted are often confused on the exam. TDE: server DOES see plaintext (it decrypts to run queries). Always Encrypted: server NEVER sees plaintext (encryption/decryption happens in the client driver). The key differentiator in exam scenarios is whether the database administrator (DBA) should be prevented from seeing the data.
 
+> [!note] Mental model — Always Encrypted
+> Think of Always Encrypted like sending your DBA a **locked briefcase**. They hold the briefcase (encrypted column), but you keep the key (CMK in Key Vault, client-side). The DBA can stack it, ship it, back it up — but never see inside. The CMK never leaves the client; only the encrypted CEK travels to the server. **DETERMINISTIC** is like always using the same lock so the DBA can sort briefcases by lock pattern (equality compare). **RANDOMIZED** is a new lock each time — most secure, but the DBA can't tell two briefcases apart.
+
 ---
 
 ### Querying Always Encrypted Columns

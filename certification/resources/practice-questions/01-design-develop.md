@@ -319,4 +319,70 @@ D. NOT IN cannot be used with subqueries
 
 ---
 
+## Question 16: Graph — SHORTEST_PATH Edge Direction *(Hard)*
+
+**Question** *(Hard)*:
+
+A developer writes a SQL graph query using `SHORTEST_PATH` to find paths between people through a `Knows` edge table. The query must follow the edge in **either direction** (A knows B implies B knows A for this traversal). Which pattern correctly expresses bidirectional traversal?
+
+A. `MATCH (start)-(Knows+)->(end)` — single direction is sufficient because graph queries are undirected by default
+B. `MATCH (start)-(Knows+)-(end)` — omit the arrow to make the edge undirected
+C. `MATCH (start)-(Knows+)->(end) OR (start)<-(Knows+)-(end)` — explicit `OR` between two directed patterns
+D. `MATCH SHORTEST_PATH((start)-(Knows+)->(end))` followed by a second `MATCH` for the reverse — UNION the results
+
+> [!success]- Answer
+> **D. Run two `MATCH SHORTEST_PATH` queries (one per direction) and UNION the results**
+>
+> SQL graph edges are **directed** — there is no built-in undirected operator. `SHORTEST_PATH` follows the declared edge direction. To traverse "either direction", define the relationship as two directional patterns and UNION them, OR store each undirected relationship as two rows in the edge table (A→B and B→A) at insert time. Option B's "omit the arrow" syntax does not exist. Option C is invalid syntax for SHORTEST_PATH (`OR` is not allowed inside the MATCH expression).
+>
+> **Exam trap**: candidates often assume `MATCH` is undirected like Cypher (Neo4j). SQL graph follows edge direction strictly.
+
+---
+
+## Question 17: Memory-Optimized Table Prerequisite *(Hard)*
+
+**Question** *(Hard)*:
+
+A team wants to create memory-optimized tables in an on-premises SQL Server 2022 instance for an OLTP hot path. The first `CREATE TABLE` with `WITH (MEMORY_OPTIMIZED = ON, DURABILITY = SCHEMA_AND_DATA)` fails. Which prerequisite is most likely missing?
+
+A. The database must be in `SIMPLE` recovery model
+B. The database must have a filegroup with `CONTAINS MEMORY_OPTIMIZED_DATA`
+C. The database must enable `READ_COMMITTED_SNAPSHOT`
+D. The table must use the `bwin` storage engine
+
+> [!success]- Answer
+> **B. The database must have a filegroup with `CONTAINS MEMORY_OPTIMIZED_DATA`**
+>
+> Memory-optimized tables require a dedicated filegroup of type `MEMORY_OPTIMIZED_DATA` to persist their checkpoint files (for `DURABILITY = SCHEMA_AND_DATA`). Syntax:
+>
+> ```sql
+> ALTER DATABASE MyDB ADD FILEGROUP MemFG CONTAINS MEMORY_OPTIMIZED_DATA;
+> ALTER DATABASE MyDB ADD FILE (name='MemFile', filename='C:\Data\MemFile')
+>     TO FILEGROUP MemFG;
+> ```
+>
+> Recovery model (A) is irrelevant. RCSI (C) is unrelated. There is no "bwin storage engine" (D) — `bw-tree` is the index structure used internally but isn't named in DDL. Azure SQL Database manages this filegroup automatically — but on-prem SQL Server requires the explicit setup.
+
+---
+
+## Question 18: REGEXP_SPLIT_TO_TABLE *(Medium)*
+
+**Question** *(Medium)*:
+
+A developer has a column `Tags nvarchar(200)` storing comma-separated values like `'azure,sql,ai,vector'`. They need to return one row per tag for joining and aggregation. Which approach uses the regex family added to Azure SQL / Fabric SQL?
+
+A. `STRING_SPLIT(Tags, ',')` — the legacy function, fine for this case
+B. `REGEXP_SPLIT_TO_TABLE(Tags, ',')` — returns one row per split element
+C. `REGEXP_MATCHES(Tags, '[^,]+')` — returns a scalar count of matches
+D. `REGEXP_REPLACE(Tags, ',', CHAR(10))` followed by `STRING_SPLIT`
+
+> [!success]- Answer
+> **B. `REGEXP_SPLIT_TO_TABLE(Tags, ',')` — returns one row per split element**
+>
+> `REGEXP_SPLIT_TO_TABLE` (added in Azure SQL Database and SQL database in Microsoft Fabric, 2025+) takes a regex separator and returns a result set with one row per split element. It is the regex-aware sibling of `STRING_SPLIT`. Both A and B would solve this specific case; the **regex family** matters when the separator is a pattern (e.g., `'[,;|]'`) rather than a single literal.
+>
+> `REGEXP_MATCHES` (C) is the wrong function for splitting. `REGEXP_REPLACE` (D) is convoluted. The other regex functions you should know cold for the exam: `REGEXP_LIKE`, `REGEXP_REPLACE`, `REGEXP_SUBSTR`, `REGEXP_INSTR`, `REGEXP_COUNT`, `REGEXP_MATCHES`, `REGEXP_SPLIT_TO_TABLE`.
+
+---
+
 **[← Back to Practice Questions](./practice-questions.md)**

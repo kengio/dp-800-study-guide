@@ -85,8 +85,10 @@ You don't need to be taking the exam to get value — the guide doubles as a ref
 
 - **11 topic sections** mapped 1:1 to the official skills measured list
 - **7 cheat sheets** for fast review (security, vector/AI, JSON, performance, T-SQL, Azure SQL config)
-- **50+ practice questions** with full explanations across all three domains
-- **2 full-length mock exams** (45 questions each, timed)
+- **60+ practice questions** with full explanations across all three domains
+- **2 full-length mock exams** (50 questions each — 45 standalone + a 5-question case study mirroring the real exam format)
+- **Per-mock debrief files** mapping every missed question to a topic file + cheat sheet
+- **End-to-end RAG worked example** — the full pipeline in ~80 lines of T-SQL
 - **Final review** designed to read in 20 minutes the morning of the exam
 - **T-SQL code examples** covering vector search, RAG, full-text, and AI integration
 
@@ -282,11 +284,15 @@ This guide ships as a living resource. The roadmap below is what's planned for t
 
 ### Q2–Q3 2026 (next 6 months)
 
-- ✅ **Align to March 2026 blueprint** — complete (this release)
+- ✅ **Align to March 2026 blueprint** — complete
 - ✅ **MIT license + open-source release** — complete
 - ✅ **2026 update callouts** in overview and final-review — complete
-- 🔄 **Expand Domain 1 & 2 practice questions** with newer-blueprint coverage (target +15 questions)
-- 🔄 **Add 2026-update questions to mock exams** (target 5–8 per mock)
+- ✅ **Mock-exam debrief files** mapping every question to a topic file — complete
+- ✅ **End-to-end RAG worked example** in `code-examples/tsql/` — complete
+- ✅ **Mermaid diagrams in Domain 3 topic files** — complete
+- ✅ **Case-study mini-blocks** in both mock exams (mirroring real DP-800 format) — complete
+- ✅ **Practice-question rebalancing** (+2 Hard Domain 1, +2 Easy Domain 2, +1 REGEXP) — complete
+- ✅ **Mental-model phrasings** in highest-leverage Domain 1 / 2 topics — complete
 - 🔄 **Hands-on lab pack** — runnable T-SQL scripts that set up sample data and walk through vector search, RAG, full-text, and MCP scenarios
 - 🔄 **Half-precision vector** examples once the feature reaches public preview in Azure SQL
 - 🔄 **Microsoft Foundry walkthrough** as an embedding-maintenance method
@@ -315,9 +321,12 @@ Legend: ✅ done · 🔄 in progress / next up · ⏳ planned · 🌱 ideas bein
 | :--- | :--- |
 | [Start Studying →](./certification/dp-800-overview.md) | Main index with all 11 study sections and progress tracker |
 | [Cheat Sheets](./certification/resources/cheat-sheets/cheat-sheets.md) | Seven quick-reference guides for exam day |
-| [Practice Questions](./certification/resources/practice-questions/practice-questions.md) | 50+ domain-specific questions with explanations |
-| [Mock Exam 1](./certification/resources/mock-exam/mock-exam-1.md) | Full 45-question timed practice exam |
-| [Mock Exam 2](./certification/resources/mock-exam-2/mock-exam-2.md) | Second full 45-question practice exam |
+| [Practice Questions](./certification/resources/practice-questions/practice-questions.md) | 60+ domain-specific questions with explanations |
+| [Mock Exam 1](./certification/resources/mock-exam/mock-exam-1.md) | 50-question timed practice exam (45 standalone + 5-question case study) |
+| [Mock Exam 1 Debrief](./certification/resources/mock-exam/mock-exam-1-debrief.md) | Per-question map to topic files + cheat sheets, plus a study plan by miss count |
+| [Mock Exam 2](./certification/resources/mock-exam-2/mock-exam-2.md) | Second 50-question practice exam (different questions; includes case study) |
+| [Mock Exam 2 Debrief](./certification/resources/mock-exam-2/mock-exam-2-debrief.md) | Same debrief pattern for Mock 2 |
+| [RAG Walkthrough](./certification/resources/code-examples/tsql/rag-end-to-end-walkthrough.md) | End-to-end RAG pipeline in ~80 lines of T-SQL |
 | [Final Review](./certification/resources/final-review.md) | 20-minute exam-morning scan |
 | [Exam Tips](./certification/resources/exam-tips.md) | Time management, common traps, and strategy |
 | [Appendix](./certification/resources/appendix/appendix.md) | Glossary, comparison tables, error reference |

@@ -4,6 +4,32 @@ Notable changes to the DP-800 study guide.
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/). Dates use ISO 8601. Each section is grouped under the Microsoft blueprint date it tracks, so future readers can match guide versions to the version of the exam they were preparing for.
 
+## [2026.05.21] — Case studies, rebalanced practice set, mental models
+
+Still aligned to the 2026-03-12 blueprint. Follow-up additions surfaced by the senior-data-engineer review.
+
+### Added
+
+- **Case-study mini-block in Mock Exam 1** — Contoso HR migration scenario with 5 linked sub-questions (Qs 46–50) covering Always Encrypted (DETERMINISTIC + BIN2), RLS with SESSION_CONTEXT, passwordless model endpoints via Managed Identity, and CES → Lakehouse change feed
+- **Case-study mini-block in Mock Exam 2** — Northwind RAG product catalog scenario with 5 linked sub-questions (Qs 46–50) covering chunking strategy, embedding maintenance at high write volume, DiskANN with metric matching, hybrid search with RRF, and RAG grounding + `$.result` JSON envelope
+- **+2 Hard practice questions in Domain 1** — graph SHORTEST_PATH edge direction and memory-optimized table filegroup prerequisite
+- **+1 REGEXP practice question in Domain 1** — `REGEXP_SPLIT_TO_TABLE`
+- **+2 Easy practice questions in Domain 2** — `ALTER ROLE ... ADD MEMBER` and TDE default-on for Azure SQL
+- **Mental-model callouts** in Domain 1/2 topic files:
+  - RANGE LEFT vs RANGE RIGHT — person standing at a doorway (`01-database-objects/05-partitioning.md`)
+  - Always Encrypted — locked briefcase the DBA holds but never opens (`05-data-security-compliance/01-encryption.md`)
+  - Row versioning (RCSI vs SI) — polaroid snapshots in tempdb (`06-performance-optimization/02-transaction-isolation-concurrency.md`)
+  - GRANT/DENY/REVOKE — bouncer at a club (`05-data-security-compliance/03-permissions-access.md`)
+- **Mock exam landing pages updated** — 50 questions, 70-minute time limit, scoring guide and domain breakdown reflect the new case-study block
+- **Mock exam debriefs updated** — new "Case Study" sub-tables added to both Mock 1 and Mock 2 debrief files
+- **CLAUDE.md** — new sections documenting the mock-exam structure, case-study format, and mental-model callout pattern
+- **README.md** — refreshed counts (60+ practice questions, 50-question mocks), added direct links to debrief files and the RAG walkthrough, marked completed roadmap items
+
+### Changed
+
+- Mock exam total: 45 → 50 questions; time limit: 60 → 70 minutes; scoring tiers updated proportionally
+- `03-permissions-access.md` — added an explicit note clarifying that `REVOKE` alone does not block access (it undoes a prior GRANT or DENY)
+
 ## [2026.05] — Open-source release, aligned to 2026-03-12 blueprint
 
 Aligned to the official Microsoft skills-measured list updated **2026-03-12**, and open-sourced under MIT.

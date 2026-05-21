@@ -91,6 +91,9 @@ COMMIT;
 > [!warning] Common Mistake
 > SNAPSHOT isolation and Read Committed Snapshot Isolation (RCSI) are both row-versioning but are activated differently and used differently. SNAPSHOT is an explicit isolation level set by the application. RCSI changes the behavior of the existing READ COMMITTED level transparently — the app doesn't need to change.
 
+> [!note] Mental model — row versioning
+> Think of row versioning like **polaroid snapshots in tempdb**: every time a row is about to change, SQL Server takes a polaroid of the old value and stores it. Readers don't wait for writers — they read the most appropriate polaroid. **RCSI** = a polaroid for each statement's start time. **SNAPSHOT** = a polaroid for the entire transaction's start time. **Cost**: tempdb grows; old polaroids get cleaned up when no one's looking at them.
+
 ---
 
 ## Lock Types and Compatibility
