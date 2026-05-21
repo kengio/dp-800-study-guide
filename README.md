@@ -296,27 +296,27 @@ This guide ships as a living resource. The roadmap below is what's planned for t
 - ✅ **Case-study mini-blocks** in both mock exams (mirroring real DP-800 format) — complete
 - ✅ **Practice-question rebalancing** (+2 Hard Domain 1, +2 Easy Domain 2, +1 REGEXP) — complete
 - ✅ **Mental-model phrasings** in highest-leverage Domain 1 / 2 topics — complete
-- 🔄 **Hands-on lab pack** — runnable T-SQL scripts that set up sample data and walk through vector search, RAG, full-text, and MCP scenarios
-- 🔄 **Half-precision vector** examples once the feature reaches public preview in Azure SQL
-- 🔄 **Microsoft Foundry walkthrough** as an embedding-maintenance method
-- 🔄 **Video walkthroughs** of the hardest topics (vector index metric matching, RLS predicate functions, CES vs CDC)
+- 🔄 **Hands-on lab pack** — runnable T-SQL scripts walking through vector search, RAG, full-text, and MCP scenarios — landing in a follow-up commit
+- ⏸ **Half-precision vector** examples — feature still **public preview**, no published examples yet; deferred until GA
+- ✅ **Microsoft Foundry walkthrough** as an embedding-maintenance method — see [`certification/09-models-embeddings/02-embedding-maintenance.md#method-7-microsoft-foundry`](./certification/09-models-embeddings/02-embedding-maintenance.md)
+- 🔄 **Video walkthroughs** of the hardest topics — outside the text-only scope of this guide; community contributions welcome
 
 ### Q4 2026 (3–6 months out)
 
-- ⏳ **Azure SQL DiskANN GA** content updates (expected to leave private preview)
-- ⏳ **Half-precision vector GA** content updates
-- ⏳ **Updated mock exams** following any Microsoft blueprint refresh
-- ⏳ **Community contributor list** in CONTRIBUTORS.md
+- ⏳ **Azure SQL DiskANN GA** content updates — currently **public preview** on SS2025 + Azure SQL + Fabric; will refresh on GA announcement
+- ⏳ **Half-precision vector GA** content updates — currently **preview**; will refresh on GA
+- ⏳ **Updated mock exams** following any Microsoft blueprint refresh — blueprint verified unchanged as of 2026-05-22 (still "Skills measured as of March 12, 2026"); will refresh when Microsoft bumps the date
+- ⏳ **Community contributor list** in CONTRIBUTORS.md — awaiting first community PR
 - ✅ **Spaced-repetition deck (Anki)** generated from cheat-sheet facts — see [`certification/resources/anki/`](./certification/resources/anki/anki-deck.md) (130 cards across 6 cheat sheets)
 - ✅ **Translation scaffolding** so non-English learners can fork and translate — see [`TRANSLATING.md`](./TRANSLATING.md)
 
 ### Q1 2027 (6–12 months out)
 
-- 🌱 **Renewal-assessment guide** for those who took DP-800 in 2026 and need to renew
-- 🌱 **Companion guide for related exams** (e.g., DP-700 Fabric Data Engineer, AI-102 AI Engineer cross-references)
+- ✅ **Renewal-assessment guide** for those who took DP-800 in 2026 and need to renew — see [`certification/resources/renewal-guide.md`](./certification/resources/renewal-guide.md)
+- ✅ **Companion guide for related exams** (DP-700 Fabric Data Engineer, AI-102 AI Engineer — with retirement warning) — see [`certification/resources/companion-exams.md`](./certification/resources/companion-exams.md)
 - ✅ **Adaptive practice questions** — JSON-driven question bank with difficulty tagging — live at [kengio.github.io/dp-800-study-guide](https://kengio.github.io/dp-800-study-guide/) and sourced from [`practice/`](./practice/README.md) (160 questions across 3 banks)
 
-Legend: ✅ done · 🔄 in progress / next up · ⏳ planned · 🌱 ideas being explored
+Legend: ✅ done · 🔄 in progress / next up · ⏸ deferred until upstream GA · ⏳ planned · 🌱 ideas being explored
 
 ## Quick navigation
 

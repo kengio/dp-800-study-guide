@@ -4,6 +4,18 @@ Notable changes to the DP-800 study guide.
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/). Dates use ISO 8601. Each section is grouped under the Microsoft blueprint date it tracks, so future readers can match guide versions to the version of the exam they were preparing for.
 
+## [Unreleased]
+
+### Added
+
+- **Renewal guide** (`certification/resources/renewal-guide.md`) — process-focused walkthrough of Microsoft's free, unproctored, open-book annual renewal assessment for DP-800: eligibility window, retake policy, what to prep (blueprint diff between original exam and renewal date), and a morning-of checklist
+- **Companion-exams guide** (`certification/resources/companion-exams.md`) — DP-700 (Fabric Data Engineer Associate, blueprint 2026-04-20) and AI-102 (Azure AI Engineer Associate, **retires 2026-06-30**) with per-skill overlap matrices, four recommended sequencing paths, and an exam-blueprint comparison table
+- **Microsoft Foundry walkthrough** — expanded `certification/09-models-embeddings/02-embedding-maintenance.md` Method 7 from a 12-line stub into a full section: architecture diagram, step-by-step setup, choose-vs-skip decision criteria, Foundry-vs-CES comparison table, mental model, and a sample under-the-hood embedding call
+
+### Verified
+
+- **DP-800 blueprint unchanged as of 2026-05-22** — `learn.microsoft.com/.../dp-800` still reads "Skills measured as of March 12, 2026". The `updated_at: 2026-03-23` metadata reflects a cosmetic page edit, not a content refresh. Mock exams remain aligned to the 2026-03-12 blueprint
+
 ## [1.1.0] — 2026-05-22 — Anki + translation scaffolding + live practice quiz
 
 Same 2026-03-12 Microsoft blueprint as v1.0.0. Adds three large companion artefacts and the docs to support them.

@@ -105,6 +105,8 @@ pie title Exam Domain Distribution
 | [Anki Deck](resources/anki/anki-deck.md) | ~130 spaced-repetition cards generated from the cheat sheets, with tag-based filtering |
 | [Adaptive Practice Quiz](../practice/README.md) | Browser-based JSON-driven quiz — 160 questions across 3 banks, with adaptive selection, exam timer, and per-bank progress. **Live: [kengio.github.io/dp-800-study-guide](https://kengio.github.io/dp-800-study-guide/)** |
 | [Final Review](resources/final-review.md) | 20-minute exam-morning scan: top facts and last-minute traps for all three domains |
+| [Renewal Guide](resources/renewal-guide.md) | DP-800 annual-renewal workflow: free/unproctored/open-book assessment, 6-month window, what to prep |
+| [Companion Exams](resources/companion-exams.md) | DP-700 + AI-102 cross-references with overlap matrices, retirement warnings, and recommended next-step paths |
 | [Appendix](resources/appendix/appendix.md) | Glossary, comparison tables, error messages |
 
 ## Study Progress Tracker

@@ -279,17 +279,101 @@ END;
 
 ## Method 7: Microsoft Foundry
 
-Microsoft Foundry (AI Studio/AI Foundry in Fabric) provides a declarative AI pipeline:
+**Microsoft Foundry** (formerly Azure AI Foundry; rebranded late 2025) is the declarative, **most-managed** option on the DP-800 blueprint. You design an embedding pipeline visually or in YAML, point it at a SQL source, deploy, and Foundry handles **chunking, batching, retries, throttling, monitoring, and write-back** — no T-SQL, no Python, no Logic App glue.
+
+It shows up on the 2026-03-12 blueprint as one of the named embedding-maintenance methods, so expect at least one DP-800 question that asks you to **pick Foundry vs CES vs CDC vs triggers** for a given scenario.
+
+### Architecture
 
 ```text
-Foundry Data Pipeline:
-├── Source: SQL Database table (Products)
-├── Step: Embed column (Description) using text-embedding-3-small
-├── Sink: SQL Database table (update DescriptionEmbedding column)
-└── Trigger: Scheduled or event-based
+Foundry Project
+├── Connections:
+│   ├── SQL connection (Azure SQL DB / SQL DB in Fabric / on-prem via SHIR)
+│   └── Embedding model deployment (text-embedding-3-small / -large / ada-002 legacy)
+├── Pipeline / Flow:
+│   ├── Source step:   SELECT ProductId, Description, LastUpdated
+│   │                  FROM dbo.Products
+│   │                  WHERE DescriptionEmbedding IS NULL
+│   │                     OR LastUpdated > EmbeddingGeneratedAt
+│   ├── Chunk step:    (optional) split long Description into N-token chunks
+│   ├── Embed step:    POST chunks to the model deployment in batch
+│   └── Sink step:     UPDATE dbo.Products SET DescriptionEmbedding = @vec,
+│                                              EmbeddingGeneratedAt = SYSUTCDATETIME()
+│                                          WHERE ProductId = @id
+└── Trigger:
+    ├── Scheduled (cron, recurrence)
+    ├── Event-driven (Fabric Eventstream / Event Grid)
+    └── On-demand (Foundry SDK / REST API)
 ```
 
-This is the most managed option — no code required, built-in retry and monitoring.
+### Step-by-step setup (typical)
+
+1. **Create a Foundry project** in the Microsoft Foundry portal (<https://ai.azure.com/>). Pick a region close to your SQL endpoint to minimise embedding-call latency.
+2. **Deploy the embedding model** — `text-embedding-3-small` (1 536 dims) is the standard choice; `text-embedding-3-large` (3 072 dims) for higher recall at higher cost; `ada-002` is legacy and rarely the right pick today.
+3. **Add a SQL connection** under the project's **Connections** pane. For passwordless, attach a Managed Identity to the Foundry project and grant `db_datareader` + `db_datawriter` (or a more scoped role) on the target database. **Do not** store SQL passwords in Foundry connection strings — Managed Identity is the GA pattern Microsoft expects on DP-800.
+4. **Author the pipeline** either via the visual editor or via a YAML flow definition. The minimum shape is the four steps above (source → chunk → embed → sink).
+5. **Attach a trigger** — scheduled recurrence for batch-style refresh, or event-driven (via a Fabric Eventstream subscribed to CES from the source DB) for near-real-time.
+6. **Deploy the pipeline.** Foundry handles retry/back-off on transient model-deployment errors automatically.
+7. **Monitor** via the Foundry project's built-in run-history pane — every run records source rows processed, tokens consumed, sink rows updated, and any per-row failures.
+
+### When to choose Foundry
+
+```text
+Use Foundry when:
+✓ You want NO code (declarative pipeline > triggers/jobs)
+✓ Embedding maintenance is one of several AI workflows you're orchestrating
+  (RAG indexing, batch scoring, evaluation) and you want them in one place
+✓ You're already in the Foundry/Fabric ecosystem
+✓ You need centralised monitoring, cost tracking, and audit per AI workflow
+✓ The pipeline shape is "SQL → embed → SQL" (the most-supported template)
+
+Avoid Foundry when:
+✗ Sub-30-second latency required from source change → embedding write
+  (use CES + Notebook, or table triggers, instead)
+✗ Your embedding logic needs custom Python (rich text preprocessing,
+  multi-modal inputs, custom chunking) — pipelines can call out, but
+  at that point a Fabric Notebook is simpler
+✗ Source is purely on-prem with no Self-Hosted Integration Runtime
+✗ Compliance forbids cross-region data flow that Foundry's hosted
+  embedding endpoint would create
+```
+
+### Foundry vs CES — the canonical comparison
+
+Both Foundry and CES (Change Event Streaming) appear on the blueprint as named methods, and the exam loves to contrast them.
+
+| Aspect | Microsoft Foundry | CES (Change Event Streaming) |
+| :--- | :--- | :--- |
+| **Source platform** | SQL Server, Azure SQL DB, SQL DB in Fabric, on-prem (with SHIR) | SQL DB in Microsoft Fabric only |
+| **Code required** | None (declarative pipeline) | Notebook code (Python) or Pipeline activities |
+| **Trigger** | Schedule / event-driven / on-demand | Event-driven (push from CES) |
+| **Latency** | Seconds to minutes (depending on trigger) | Near-real-time (push-based) |
+| **Embedding logic** | Built-in `Embed` step | You write it in the Notebook |
+| **Monitoring** | Foundry run history (centralised) | Eventstream + Notebook job history (split) |
+| **Best for** | Multi-workflow AI projects, batch + scheduled refresh, no-code teams | Fabric-only deployments needing sub-30 s latency |
+
+### What the exam will ask
+
+> [!warning] Common Mistake
+> "Microsoft Foundry **requires** Fabric" — false. Foundry connects to Azure SQL Database and on-prem SQL Server (via Self-Hosted Integration Runtime) too. CES is the Fabric-only one. Don't conflate them.
+
+> [!note] Mental model — Foundry vs the others
+> **Foundry is the "credit card" option** — pay (in service cost + lock-in) for ergonomics. **CES is the "tap to pay"** — fast and Fabric-native but only on the right rails. **CDC/Change Tracking are "bank transfers"** — they work everywhere but you write the plumbing. **Triggers are "cash"** — instant, but they cost write latency and stop scaling around a few thousand rows per minute.
+
+```python
+# Foundry handles the embedding call for you, but if you want to see what
+# it does under the hood, this is approximately what the Embed step runs:
+import requests
+
+embedding = requests.post(
+    "https://<your-foundry>.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-01",
+    headers={"api-key": "<managed-identity-token-from-foundry>"},
+    json={"input": description}
+).json()["data"][0]["embedding"]
+
+# Foundry then writes back to SQL via the connection it manages — no T-SQL
+# required from you. The whole pipeline declaration is YAML or visual.
+```
 
 ---
 
