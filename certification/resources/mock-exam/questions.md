@@ -676,17 +676,17 @@ D. Document A — `1/(60+3) + 1/(60+1) ≈ 0.0317` vs Document B — `1/(60+1) +
 
 ## Question 42: RAG — sp_invoke_external_rest_endpoint *(Medium)*
 
-A developer calls `sp_invoke_external_rest_endpoint` to query Azure OpenAI. The response JSON needs to be parsed to extract the generated text. The response is stored in `@response nvarchar(max)`. How is the message content extracted?
+A developer calls `sp_invoke_external_rest_endpoint` to query Azure OpenAI. The response is captured in `@response nvarchar(max)`. Which path correctly extracts the assistant's reply text?
 
 A. `SELECT @response`
 B. `SELECT JSON_VALUE(@response, '$.choices[0].message.content')`
-C. `SELECT JSON_QUERY(@response, '$.choices[0].message')`
+C. `SELECT JSON_VALUE(@response, '$.result.choices[0].message.content')`
 D. `SELECT OPENJSON(@response, '$.choices') WITH (content nvarchar(max) '$.message.content')`
 
 > [!success]- Answer
-> **B. `SELECT JSON_VALUE(@response, '$.choices[0].message.content')`**
+> **C. `SELECT JSON_VALUE(@response, '$.result.choices[0].message.content')`**
 >
-> The Azure OpenAI chat completion response has the structure: `{"choices":[{"message":{"role":"assistant","content":"..."}}]}`. `JSON_VALUE` with path `$.choices[0].message.content` extracts the scalar string value of the assistant's response.
+> Common trap. `sp_invoke_external_rest_endpoint` wraps the API response under a `result` envelope: `{"response": {...}, "result": {"choices":[{"message":{"role":"assistant","content":"..."}}]}}`. Option B (`$.choices[0]...`) is the path you would use if you called Azure OpenAI directly with HttpClient — but **not** through `sp_invoke_external_rest_endpoint`. The stored procedure's `result` wrapper is the most-missed detail in T-SQL RAG implementations.
 
 ---
 
@@ -706,19 +706,19 @@ D. The embedding was generated with 1536 tokens of context
 
 ---
 
-## Question 44: CREATE EXTERNAL MODEL — Task Types *(Medium)*
+## Question 44: CREATE EXTERNAL MODEL — Model Type *(Medium)*
 
-A developer needs to use `PREDICT` with an external model to classify product descriptions as one of several categories. Which `TASK` value should be specified in `CREATE EXTERNAL MODEL`?
+A developer needs to register an external Azure OpenAI deployment that generates 1536-dimensional embeddings for product descriptions. Which `MODEL_TYPE` value belongs in `CREATE EXTERNAL MODEL ... WITH (...)`?
 
-A. `TASK = EMBEDDINGS`
-B. `TASK = CHAT_COMPLETION`
-C. `TASK = CLASSIFICATION`
-D. `TASK = SUMMARIZATION`
+A. `MODEL_TYPE = EMBEDDINGS`
+B. `MODEL_TYPE = COMPLETIONS`
+C. `TASK = EMBEDDINGS`
+D. `MODEL_TYPE = TEXT`
 
 > [!success]- Answer
-> **C. `TASK = CLASSIFICATION`**
+> **A. `MODEL_TYPE = EMBEDDINGS`**
 >
-> The `TASK` parameter specifies the model's intended use and determines how inputs/outputs are shaped in the `PREDICT` function. `CLASSIFICATION` is appropriate for models that output category labels or probabilities. `EMBEDDINGS` is for embedding generation. `CHAT_COMPLETION` is for conversational/generative models.
+> `CREATE EXTERNAL MODEL` uses the `MODEL_TYPE` keyword (not `TASK`). Valid values include `EMBEDDINGS` and `COMPLETIONS`. The `PREDICT` function uses this to shape inputs and outputs. Option C is a common confusion with model-card terminology in non-SQL platforms (LangChain, Hugging Face) where "task" is the field name — in T-SQL the keyword is `MODEL_TYPE`.
 
 ---
 

@@ -584,19 +584,19 @@ D. Post-processing the response with `ISJSON()` to validate
 
 ---
 
-## Question 36: Vector Index — DiskANN Requirements *(Hard)*
+## Question 36: Vector Index — DiskANN with the `dot` Metric *(Hard)*
 
-A developer wants to create a DiskANN vector index on a `VECTOR(1536)` column. Which prerequisite must be met before creating the index?
+A developer creates a DiskANN vector index with `METRIC = 'dot'` and wants the results to behave like cosine similarity. Which prerequisite must be met?
 
 A. The column must be the primary key
-B. The vectors must be normalized (unit length) — apply `VECTOR_NORMALIZE` before inserting
+B. The vectors must be normalized to unit length (apply `VECTOR_NORMALIZE` before inserting)
 C. The table must have fewer than 1 million rows
 D. The column must use `VECTOR(512)` or smaller dimensions
 
 > [!success]- Answer
-> **B. The vectors must be normalized (unit length) — apply `VECTOR_NORMALIZE` before inserting**
+> **B. The vectors must be normalized to unit length (apply `VECTOR_NORMALIZE` before inserting)**
 >
-> DiskANN for inner product (cosine) search requires normalized vectors. The index uses inner product as its similarity metric, which equals cosine similarity for unit vectors. Storing non-normalized vectors and building a DiskANN index will produce incorrect results for cosine similarity search. Best practice: normalize embeddings at insert time.
+> Dot product equals cosine similarity only when both vectors have unit magnitude. To use `dot` as a faster proxy for cosine, normalize stored vectors with `VECTOR_NORMALIZE(..., 'norm2')` before insert/update. **Note: `cosine` itself does NOT require pre-normalization** — the cosine metric handles magnitudes internally. The "normalize before indexing" rule is specific to the `dot` metric being used as a cosine proxy.
 
 ---
 
@@ -632,19 +632,19 @@ D. Semantic chunking works with any language model
 
 ---
 
-## Question 39: VECTOR_SEARCH — Syntax *(Medium)*
+## Question 39: VECTOR_SEARCH — Current Syntax *(Medium)*
 
-A developer uses `VECTOR_SEARCH` to find the 10 most similar products to a query embedding. Which clause specifies the number of results?
+A developer wants the 10 most similar products to a query embedding against a **latest-version** DiskANN vector index on Azure SQL. Which clause is the recommended current syntax?
 
-A. `TOP 10` in the outer SELECT
+A. `SELECT TOP (10) ... ORDER BY VECTOR_DISTANCE('cosine', col, @q) WITH APPROXIMATE`
 B. `WITH (TOP_K = 10)` in the VECTOR_SEARCH options
 C. `LIMIT 10` at the end of the query
-D. `FETCH NEXT 10 ROWS ONLY`
+D. `VECTOR_SEARCH(..., TOP_N = 10)`
 
 > [!success]- Answer
-> **B. `WITH (TOP_K = 10)` in the VECTOR_SEARCH options**
+> **A. `SELECT TOP (10) ... ORDER BY VECTOR_DISTANCE('cosine', col, @q) WITH APPROXIMATE`**
 >
-> `VECTOR_SEARCH` has its own `WITH (TOP_K = n)` parameter that controls how many approximate nearest neighbors the ANN index retrieves. This is different from the outer query's `TOP N` — the ANN index must retrieve `TOP_K` candidates internally, after which the outer query can filter further. Setting `TOP_K` correctly is important for recall accuracy.
+> On latest-version vector indexes, the current pattern is `SELECT TOP (N) ... ORDER BY VECTOR_DISTANCE(...) WITH APPROXIMATE`. The legacy `VECTOR_SEARCH(... TOP_N = n)` table-valued form is **deprecated** on current indexes — passing `TOP_N` raises Msg 42274. `TOP_K` (option B) is not a real parameter name. `LIMIT` is not T-SQL syntax. To raise recall, increase `N` in `TOP (N)`.
 
 ---
 

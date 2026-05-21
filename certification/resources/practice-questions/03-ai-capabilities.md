@@ -20,18 +20,18 @@ Domain 3 covers 20–25% of the DP-800 exam.
 A developer wants to call Azure OpenAI's `text-embedding-3-small` model from T-SQL to generate embeddings. Which statement correctly registers this model in Azure SQL Database?
 
 A. `CREATE MODEL EmbeddingModel TYPE = AZURE_OPENAI WITH (MODEL = 'text-embedding-3-small')`
-B. `CREATE EXTERNAL MODEL EmbeddingModel WITH (LOCATION = '...', CREDENTIAL = ..., TASK = EMBEDDINGS, MODEL = 'text-embedding-3-small')`
+B. `CREATE EXTERNAL MODEL EmbeddingModel WITH (LOCATION = '...', CREDENTIAL = ..., MODEL_TYPE = EMBEDDINGS, MODEL = 'text-embedding-3-small')`
 C. `CREATE EXTERNAL MODEL EmbeddingModel WITH (ENDPOINT = '...', KEY = '...', TYPE = 'OpenAI')`
 D. `EXEC sp_create_external_model 'EmbeddingModel', 'text-embedding-3-small'`
 
 > [!success]- Answer
-> **B. `CREATE EXTERNAL MODEL EmbeddingModel WITH (LOCATION = '...', CREDENTIAL = ..., TASK = EMBEDDINGS, MODEL = 'text-embedding-3-small')`**
+> **B. `CREATE EXTERNAL MODEL EmbeddingModel WITH (LOCATION = '...', CREDENTIAL = ..., MODEL_TYPE = EMBEDDINGS, MODEL = 'text-embedding-3-small')`**
 >
 > The full `CREATE EXTERNAL MODEL` syntax requires:
-> - `LOCATION`: The Azure OpenAI endpoint URL
-> - `CREDENTIAL`: A database-scoped credential holding the API key
-> - `TASK`: The model's task type (e.g., `EMBEDDINGS`, `CHAT_COMPLETION`, `CLASSIFICATION`)
-> - `MODEL`: The deployment name in Azure OpenAI
+> - `LOCATION` — the Azure OpenAI endpoint URL
+> - `CREDENTIAL` — a database-scoped credential holding the API key
+> - `MODEL_TYPE` — `EMBEDDINGS` or `COMPLETIONS` (this is the T-SQL keyword; some non-SQL frameworks call this "task")
+> - `MODEL` — the deployment name in Azure OpenAI
 >
 > Once created, the model is invoked with `SELECT * FROM PREDICT(MODEL = EmbeddingModel, ...)`.
 

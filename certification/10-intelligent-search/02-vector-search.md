@@ -350,6 +350,8 @@ ORDER BY vs.distance ASC;
 - [01-Full-Text Search](./01-fulltext-search.md)
 - [03-Hybrid Search & RRF](./03-hybrid-search-rrf.md)
 - [03-Chunking & Generation](../09-models-embeddings/03-chunking-generation.md)
+- [11-RAG: Use Cases](../11-rag/01-rag-use-cases.md) — vector search is the retrieval engine for RAG
+- [11-RAG: Prompts and Responses](../11-rag/02-prompts-and-responses.md)
 
 ---
 

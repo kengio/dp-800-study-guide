@@ -85,27 +85,26 @@ FROM dbo.Documents;
 
 > [!info] DiskANN is an approximate nearest neighbor index that enables fast vector search without scanning every row.
 
-Approximate Nearest Neighbor (ANN) index for fast vector search. Creates a graph-based index on disk.
+Approximate Nearest Neighbor (ANN) index for fast vector search. Creates a graph-based index on disk. **Status: public preview** across SQL Server 2025, Azure SQL Database, Azure SQL Managed Instance, and SQL database in Microsoft Fabric (SQL Server 2025 also requires `PREVIEW_FEATURES = ON`).
 
 ```sql
--- Create DiskANN index
-CREATE NONCLUSTERED INDEX IX_Documents_Embedding
+-- Create a DiskANN vector index (current syntax)
+CREATE VECTOR INDEX IX_Documents_Embedding
     ON dbo.Documents (Embedding)
-    USING DISKANN;
+    WITH (METRIC = 'cosine', TYPE = 'diskann');
 
--- With options
-CREATE NONCLUSTERED INDEX IX_Documents_Embedding
-    ON dbo.Documents (Embedding)
-    USING DISKANN WITH (MAXDOP = 4);
+-- Rebuild after bulk inserts
+ALTER INDEX IX_Documents_Embedding ON dbo.Documents REBUILD;
 ```
 
 | Feature | Detail |
 | :--- | :--- |
-| Max dimensions | 1,998 |
+| Max dimensions | 1 998 |
 | Approximate | Yes (may miss exact nearest neighbors) |
 | Updateable | Yes (inserts/updates/deletes supported) |
-| Filterable | Yes (with WHERE clause) |
-| Index type | Nonclustered |
+| Filterable | Yes (with WHERE clause / pre-filter subquery) |
+| Index type | `VECTOR INDEX` with `TYPE = 'diskann'` |
+| Required `METRIC` values | `cosine` · `euclidean` · `dot` |
 
 ---
 
@@ -114,28 +113,37 @@ CREATE NONCLUSTERED INDEX IX_Documents_Embedding
 > [!info] VECTOR_SEARCH is the built-in function that leverages DiskANN for efficient top-K nearest neighbor queries.
 
 ```sql
--- Top-K nearest neighbors using DiskANN index
+-- Current syntax (latest-version indexes): SELECT TOP (N) ... WITH APPROXIMATE
+SELECT TOP (10) d.DocumentID, d.Title,
+       VECTOR_DISTANCE('cosine', d.Embedding, @queryVector) AS distance
+FROM dbo.Documents AS d
+WHERE VECTOR_DISTANCE('cosine', d.Embedding, @queryVector) IS NOT NULL
+ORDER BY distance
+WITH APPROXIMATE;   -- uses the DiskANN index when one matches the metric
+
+-- Legacy named-arg form (earlier-version indexes only)
 SELECT vs.DocumentID, vs.Title, vs.distance
 FROM VECTOR_SEARCH(
-    dbo.Documents,            -- table
-    'Embedding',              -- vector column
-    @queryVector,             -- query vector
-    'cosine',                 -- metric
-    10                        -- top K
-) vs;
+    TABLE      = dbo.Documents AS d,
+    COLUMN     = Embedding,
+    SIMILAR_TO = @queryVector,
+    METRIC     = 'cosine',
+    TOP_N      = 10
+) AS vs;
+-- NOTE: TOP_N is deprecated on latest-version indexes (raises Msg 42274).
+-- Use SELECT TOP (N) ... WITH APPROXIMATE instead.
 ```
 
 ### With Pre-filter
 
 ```sql
-SELECT vs.DocumentID, vs.Title, vs.distance
-FROM VECTOR_SEARCH(
-    (SELECT * FROM dbo.Documents WHERE CategoryID = 5),
-    'Embedding',
-    @queryVector,
-    'cosine',
-    10
-) vs;
+SELECT TOP (10) d.DocumentID, d.Title,
+       VECTOR_DISTANCE('cosine', d.Embedding, @queryVector) AS distance
+FROM dbo.Documents AS d
+WHERE d.CategoryID = 5
+  AND VECTOR_DISTANCE('cosine', d.Embedding, @queryVector) IS NOT NULL
+ORDER BY distance
+WITH APPROXIMATE;
 ```
 
 ---
@@ -359,8 +367,9 @@ SELECT JSON_VALUE(@response, '$.result.choices[0].message.content') AS Answer;
 
 ## Gotchas & Traps
 
-- **DiskANN metric must match** — the metric set on the DiskANN index (`cosine`, `dot`, or `euclidean`) must exactly match the metric used in `VECTOR_SEARCH`. Mismatched metrics cause an error at query time.
-- **VECTOR_SEARCH is approximate** — it can miss the true nearest neighbor for speed. Use `VECTOR_DISTANCE` when perfect accuracy matters; use `VECTOR_SEARCH` when scale matters.
+- **DiskANN metric must match** — the metric on the index (`cosine`, `dot`, or `euclidean`) must match the metric used in the search. **A mismatch does NOT raise an error** — it logs a warning and silently falls back to exact kNN, which can be a nasty performance regression in production. To support multiple metrics, build one index per metric.
+- **`VECTOR_SEARCH` is approximate** — it can miss the true nearest neighbor for speed. Use `VECTOR_DISTANCE` in `ORDER BY` (without `WITH APPROXIMATE`) when perfect accuracy matters; use `WITH APPROXIMATE` (or the legacy `VECTOR_SEARCH` TVF) when scale matters.
+- **`TOP_N` is deprecated** — on latest-version vector indexes, recall is tuned via `SELECT TOP (N) ... WITH APPROXIMATE` (raise `N`). The old `TOP_N` parameter on `VECTOR_SEARCH(...)` only works with earlier-version indexes and raises Msg 42274 on current ones.
 - **Normalize before dot product** — `VECTOR_NORMALIZE` (norm2) is required before you can use dot product distance as a cosine similarity proxy. Without normalization, dot product reflects magnitude, not direction.
 - **Embedding model dimensions matter** — text-embedding-3-small = 1536 dims; text-embedding-3-large = 3072 dims; ada-002 = 1536 dims. Changing models requires regenerating ALL embeddings — old and new vectors are incompatible.
 - **sp_invoke_external_rest_endpoint needs a CREDENTIAL** — the Azure OpenAI API key goes in a `DATABASE SCOPED CREDENTIAL`, not hard-coded in the procedure.

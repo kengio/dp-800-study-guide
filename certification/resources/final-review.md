@@ -84,11 +84,11 @@ tags:
 ## Last-Minute Traps
 
 1. **JSON_VALUE on an object/array path returns NULL** — not an error. Use `JSON_QUERY` to extract objects or arrays.
-2. **DiskANN index metric must match the query metric** — DiskANN supports `cosine`, `dot`, and `euclidean`, but the metric on the index must match what you pass to `VECTOR_SEARCH`. Mixing metrics causes an error.
+2. **DiskANN index metric must match the query metric** — DiskANN supports `cosine`, `dot`, and `euclidean`. The metric on the index must match the metric used in the query. **A mismatch does NOT error** — it logs a warning and silently falls back to exact kNN (no index used). Build one index per metric you need.
 3. **DENY always overrides GRANT** — even if the GRANT came through a role. There is no way to "un-deny" except REVOKE of the DENY.
 4. **DDM ≠ encryption** — DDM hides values at display time; the data is stored in plaintext. Users with `UNMASK` or admin rights see everything.
 5. **SNAPSHOT isolation ≠ RCSI** — SNAPSHOT = application sets it per transaction; RCSI = database setting that changes the *default* READ COMMITTED behavior to row-versioning.
-6. **VECTOR_SEARCH is approximate** — it can miss the true nearest neighbor for speed. VECTOR_DISTANCE is exact but slower.
+6. **VECTOR_SEARCH / `WITH APPROXIMATE` is approximate** — it can miss the true nearest neighbor for speed. `VECTOR_DISTANCE` in `ORDER BY` without `WITH APPROXIMATE` is exact (ENN) but slower. On latest-version indexes use `SELECT TOP (N) … WITH APPROXIMATE` (the legacy `TOP_N` parameter is deprecated and raises Msg 42274).
 7. **CMK stays client-side** — Always Encrypted: the Column Master Key lives in Key Vault (or cert store), never uploaded to SQL Server. The server only holds the encrypted CEK.
 8. **SqlPackage /Action:Extract ≠ Publish** — Extract creates a dacpac FROM an existing database. Publish deploys a dacpac TO a database.
 9. **Partition function ≠ partition scheme** — function defines value boundaries; scheme maps them to filegroups. Need both to partition a table.

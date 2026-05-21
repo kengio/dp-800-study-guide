@@ -64,7 +64,7 @@ tags:
 
 | Trap | Correct Answer |
 | :--- | :--- |
-| "Which allows equality comparisons on Always Encrypted?" | **DETERMINISTIC** encryption |
+| "Which allows equality comparisons on Always Encrypted?" | **DETERMINISTIC** encryption (`varchar`/`nvarchar` columns also need a **BIN2** collation) |
 | "Which isolation level uses row versioning?" | **Snapshot** and **RCSI** (both) |
 | "How to prevent reader/writer blocking without changing app code?" | Enable **RCSI** at database level |
 | "What is required before creating a memory-optimized table?" | A **MEMORY_OPTIMIZED_DATA filegroup** |
@@ -72,6 +72,36 @@ tags:
 | "Which eliminates rows vs masking values?" | **RLS** eliminates rows; **DDM** masks values |
 | "What does ANN sacrifice for speed?" | **Accuracy** (approximate, not exact) |
 | "How to maintain an indexed view?" | SQL Server maintains it **automatically** on DML |
+| "DiskANN index metric doesn't match the query metric — what happens?" | **Warning + silent fallback to exact kNN** (it does **not** error). Build one index per metric. |
+| "`TOP_N` in `VECTOR_SEARCH` on a current Azure SQL vector index?" | **Deprecated** — raises Msg 42274. Use `SELECT TOP (N) ... WITH APPROXIMATE` |
+| "`PARTITION FUNCTION ... RANGE RIGHT FOR VALUES ('2025-01-01', '2025-02-01')` — which partition holds `'2025-01-01'`?" | **Partition 2** (RANGE RIGHT puts the boundary value in the **right/newer** partition) |
+| "`JSON_VALUE` returns a JSON object — what do you get?" | **NULL** (no error). Use `JSON_QUERY` for objects/arrays |
+| "RLS: must INSERT also be blocked, not just SELECT filtered?" | Add a **BLOCK AFTER INSERT** predicate alongside the FILTER predicate |
+| "CDC vs Change Tracking — which captures before-image of a row?" | **CDC** (CT captures only PK + operation; you must join to the source table for current values) |
+| "`SqlPackage /Action:Extract` vs `/Publish` — which deploys?" | **Publish** (Extract creates a dacpac **from** an existing DB) |
+| "`WHERE col NOT IN (SELECT ...)` returns zero rows" | The subquery contains a **NULL**. Use `NOT EXISTS` instead |
+| "Snapshot Isolation gives 3960 — what is it?" | **Update conflict** detected by SI (not RCSI). Retry the transaction |
+| "Connection string for passwordless Azure SQL from App Service?" | `Authentication=Active Directory Managed Identity` + `CREATE USER [name] FROM EXTERNAL PROVIDER` in the DB |
+| "`sp_invoke_external_rest_endpoint` response JSON path?" | `$.result.choices[0].message.content` (the proc wraps the API response under `result`) |
+
+## Case-Study Playbook
+
+DP-800 includes interactive case studies — a multi-paragraph scenario with several linked questions. Get this format right and you bank easy points.
+
+- **Read the scenario once, end to end, before opening the first question** — the requirements at the bottom often reframe earlier details
+- **You can jump between questions inside a case study, but you cannot return to the case study after you submit it.** Use the **Review** button inside the case to flag answers
+- **Tabs/exhibits matter** — case studies expose architecture, code, and requirements on separate tabs; you'll lose points by missing a constraint that lives on a different tab
+- **Budget about 25 minutes per case-study block** out of your 120-minute total (the exam is ~50 questions; case study counts as a single block but contains 4–6 sub-questions)
+- **The "best" answer is the one that satisfies every stated constraint** — eliminate options that fail any single requirement before comparing the remainder
+- **If two answers both satisfy the constraints, pick the one with the lowest operational cost / least new infrastructure** — Microsoft consistently rewards the more managed option (e.g., DAB over a custom API, Managed Identity over API keys, CES over polling)
+
+## Time Budget (120 min / ~50 questions)
+
+| Block | Allocation |
+| :--- | :--- |
+| Standalone questions (~45) | ~85 min · ≈ 1:50 per question |
+| Case-study block | ~25 min |
+| Final review of flagged questions | ~10 min |
 
 ## Scoring Strategy
 
