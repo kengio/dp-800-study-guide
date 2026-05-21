@@ -27,6 +27,7 @@ These examples complement the study notes in `certification/` and are particular
 | [rag-patterns.md](./rag-patterns.md) | `sp_invoke_external_rest_endpoint` patterns for RAG: building prompts, calling Azure OpenAI chat completion, parsing responses, and database scoped credential setup |
 | [vector-search-patterns.md](./vector-search-patterns.md) | Vector search and hybrid search queries: VECTOR_DISTANCE, VECTOR_SEARCH with DiskANN, CONTAINSTABLE, and Reciprocal Rank Fusion (RRF) combining both |
 | [security-patterns.md](./security-patterns.md) | Security implementation patterns: Row-Level Security (filter and block predicates), Dynamic Data Masking (all masking functions), and permission management (GRANT/DENY/REVOKE examples) |
+| [rag-end-to-end-walkthrough.md](./rag-end-to-end-walkthrough.md) | **Worked example** — build a complete RAG-based policy Q&A bot in ~80 lines of T-SQL. Walks every Domain 3 testable concept (`CREATE EXTERNAL MODEL`, `VECTOR`, `PREDICT`, vector search with `WITH APPROXIMATE`, `sp_invoke_external_rest_endpoint`, `$.result` JSON envelope) in one place |
 
 ---
 
