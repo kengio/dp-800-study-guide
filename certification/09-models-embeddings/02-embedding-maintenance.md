@@ -290,24 +290,17 @@ This is the most managed option — no code required, built-in retry and monitor
 
 ## Choosing an Approach
 
-```text
-Decision tree:
-
-High write volume (> 1000 rows/min)?
-├── YES → Batch approach: Change Tracking or CDC
-└── NO → Continue...
-
-Fabric SQL Database?
-├── YES → CES (simplest cloud-native option)
-└── NO → Continue...
-
-Real-time latency required (< 30 seconds)?
-├── YES → Azure Functions SQL trigger
-└── NO → Continue...
-
-Prefer no-code/low-code?
-├── YES → Logic Apps or Foundry
-└── NO → Change Tracking with SQL Agent job
+```mermaid
+flowchart TD
+    Start([Source text changes]) --> Vol{"High write volume<br/>> 1000 rows/min?"}
+    Vol -- yes --> Batch["Batch approach:<br/><b>Change Tracking</b> or <b>CDC</b><br/>(decouple writes from embed cost)"]
+    Vol -- no --> Plat{"Platform = SQL Database<br/>in Microsoft Fabric?"}
+    Plat -- yes --> CES["<b>CES</b><br/>(push-based, zero infra)"]
+    Plat -- no --> Lat{"Real-time latency<br/>required (< 30 s)?"}
+    Lat -- yes --> AF["<b>Azure Functions</b><br/>SQL trigger binding"]
+    Lat -- no --> LC{"Prefer no-code /<br/>low-code?"}
+    LC -- yes --> Foundry["<b>Microsoft Foundry</b><br/>(declarative pipeline)<br/>or <b>Logic Apps</b>"]
+    LC -- no --> CT["<b>Change Tracking</b><br/>with SQL Agent job"]
 ```
 
 ---

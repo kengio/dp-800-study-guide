@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Microsoft DP-800 official study guide
+    url: https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-800
+    about: The official skills measured list. This is the source of truth — always check here first.
+  - name: Question about the exam itself (not this guide)
+    url: https://learn.microsoft.com/en-us/answers/products/
+    about: Use Microsoft Q&A for exam policy / scheduling / accommodation questions.
