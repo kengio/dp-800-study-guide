@@ -452,7 +452,7 @@ D. `CREATE ROLE [ReportReader] AS db_datareader`
 
 **Question** *(Easy)*:
 
-A new Azure SQL Database is provisioned. The team asks whether Transparent Data Encryption (TDE) needs to be explicitly enabled to encrypt data at rest. What is the default behaviour?
+A new Azure SQL Database is provisioned. The team asks whether Transparent Data Encryption (TDE) needs to be explicitly enabled to encrypt data at rest. What is the default behavior?
 
 A. TDE must be enabled with `ALTER DATABASE ... SET ENCRYPTION ON`
 B. TDE is enabled **by default** for all new Azure SQL databases — encryption at rest is automatic

@@ -59,7 +59,7 @@ Aligned to the official Microsoft skills-measured list updated **2026-03-12**, a
 
 - **Reclassified `VECTOR_SEARCH`, `VECTOR_NORMALIZE`, `VECTORPROPERTY`** as **public preview** (not GA) on SS2025 / Azure SQL Database / Fabric SQL. Only `VECTOR` and `VECTOR_DISTANCE` are GA. Reflected across overview, final-review, vector-search topic file, and README
 - **DiskANN status** corrected to **public preview** across SQL Server 2025, Azure SQL Database, Azure SQL Managed Instance, and SQL database in Microsoft Fabric (was previously stated as "private preview in Azure SQL")
-- **DiskANN metric-mismatch behaviour** corrected from "raises an error" to "logs a warning and silently falls back to exact kNN" (the more dangerous behaviour) — applied to cheat sheet, final-review, mock exam, and practice question Q16
+- **DiskANN metric-mismatch behavior** corrected from "raises an error" to "logs a warning and silently falls back to exact kNN" (the more dangerous behavior) — applied to cheat sheet, final-review, mock exam, and practice question Q16
 - **Half-precision (`float16`) vector** description corrected: halves storage at the same dimension count; the `VECTOR` type documented cap remains **1 998** dimensions (was incorrectly stated as ~4 000)
 - **`VECTOR_SEARCH` syntax** updated to the current `SELECT TOP (N) ... WITH APPROXIMATE` pattern. The legacy `VECTOR_SEARCH(... TOP_N = n)` TVF marked as deprecated on latest-version indexes (raises Msg 42274)
 - **DiskANN DDL** updated from `CREATE NONCLUSTERED INDEX ... USING DISKANN` to `CREATE VECTOR INDEX ... WITH (METRIC=..., TYPE='diskann')` (the current syntax)

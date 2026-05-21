@@ -22,7 +22,7 @@ SQL Server provides multiple encryption layers: Transparent Data Encryption (TDE
 
 > [!tip] What the Exam Tests
 > - **TDE**: protects at rest (stolen backup/disk); server sees plaintext; zero app changes; on by default in Azure SQL
-> - **Always Encrypted**: server NEVER sees plaintext; CMK client-side in Key Vault; driver handles encrypt/decrypt; app must use Always Encrypted-aware driver
+> - **Always Encrypted**: server NEVER sees plaintext; CMK lives in key store (Azure Key Vault / HSM / Windows cert store), accessed only by the client driver; driver handles encrypt/decrypt; app must use Always Encrypted-aware driver
 > - **Column-level** (`ENCRYPTBYKEY`): manual encrypt/decrypt in app or T-SQL; server sees plaintext; most flexible but most effort
 
 ---

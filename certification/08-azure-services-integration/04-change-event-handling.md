@@ -234,7 +234,7 @@ The SQL trigger binding automatically enables Change Tracking on the target tabl
 
 ## Change Event Streaming (CES) in Microsoft Fabric
 
-CES is a Fabric-native feature for SQL Database in Fabric that streams change events to downstream Fabric workloads (Eventstream, Lakehouse, Warehouse) without any polling or CDC configuration.
+CES is a Fabric-native feature for SQL Database in Fabric that streams change events to downstream Fabric workloads (Eventstream, Lakehouse, or KQL Database / Eventhouse) without any polling or CDC configuration.
 
 ```text
 SQL Database in Fabric → Change Event Streaming → Eventstream → Lakehouse / KQL Database
