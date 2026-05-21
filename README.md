@@ -45,6 +45,9 @@ tags:
 > [!NOTE]
 > **I used this guide to pass DP-800.** ✅ These are the exact notes, cheat sheets, practice questions, and mock exams I built while preparing — refined while studying, hardened on the actual exam, and now open-sourced under MIT so you can pass too. Every section is mapped 1:1 to the official Microsoft skills-measured list. If it helped you, ⭐ the repo and pass it on.
 
+> [!TIP]
+> **▶ [Try the practice quiz live](https://kengio.github.io/dp-800-study-guide/)** — adaptive multiple-choice quiz, **160 questions across 3 banks** (60 practice + 50 Mock 1 + 50 Mock 2, including the 5-question case-study block). Runs in your browser, progress saved locally. No install, no signup. Light/dark/auto theme + exam timer (70 min mock / 120 min real exam).
+
 ---
 
 ## Contents
@@ -205,8 +208,8 @@ No problem. The guide also renders perfectly in:
 1. **Start at the [main overview](./certification/dp-800-overview.md)** — it has the full study path and a progress tracker.
 2. **Work through the 11 topic sections in order** — each topic file is 300–600 lines with examples, comparison tables, common-mistake callouts, and exam tips.
 3. **Hit the [cheat sheets](./certification/resources/cheat-sheets/cheat-sheets.md)** after each domain to consolidate.
-4. **Take the [practice questions](./certification/resources/practice-questions/practice-questions.md)** — aim for 70 %+ per domain before moving on.
-5. **Sit the two [mock exams](./certification/resources/mock-exam/mock-exam-1.md) under timed conditions** when you think you're close.
+4. **Take the [practice questions](./certification/resources/practice-questions/practice-questions.md)** — aim for 70 %+ per domain before moving on. Or drill them adaptively in the **[live practice quiz](https://kengio.github.io/dp-800-study-guide/)** which surfaces what you've recently missed.
+5. **Sit the two [mock exams](./certification/resources/mock-exam/mock-exam-1.md) under timed conditions** when you think you're close — both are available as bank options in the [live quiz](https://kengio.github.io/dp-800-study-guide/) with a 70-minute timer.
 6. **Read [`final-review.md`](./certification/resources/final-review.md) the morning of the exam** — it's the 20-minute scan.
 
 ## Study roadmap

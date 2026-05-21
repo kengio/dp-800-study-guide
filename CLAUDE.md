@@ -23,6 +23,7 @@ dp-800-study-guide/
 │   ├── 11-rag/                 # Retrieval-augmented generation
 │   └── resources/              # Practice questions, mock exams, exam tips, code examples, appendix, cheat sheets
 ├── i18n/                       # Community translations — parallel tree per locale, see TRANSLATING.md
+├── practice/                   # Static adaptive practice quiz — HTML/JS/CSS + Python build.py + JSON banks
 ```
 
 Each topic folder contains a named index file (e.g., `database-objects.md`, `advanced-tsql.md`) and numbered `.md` topic files.
@@ -35,6 +36,16 @@ Top-level files:
 - `CONTRIBUTING.md` / `CONTRIBUTORS.md` / `CHANGELOG.md` — public-facing community files.
 - `TRANSLATING.md` — translation conventions: BCP-47 locale codes, `i18n/<locale>/` mirror layout, priority order, currency policy. Translations must not alter English source files.
 - `OBSIDIAN-SETUP.md` — optional setup notes for editing the guide in Obsidian.
+
+## Practice Quiz (`practice/`)
+
+A static browser-based quiz live at <https://kengio.github.io/dp-800-study-guide/>. Auto-deployed by `.github/workflows/deploy-practice.yml` on any push that touches `practice/**` or the source markdown.
+
+- **Source of truth is markdown.** `practice/build.py` parses `certification/resources/practice-questions/*.md` and both `mock-exam/questions.md` + `mock-exam-2/questions.md` into `practice/data/*.json`. The deploy workflow re-runs `build.py` on every deploy, so the live site always reflects current markdown even if the committed JSON is stale.
+- **Edit markdown, not JSON.** New questions, fixes, and renumbering go in the source `.md` files; the JSON in `practice/data/` is generated. Run `python3 practice/build.py` locally to refresh before committing.
+- **Question format** — see [`practice/format.md`](./practice/format.md). The parser supports three heading formats, accepts `A.` or `A)` choices, and recognises both `**B. <choice>**` and `**Correct Answer: B**` styles inside the `> [!success]-` callout. Mock-exam domains are demarcated by `<!-- DOMAIN N: <name> (~M questions) -->` HTML comments; case-study sub-questions use `###` H3 headings under a `## Case Study: ...` H2.
+- **Question `id` is stable across rebuilds.** Don't renumber questions inside a `.md` file without intent — it breaks learners' localStorage progress.
+- **Same UX as the upstream Databricks study guide.** `index.html` + `app.js` + `styles.css` + `favicon.svg` were ported verbatim; only branding strings, the `CERTS` list, the `dp800-practice-` storage prefix, and the timer presets were swapped.
 
 ## Currency Policy
 

@@ -14,7 +14,7 @@ Thanks for being here. This guide exists because someone open-sourced their exam
 | :--- | :--- |
 | **Typo / link rot fix** | Open a PR directly. No issue needed. |
 | **Factual correction** | Open a PR. Cite the Microsoft Learn page in the description. |
-| **New practice question** | Open a PR adding it under the matching domain in `certification/resources/practice-questions/`. Follow the existing format (see [conventions](#conventions) below). |
+| **New practice question** | Open a PR adding it under the matching domain in `certification/resources/practice-questions/` (or, for the timed-exam-feel version, in `certification/resources/mock-exam/questions.md` / `mock-exam-2/questions.md`). Follow the existing format (see [conventions](#conventions) below). The [live practice quiz](https://kengio.github.io/dp-800-study-guide/) re-deploys automatically on merge — see [`practice/format.md`](./practice/format.md) for the exact markdown contract the converter expects. |
 | **Topic-file expansion** | Open an issue first to align scope, then PR. |
 | **New cheat sheet or worked example** | Open an issue first — these are higher-effort additions and we want to keep the set focused. |
 | **Blueprint refresh** | When Microsoft updates the skills-measured page, follow the [Currency Policy](#currency-policy) below. |
