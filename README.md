@@ -304,8 +304,8 @@ This guide ships as a living resource. The roadmap below is what's planned for t
 - ⏳ **Half-precision vector GA** content updates
 - ⏳ **Updated mock exams** following any Microsoft blueprint refresh
 - ⏳ **Community contributor list** in CONTRIBUTORS.md
-- ⏳ **Spaced-repetition deck (Anki)** generated from cheat-sheet facts
-- ⏳ **Translation scaffolding** so non-English learners can fork and translate
+- ✅ **Spaced-repetition deck (Anki)** generated from cheat-sheet facts — see [`certification/resources/anki/`](./certification/resources/anki/anki-deck.md) (130 cards across 6 cheat sheets)
+- ✅ **Translation scaffolding** so non-English learners can fork and translate — see [`TRANSLATING.md`](./TRANSLATING.md)
 
 ### Q1 2027 (6–12 months out)
 
