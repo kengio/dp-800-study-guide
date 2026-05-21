@@ -425,6 +425,14 @@ dp-800-study-guide/
 
 </details>
 
+## Translations
+
+The English content under `certification/` is canonical. Community translations live in `i18n/<locale>/` as parallel trees and don't alter the English source.
+
+- **Available locales** — see [`i18n/README.md`](./i18n/README.md) (none yet — be the first!)
+- **How to translate** — read [`TRANSLATING.md`](./TRANSLATING.md) for BCP-47 locale codes, layout, priority order, and the currency policy
+- **Coordinate first** — open an issue titled `i18n: <locale name>` so two people don't start the same locale in parallel
+
 ## Contributing
 
 Found an error, a stale link, or a topic that needs deeper coverage? PRs are welcome.

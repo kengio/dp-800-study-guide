@@ -9,6 +9,7 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/). 
 ### Added
 
 - **Anki deck** (`certification/resources/anki/dp-800.tsv`) — ~130 spaced-repetition cards generated from the 6 cheat sheets, with tag-based filtering and an import-instructions readme
+- **Translation scaffolding** — `TRANSLATING.md` (translator guide: BCP-47 locale codes, `i18n/<locale>/` mirror layout, suggested priority order, currency policy, quality bar) and `i18n/README.md` (locale index, no locales yet). New `## Translations` section in `README.md` linking to both; `CONTRIBUTING.md` and `CLAUDE.md` updated to document the convention
 
 ## [1.0.0] — 2026-05-21 — Initial tagged release
 

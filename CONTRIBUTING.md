@@ -18,7 +18,7 @@ Thanks for being here. This guide exists because someone open-sourced their exam
 | **Topic-file expansion** | Open an issue first to align scope, then PR. |
 | **New cheat sheet or worked example** | Open an issue first — these are higher-effort additions and we want to keep the set focused. |
 | **Blueprint refresh** | When Microsoft updates the skills-measured page, follow the [Currency Policy](#currency-policy) below. |
-| **Translation** | Awesome — open an issue to coordinate (we don't want two people starting the same translation). |
+| **Translation** | Read [`TRANSLATING.md`](./TRANSLATING.md) for the layout (`i18n/<locale>/` mirror), priority order, and conventions. Open an issue titled `i18n: <locale name>` first to coordinate. |
 
 ## How to contribute
 

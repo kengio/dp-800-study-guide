@@ -22,6 +22,7 @@ dp-800-study-guide/
 │   ├── 10-intelligent-search/  # Full-text, vector, and hybrid search
 │   ├── 11-rag/                 # Retrieval-augmented generation
 │   └── resources/              # Practice questions, mock exams, exam tips, code examples, appendix, cheat sheets
+├── i18n/                       # Community translations — parallel tree per locale, see TRANSLATING.md
 ```
 
 Each topic folder contains a named index file (e.g., `database-objects.md`, `advanced-tsql.md`) and numbered `.md` topic files.
@@ -31,6 +32,8 @@ Top-level files:
 - `README.md` — public-facing entry point with badges, exam overview, and quick navigation. Rewrite when the blueprint date or major features change.
 - `LICENSE` — MIT.
 - `CLAUDE.md` — this file. Project conventions for AI assistants and contributors.
+- `CONTRIBUTING.md` / `CONTRIBUTORS.md` / `CHANGELOG.md` — public-facing community files.
+- `TRANSLATING.md` — translation conventions: BCP-47 locale codes, `i18n/<locale>/` mirror layout, priority order, currency policy. Translations must not alter English source files.
 - `OBSIDIAN-SETUP.md` — optional setup notes for editing the guide in Obsidian.
 
 ## Currency Policy
