@@ -15,11 +15,13 @@ tags:
 Stored procedures are precompiled T-SQL batches stored in the database. They support parameters (input, output, table-valued), error handling, transaction control, and security context switching.
 
 > [!abstract]
+>
 > - Covers stored procedure creation, parameters (INPUT/OUTPUT), dynamic SQL, error handling, and execution context
 > - Stored procedures encapsulate logic, support plan reuse, and can use EXECUTE AS for security context
 > - Key exam topics: sp_executesql vs EXEC for dynamic SQL, TRY/CATCH with XACT_STATE, OUTPUT parameters
 
 > [!tip] What the Exam Tests
+>
 > - `sp_executesql` is parameterized (prevents SQL injection + enables plan reuse); `EXEC(@sql)` is not parameterized
 > - OUTPUT parameters pass values back to the caller; declared with `@param datatype OUTPUT` in both definition and call
 > - In a CATCH block: `XACT_STATE() = -1` means the transaction is uncommittable — you MUST ROLLBACK before doing anything else
@@ -329,6 +331,7 @@ OPTION(OPTIMIZE FOR (@CustomerID UNKNOWN));
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - `THROW` re-raises errors with full fidelity; `RAISERROR` is the older alternative
 > - `SCOPE_IDENTITY()` returns the last identity inserted in the **current scope** (safer than `@@IDENTITY`)
 > - Table-valued parameters must be declared `READONLY` in the procedure signature

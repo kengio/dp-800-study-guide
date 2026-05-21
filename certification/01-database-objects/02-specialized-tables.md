@@ -17,11 +17,13 @@ tags:
 SQL Server and Azure SQL support several specialized table types for specific scenarios: in-memory OLTP tables for high throughput, temporal tables for historical queries, external tables for accessing remote data, ledger tables for tamper-evident auditing, and graph tables for relationship data.
 
 > [!abstract]
+>
 > - Covers temporal tables (system-versioned history), ledger tables (tamper-evident), and memory-optimized tables
 > - Each has distinct syntax and distinct exam scenarios
 > - Key exam topics: temporal query syntax, ledger append-only behavior, memory-optimized DURABILITY options
 
 > [!tip] What the Exam Tests
+>
 > - `FOR SYSTEM_TIME AS OF 'datetime'` is the correct temporal point-in-time syntax — not a WHERE clause on SysStartTime
 > - Ledger tables are **append-only** — no UPDATE or DELETE; `GENERATED ALWAYS AS ROW START/END` columns are system-managed
 > - Memory-optimized `DURABILITY = SCHEMA_ONLY` means data is lost on restart; `SCHEMA_AND_DATA` survives
@@ -309,6 +311,7 @@ See [04-Graph Queries](../03-advanced-tsql/04-graph-queries.md) for advanced MAT
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - **Temporal** tables need two `datetime2` columns with `PERIOD FOR SYSTEM_TIME` — the database tracks them automatically
 > - **In-memory** tables require a `MEMORY_OPTIMIZED_DATA` filegroup first
 > - **`CONTAINED IN`** vs **`FROM...TO`**: `CONTAINED IN` requires both ValidFrom and ValidTo to be within the window; `FROM...TO` only requires overlap

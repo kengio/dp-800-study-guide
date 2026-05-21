@@ -16,11 +16,13 @@ tags:
 Triggers are stored procedures that execute automatically in response to DML (INSERT, UPDATE, DELETE) or DDL (CREATE, ALTER, DROP) events. They are used for auditing, enforcing complex business rules, and maintaining derived data.
 
 > [!abstract]
+>
 > - Covers DML triggers (AFTER, INSTEAD OF), DDL triggers, INSERTED/DELETED virtual tables
 > - Triggers fire automatically in response to data or schema changes
 > - Key exam topics: AFTER vs INSTEAD OF behavior, INSERTED/DELETED table contents in UPDATE, DDL trigger scope
 
 > [!tip] What the Exam Tests
+>
 > - `AFTER` trigger fires **after** the DML statement succeeds; `INSTEAD OF` fires **in place of** the DML (statement does not execute automatically)
 > - In an UPDATE trigger: `INSERTED` contains **new** values; `DELETED` contains **old** (pre-update) values — both virtual tables are populated
 > - `INSTEAD OF` triggers on views enable updates to non-updatable views (e.g., views joining multiple tables)
@@ -316,6 +318,7 @@ WHERE object_id = OBJECT_ID('trg_Orders_Audit');
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - AFTER triggers fire **after constraints** — if a constraint fails, the trigger doesn't run
 > - INSTEAD OF triggers fire **before constraints** — and replace the DML
 > - `EVENTDATA()` returns an XML document with details about DDL events

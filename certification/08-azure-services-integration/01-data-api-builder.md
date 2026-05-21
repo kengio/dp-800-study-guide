@@ -18,11 +18,13 @@ tags:
 DAB supports Azure SQL, SQL Server, Azure Cosmos DB, and MySQL/PostgreSQL, and can be deployed as a container or hosted in Azure Static Web Apps or Azure App Service.
 
 > [!abstract]
+>
 > - Covers Data API Builder (DAB): what it is, config file structure, entity mapping, and permissions
 > - DAB generates REST and GraphQL endpoints from a config file — no custom controller code required
 > - Key exam topics: DAB config structure, entity-to-DB-object mapping, REST vs GraphQL endpoint paths, permission roles
 
 > [!tip] What the Exam Tests
+>
 > - DAB requires **zero custom code** — the config file maps database entities to REST/GraphQL endpoints
 > - REST path: `/api/{EntityName}/{pk}`; GraphQL endpoint: `/graphql` (single endpoint, all operations)
 > - Permissions in DAB: `anonymous` (unauthenticated), `authenticated` (any signed-in user), named roles (custom)
@@ -123,6 +125,7 @@ DAB supports a single primary data source per runtime instance:
 The connection string should **never** be hardcoded — use `@env('VAR_NAME')` to reference environment variables or Azure Key Vault references.
 
 For SQL Database in Fabric (or Azure SQL), use a connection string like:
+
 ```text
 Server=myserver.database.windows.net;Database=MyDB;Authentication=Active Directory Default;
 ```
@@ -232,6 +235,7 @@ DAB can express relationships between entities for GraphQL nested queries:
 ```
 
 This enables GraphQL queries like:
+
 ```graphql
 query {
   orders {
@@ -270,6 +274,7 @@ DAB supports cursor-based pagination automatically. REST responses include a `ne
 ```
 
 REST pagination:
+
 ```text
 GET /api/Order?$first=20           → first 20 rows
 GET /api/Order?$first=20&$after=eyJ... → next page using cursor
@@ -404,6 +409,7 @@ az containerapp create \
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - DAB config uses `@env('VAR_NAME')` for connection strings — never hardcode credentials
 > - Entities map to tables, views, or stored procedures — the `type` field controls this
 > - REST methods are configured per-entity; stored procedures default to `post` for mutations

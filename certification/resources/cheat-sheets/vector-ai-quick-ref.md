@@ -15,6 +15,7 @@ tags:
 VECTOR type, distance functions, DiskANN indexing, full-text search, hybrid search, and RAG patterns for Azure SQL Database.
 
 > [!abstract] Quick Reference
+>
 > - VECTOR data type, distance functions (cosine, dot, euclidean), and DiskANN indexing
 > - Full-text search, hybrid search with RRF, embedding generation, and end-to-end RAG pattern
 > - Use when practicing AI-capability questions from Domain 3 (25-30% of exam)

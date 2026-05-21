@@ -15,11 +15,13 @@ tags:
 Hybrid search combines full-text search (keyword matching) with vector search (semantic similarity) to produce better results than either alone. The challenge is merging two ranked lists with different scoring scales. **Reciprocal Rank Fusion (RRF)** is the standard algorithm for combining ranked lists without needing to normalize scores — it uses only the rank position, not the score values.
 
 > [!abstract]
+>
 > - Covers hybrid search: combining full-text and vector search results using Reciprocal Rank Fusion (RRF)
 > - Hybrid search improves over either method alone by capturing both keyword precision and semantic recall
 > - Key exam topics: RRF formula, k parameter, how to combine result sets, when hybrid outperforms single-method
 
 > [!tip] What the Exam Tests
+>
 > - **RRF formula**: `score = Σ 1/(k + rank)` for each result set; `k = 60` default; higher score = more relevant
 > - RRF is a **rank-combination algorithm** — it combines the ranks of results from multiple sources, not their raw scores
 > - Hybrid search outperforms single-method when queries mix exact keywords and semantic meaning
@@ -43,7 +45,7 @@ Hybrid search combines full-text search (keyword matching) with vector search (s
 
 RRF combines ranked lists by assigning each document a score based on its rank in each list:
 
-```
+```text
 RRF_score(doc) = Σ  1 / (k + rank_in_list_i)
 ```
 
@@ -193,7 +195,7 @@ ORDER BY r.RRFScore DESC;
 
 Recall measures how many relevant items are returned out of all relevant items that exist:
 
-```
+```text
 Recall@K = |Relevant items in top K| / |Total relevant items|
 ```
 
@@ -204,7 +206,7 @@ Recall@K = |Relevant items in top K| / |Total relevant items|
 
 Precision measures how many returned items are actually relevant:
 
-```
+```text
 Precision@K = |Relevant items in top K| / K
 ```
 
@@ -213,7 +215,7 @@ Precision@K = |Relevant items in top K| / K
 
 ### Mean Reciprocal Rank (MRR)
 
-```
+```text
 MRR = (1/|Q|) × Σ (1 / rank_of_first_relevant_result)
 ```
 
@@ -301,6 +303,7 @@ Larger k → more uniform distribution across ranks
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - RRF uses **ranks**, not raw scores — this makes it scale-invariant and robust to different scoring systems
 > - `k=60` is the standard RRF constant; lower k weights top ranks more heavily
 > - `FULL OUTER JOIN` is essential — a document may appear in only one of the two result sets

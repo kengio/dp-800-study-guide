@@ -16,11 +16,13 @@ tags:
 The DP-800 exam covers enabling GitHub Copilot and Copilot in Fabric, configuring model and Model Context Protocol (MCP) tool options, and creating Copilot instruction files to provide project-specific context.
 
 > [!abstract]
+>
 > - Covers GitHub Copilot features for database development: inline suggestions, Copilot Chat, slash commands
 > - Copilot suggests; it does not execute — all suggestions require human review
 > - Key exam topics: Copilot Chat slash commands (/explain, /fix, /doc), inline completion behavior, Azure SQL setup
 
 > [!tip] What the Exam Tests
+>
 > - Copilot provides **suggestions only** — it cannot run SQL or make changes without explicit developer action
 > - Slash commands: `/explain` = explain selected code; `/fix` = suggest a fix; `/doc` = generate documentation; `/tests` = generate tests
 > - Copilot for Azure SQL in SSMS/VS Code requires the GitHub Copilot extension + appropriate license
@@ -386,6 +388,7 @@ AI models often generate the unsafe pattern. Always replace direct concatenation
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - **Instruction files** are at `.github/copilot-instructions.md` — know the exact location
 > - Model selection is available in Copilot Chat — not the inline completion
 > - MCP tool configuration can be scoped: session-level vs persistent (`.vscode/mcp.json`)

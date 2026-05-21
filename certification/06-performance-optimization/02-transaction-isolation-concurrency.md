@@ -18,11 +18,13 @@ tags:
 Transaction isolation levels control how concurrent transactions see each other's changes. Choosing the right level balances data consistency against concurrency and blocking.
 
 > [!abstract]
+>
 > - Covers all six isolation levels, optimistic vs pessimistic concurrency, blocking, and deadlocks
 > - Isolation level determines what data a transaction can see and what locks it takes
 > - Key exam topics: SNAPSHOT vs RCSI distinction, which isolation level prevents which anomaly, deadlock detection
 
 > [!tip] What the Exam Tests
+>
 > - **SNAPSHOT** = application sets per-transaction; `SET TRANSACTION ISOLATION LEVEL SNAPSHOT`; requires `ALLOW_SNAPSHOT_ISOLATION ON`
 > - **RCSI** = database setting; changes default READ COMMITTED to row-versioning; `ALTER DATABASE db SET READ_COMMITTED_SNAPSHOT ON`
 > - Isolation anomalies (cumulative): dirty reads possible at READ UNCOMMITTED; non-repeatable reads persist through READ COMMITTED; phantom reads persist through REPEATABLE READ; SERIALIZABLE and SNAPSHOT prevent all three
@@ -335,6 +337,7 @@ CROSS APPLY XmlData.nodes('//RingBufferTarget/event[@name="xml_deadlock_report"]
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - **RCSI** is enabled at the database level and affects all `READ COMMITTED` queries automatically — no application change needed
 > - **Snapshot Isolation** requires `SET TRANSACTION ISOLATION LEVEL SNAPSHOT` in the application
 > - Deadlocks (error 1205) require a retry mechanism — SQL Server automatically chooses the victim

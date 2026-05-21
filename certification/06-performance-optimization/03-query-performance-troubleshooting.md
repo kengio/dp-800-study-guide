@@ -16,11 +16,13 @@ tags:
 SQL Server provides several tools for diagnosing query performance: execution plans (estimated and actual), Dynamic Management Views (DMVs), Query Store for plan history, and Query Performance Insight in Azure SQL.
 
 > [!abstract]
+>
 > - Covers execution plan analysis, Query Store usage, DMV-based diagnostics, and index tuning
 > - Performance troubleshooting follows a systematic path: identify → diagnose → fix → verify
 > - Key exam topics: Query Store views and forcing plans, key DMV names, index scan vs seek, blocking identification
 
 > [!tip] What the Exam Tests
+>
 > - **Query Store**: `sys.query_store_query`, `sys.query_store_plan`, `sys.query_store_runtime_stats`; force plan = `sp_query_store_force_plan`; plans survive restarts
 > - **Index seek vs scan**: seek = uses index to go directly to rows (efficient); scan = reads all index pages (expensive on large tables)
 > - Blocking: `sys.dm_exec_requests` (blocked_by column) + `sys.dm_os_waiting_tasks` (wait_type, blocking_session_id)
@@ -383,6 +385,7 @@ EXEC sp_updatestats;
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - **Key Lookup** = missing INCLUDE columns in non-clustered index (adds a second lookup to clustered index)
 > - Query Store `FORCE_LAST_GOOD_PLAN` is an automatic tuning feature; manual `sp_query_store_force_plan` is manual
 > - `sys.dm_db_missing_index_details` provides index recommendations — not always accurate, use as a hint

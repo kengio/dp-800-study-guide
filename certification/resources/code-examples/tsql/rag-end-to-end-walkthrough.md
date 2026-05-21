@@ -15,6 +15,7 @@ tags:
 A complete RAG (Retrieval-Augmented Generation) pipeline built entirely inside Azure SQL Database. Read this once and every Domain 3 question on the exam will feel familiar.
 
 > [!abstract]
+>
 > - Demonstrates the full RAG flow in one place: **chunk → embed → store → retrieve → augment prompt → call LLM → parse → return**
 > - Touches every Domain 3 testable concept: `CREATE EXTERNAL MODEL`, `PREDICT`, `VECTOR(n)`, `VECTOR_DISTANCE` / `WITH APPROXIMATE`, `sp_invoke_external_rest_endpoint`, `DATABASE SCOPED CREDENTIAL`, `JSON_OBJECT` / `JSON_VALUE`
 > - Scenario: a Q&A bot grounded on company policy documents

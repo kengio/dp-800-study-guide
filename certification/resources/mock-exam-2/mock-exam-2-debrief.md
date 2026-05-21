@@ -11,11 +11,13 @@ tags:
 # Mock Exam 2 — Debrief
 
 > [!abstract]
+>
 > - Use this **after** completing Mock Exam 2 and checking your answers
 > - Every question maps to a topic file + cheat sheet + key concept
 > - The "If you missed N+ in domain X" section at the bottom turns your score into a study plan
 
 > [!tip] How to use this debrief
+>
 > 1. List the question numbers you got wrong
 > 2. For each, look up the row below — re-read the topic file and the cheat-sheet section it points to
 > 3. If you missed **3 or more questions in the same domain**, jump to the **Study Plan** section

@@ -14,6 +14,7 @@ tags:
 T-SQL patterns for vector storage, similarity search, DiskANN indexing, and hybrid search with Reciprocal Rank Fusion (RRF). Relevant to DP-800 Domain 3 (AI capabilities).
 
 > [!abstract] What You'll Learn
+>
 > - VECTOR data type storage and metadata functions (VECTOR_NORMALIZE, VECTORPROPERTY)
 > - VECTOR_DISTANCE with cosine, dot product, and euclidean metrics
 > - Approximate nearest neighbor search with DiskANN indexes and VECTOR_SEARCH

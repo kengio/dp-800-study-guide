@@ -16,11 +16,13 @@ tags:
 SQL Server graph tables store node and edge data using special columns (`$node_id`, `$from_id`, `$to_id`) and support graph traversal with the `MATCH` predicate — enabling relationship queries without recursive CTEs.
 
 > [!abstract]
+>
 > - Covers graph database objects (NODE tables, EDGE tables) and graph query syntax (MATCH, SHORTEST_PATH)
 > - SQL graph tables are regular SQL tables with special system-generated columns for graph traversal
 > - Key exam topics: NODE vs EDGE table creation, MATCH clause syntax, when graph outperforms relational (hierarchies)
 
 > [!tip] What the Exam Tests
+>
 > - `CREATE TABLE … AS NODE` and `CREATE TABLE … AS EDGE` — EDGE tables reference NODE tables
 > - `MATCH (Person)-[Knows]->(Person)` syntax is required for graph traversal — you cannot use regular JOINs for graph patterns
 > - `SHORTEST_PATH` inside a `MATCH` clause finds the shortest path between two nodes in a connected graph
@@ -55,6 +57,7 @@ CREATE TABLE dbo.Visited (
 ```
 
 **System columns:**
+
 - Node tables: `$node_id` (unique node identifier, JSON format internally)
 - Edge tables: `$edge_id`, `$from_id` (source node), `$to_id` (target node)
 
@@ -259,6 +262,7 @@ CREATE INDEX IX_Person_Name ON Person(Name);
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - `MATCH` can only be used with graph tables (defined `AS NODE` or `AS EDGE`)
 > - Arrow direction in `MATCH` corresponds to `$from_id` → `$to_id` in the edge table
 > - `SHORTEST_PATH` requires the `FOR PATH` keyword on edge and node aliases

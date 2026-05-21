@@ -17,11 +17,13 @@ tags:
 SQL Server uses a layered permission system: server-level logins, database-level users, roles, and object-level GRANT/DENY/REVOKE. Azure SQL extends this with Azure Active Directory authentication and Managed Identity for passwordless access.
 
 > [!abstract]
+>
 > - Covers GRANT/DENY/REVOKE, database roles, ownership chaining, and EXECUTE AS context
 > - SQL Server uses a hierarchical permission system: server → database → schema → object
 > - Key exam topics: DENY/GRANT precedence, fixed database roles, ownership chaining behavior
 
 > [!tip] What the Exam Tests
+>
 > - **DENY always wins** over GRANT — even if a GRANT came through role membership, an explicit DENY on the principal blocks access
 > - **REVOKE** removes a previously granted or denied permission — it does NOT itself deny access
 > - Fixed roles: `db_datareader` = SELECT on all tables; `db_datawriter` = INSERT/UPDATE/DELETE; `db_owner` = full control; `db_ddladmin` = DDL only
@@ -306,6 +308,7 @@ CREATE PROCEDURE dbo.sp_GetHRData AS SELECT * FROM hr.Employees;
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - `DENY` always wins — it overrides GRANT even when inherited through a role
 > - Managed Identity authentication uses `FROM EXTERNAL PROVIDER` syntax in SQL
 > - Always use **Managed Identity** over connection string credentials for Azure services

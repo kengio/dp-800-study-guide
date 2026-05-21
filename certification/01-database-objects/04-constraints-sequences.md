@@ -16,11 +16,13 @@ tags:
 Constraints enforce data integrity at the database level. SQL Server supports PRIMARY KEY, FOREIGN KEY, UNIQUE, CHECK, and DEFAULT constraints. SEQUENCES provide database-wide, shareable, non-identity number generators.
 
 > [!abstract]
+>
 > - Covers PRIMARY KEY, FOREIGN KEY, CHECK, DEFAULT, UNIQUE constraints, and SEQUENCE objects
 > - Constraints enforce data integrity at the database level; sequences provide independent number generation
 > - Key exam topics: SEQUENCE vs IDENTITY, constraint types and enforcement timing
 
 > [!tip] What the Exam Tests
+>
 > - `SEQUENCE` is **independent of any table** — can be shared across tables, cycled, and reset with `ALTER SEQUENCE`
 > - `IDENTITY` is **column-bound** — cannot be shared, cannot be reset cleanly without DBCC, increments only upward
 > - `CHECK` constraints can reference multiple columns in the same row; `FOREIGN KEY` enforces referential integrity across tables
@@ -327,6 +329,7 @@ WHERE NationalID IS NOT NULL;
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - `PRIMARY KEY` creates a clustered index by default — can be overridden with `NONCLUSTERED`
 > - `UNIQUE` allows one NULL value per column; a filtered unique index can exclude NULLs entirely
 > - `CHECK` constraints added with `WITH NOCHECK` are marked `is_not_trusted = 1` — the optimizer ignores them for plan simplification

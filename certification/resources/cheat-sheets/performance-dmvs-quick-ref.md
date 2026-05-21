@@ -14,6 +14,7 @@ tags:
 Key **Dynamic Management Views** (DMVs), diagnostic queries, and performance tuning patterns for Azure SQL Database.
 
 > [!abstract] Quick Reference
+>
 > - DMV reference table for query stats, waits, indexes, locking, and Azure SQL resource usage
 > - Copy-paste diagnostic queries for top CPU, I/O, blocking, and missing indexes
 > - Use when practicing performance tuning scenarios or memorizing key DMV names

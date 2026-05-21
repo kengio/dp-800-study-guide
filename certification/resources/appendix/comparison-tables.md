@@ -13,6 +13,7 @@ Quick-reference comparison tables for the DP-800 exam, organized by topic catego
 Each table includes an exam tip callout highlighting the decision pattern most likely to appear in DP-800 questions. Focus on the **distinguishing rows** — the features that differ between options, not the ones they share.
 
 > [!abstract] TL;DR
+>
 > - 17 side-by-side comparison tables organized into 7 categories aligned to exam domains
 > - Each table highlights the key distinguishing feature with ==highlight== markers
 > - Scroll to the Quick Decision Matrix at the bottom for rapid keyword-to-answer lookup

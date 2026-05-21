@@ -13,6 +13,7 @@ tags:
 Common JSON patterns for Azure SQL and Fabric SQL — covering construction, parsing, scalar functions, indexing, and SQL Server 2022+ construction functions.
 
 > [!abstract] What You'll Learn
+>
 > - FOR JSON PATH/AUTO for constructing JSON output from query results
 > - OPENJSON with default and typed schemas for parsing JSON input
 > - JSON_VALUE, JSON_QUERY, JSON_MODIFY, and ISJSON scalar functions

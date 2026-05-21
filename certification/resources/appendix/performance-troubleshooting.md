@@ -12,6 +12,7 @@ tags:
 A systematic reference for diagnosing and resolving SQL Server and Azure SQL performance issues.
 
 > [!abstract] TL;DR
+>
 > - Follow the 7-step diagnosis workflow to systematically narrow down performance problems
 > - Key DMV reference table and ready-to-run diagnostic queries for each category
 > - Focus on wait stats analysis, execution plan warnings, and blocking chain resolution — these dominate performance questions on the exam

@@ -16,11 +16,13 @@ tags:
 Common Table Expressions (CTEs) provide named temporary result sets for readable, reusable queries. Window functions perform calculations across sets of rows related to the current row — without collapsing results like GROUP BY does.
 
 > [!abstract]
+>
 > - Covers CTEs (non-recursive and recursive), window functions (ROW_NUMBER, RANK, DENSE_RANK, LAG, LEAD, SUM OVER), and frame clauses
 > - CTEs improve readability; recursive CTEs traverse hierarchies; window functions compute across related rows without collapsing them
 > - Key exam topics: tie-breaking behavior of ranking functions, recursive CTE structure, ROWS vs RANGE frame
 
 > [!tip] What the Exam Tests
+>
 > - Tie behavior: `ROW_NUMBER` = unique (arbitrary tiebreak); `RANK` = gaps after tie (1,1,3); `DENSE_RANK` = no gaps (1,1,2)
 > - Recursive CTE: **anchor member** (runs once) `UNION ALL` **recursive member** (runs until no rows). Default limit is 100; use `OPTION (MAXRECURSION n)` to override (0 = unlimited, use with caution)
 > - `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` = running total; `RANGE` uses logical range (can include ties)
@@ -348,6 +350,7 @@ SELECT * FROM Ranked WHERE dr <= 3;
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - `RANK()` leaves gaps after ties; `DENSE_RANK()` does not; `ROW_NUMBER()` has no ties
 > - Default window frame is `RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` — be explicit with `ROWS`
 > - Recursive CTEs need both an anchor member and a recursive member joined with `UNION ALL`

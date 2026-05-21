@@ -13,6 +13,7 @@ tags:
 Reusable T-SQL window function patterns for Azure SQL Database and Microsoft Fabric SQL analytics workloads.
 
 > [!abstract] What You'll Learn
+>
 > - Ranking functions: ROW_NUMBER, RANK, DENSE_RANK, NTILE
 > - Aggregate window functions with running totals, moving averages, and contribution percentages
 > - ROWS vs RANGE frame clauses and their behavioral differences
@@ -420,8 +421,8 @@ WHERE rn > 1;  -- these are the duplicates that would be deleted
 
 | CustomerID | Email | FullName | CreatedDate | rn |
 |---|---|---|---|---|
-| 7 | alice@co.com | Alice Smith | 2025-01-15 | 2 |
-| 3 | alice@co.com | Alice S. | 2024-06-01 | 3 |
+| 7 | <alice@co.com> | Alice Smith | 2025-01-15 | 2 |
+| 3 | <alice@co.com> | Alice S. | 2024-06-01 | 3 |
 
 ```sql
 -- Step 2: DELETE duplicate rows (keep rn = 1 only)

@@ -16,11 +16,13 @@ tags:
 Using AI-assisted development tools (GitHub Copilot, Copilot in Fabric) introduces new security considerations: what data is sent to the model, what code suggestions might be generated, and how to prevent prompt injection and credential exposure.
 
 > [!abstract]
+>
 > - Covers AI security threats relevant to database development: prompt injection, data exposure, and AI-generated code risks
 > - AI tools introduce new attack surfaces that did not exist in traditional development
 > - Key exam topics: prompt injection definition, safe use of AI-generated SQL, data exposure risk categories
 
 > [!tip] What the Exam Tests
+>
 > - **Prompt injection**: an attacker embeds instructions in user input that manipulate the AI's behavior or extract data
 > - AI-generated SQL should always be **reviewed before execution** — never auto-execute against production
 > - Sending sensitive data to external AI models (PII, financial records) creates data **residency and compliance risks**
@@ -365,6 +367,7 @@ GO
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - The exam tests your ability to **identify** security risks, not just implement features
 > - Key risk categories: data exposure, credential leakage, prompt injection, insecure code generation
 > - **Managed Identity** is the recommended approach for passwordless service authentication

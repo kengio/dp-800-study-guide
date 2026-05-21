@@ -16,11 +16,13 @@ tags:
 T-SQL functions encapsulate reusable logic. SQL Server supports scalar functions (return a single value) and table-valued functions (return a result set) — both inline and multi-statement variants.
 
 > [!abstract]
+>
 > - Covers scalar UDFs, inline TVFs, multi-statement TVFs, and determinism
 > - Inline TVFs are expanded like views (optimizer-transparent); multi-statement TVFs are black boxes
 > - Key exam topics: inline vs multi-statement TVF performance, deterministic vs non-deterministic, SCHEMABINDING
 
 > [!tip] What the Exam Tests
+>
 > - **Inline TVF** = single SELECT statement, expanded like a view, allows parallelism, better cardinality estimates
 > - **Multi-statement TVF** = explicit RETURN TABLE variable, black box to optimizer, no parallelism
 > - Scalar UDFs historically inhibit parallelism — SQL Server 2019+ can inline some scalar UDFs automatically (Intelligent Query Processing)
@@ -302,6 +304,7 @@ END;
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - **Inline TVF is the preferred function type** — it's inlined by the optimizer
 > - Scalar functions **prevent parallelism** when used in DML or large queries
 > - Multi-statement TVFs have a fixed cardinality estimate (1 row) by default unless using deferred compilation (SQL 2019+)

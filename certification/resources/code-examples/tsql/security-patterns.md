@@ -17,6 +17,7 @@ T-SQL patterns for implementing Row-Level Security, Dynamic Data Masking, permis
 ownership chaining, and Always Encrypted — all exam-relevant for DP-800 Domain 2.
 
 > [!abstract] What You'll Learn
+>
 > - Row-Level Security with filter and block predicates for multi-tenant isolation
 > - Dynamic Data Masking with all four masking functions
 > - Permission management patterns with GRANT, DENY, REVOKE, and roles
@@ -226,7 +227,7 @@ REVERT;
 
 | CustomerID | Name | Email | Phone | CreditScore |
 |---|---|---|---|---|
-| 1 | XXXX | jXXX@XXXX.com | 04XXX-XXXX-78 | 617 |
+| 1 | XXXX | <jXXX@XXXX.com> | 04XXX-XXXX-78 | 617 |
 
 > [!warning] Watch Out
 > DDM can be bypassed by users with `db_owner` or `ALTER TABLE` permissions — they can simply remove masks. Combine DDM with RLS for defense in depth.
@@ -355,6 +356,7 @@ the Column Master Key (CMK) can read plaintext values. The database engine and D
 ciphertext.
 
 Key hierarchy:
+
 - **Column Master Key (CMK):** asymmetric key stored externally (Azure Key Vault, Windows
   Certificate Store, HSM). SQL Server stores only metadata (key store + path).
 - **Column Encryption Key (CEK):** symmetric key stored in the database, encrypted by the CMK.

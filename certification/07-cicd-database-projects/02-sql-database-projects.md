@@ -15,11 +15,13 @@ tags:
 SQL Database Projects allow you to version-control your entire database schema as T-SQL source files and build a deployable **dacpac** artifact. The modern SDK-style `.sqlproj` format (using `Microsoft.Build.Sql`) integrates with standard `dotnet` tooling and CI/CD pipelines. A dacpac captures the desired state of a database schema — deployment calculates and applies the diff.
 
 > [!abstract]
+>
 > - Covers SQL Database Projects (.sqlproj), the dacpac build artifact, publishing, and pre/post-deployment scripts
 > - SQL DB Projects bring code-first, source-controlled schema management to SQL Server and Azure SQL
 > - Key exam topics: project structure, dacpac vs bacpac distinction, pre/post-deployment script role
 
 > [!tip] What the Exam Tests
+>
 > - Build produces a `.dacpac` (schema only); `SqlPackage /Action:Publish` deploys the diff (compares target and applies changes)
 > - **dacpac** = schema-only; **bacpac** = schema + data (for import/export, not CI/CD deployment)
 > - Pre/post-deployment scripts run outside the dacpac diff — used for data migrations, seed data, one-time operations
@@ -42,6 +44,7 @@ The SDK-style project file is minimal compared to the legacy format:
 ```
 
 Key differences from the legacy format:
+
 - All `.sql` files in the project directory are **automatically included** (no explicit `<Build Include="..."/>` entries needed)
 - Uses standard MSBuild SDK conventions
 - Compatible with `dotnet build` CLI
@@ -288,6 +291,7 @@ SDK-style projects support referencing shared objects as NuGet packages:
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - SDK-style projects use `<Project Sdk="Microsoft.Build.Sql/...">` — all `.sql` files are automatically included
 > - The dacpac represents the **desired state** — deployment is always a diff, never a full recreate
 > - `BlockOnPossibleDataLoss=true` is the safety net for production deployments — it prevents accidental data loss

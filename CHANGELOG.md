@@ -4,6 +4,21 @@ Notable changes to the DP-800 study guide.
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/). Dates use ISO 8601. Each section is grouped under the Microsoft blueprint date it tracks, so future readers can match guide versions to the version of the exam they were preparing for.
 
+## [1.0.0] — 2026-05-21 — Initial tagged release
+
+First tagged release of the open-sourced DP-800 study guide. Aligned to the Microsoft skills-measured list updated **2026-03-12**. Bundles all prior 2026.05 + 2026.05.21 content under a stable `v1.0.0` tag for reference.
+
+### Added
+
+- **CI** — `.github/workflows/lint.yml` runs markdownlint-cli2 + lychee internal-link integrity on every PR and on pushes to `main`
+- **`.markdownlint-cli2.jsonc`** with repo-wide glob set and `.obsidian/`, `node_modules/`, `.git/` ignores
+- **`lychee.toml`** validating every relative `.md`/image/file link; skips external HTTP(S), mail, tel, ftp schemes
+- **`CONTRIBUTORS.md`** with attribution format, "how to get added" instructions, and maintainer entry
+
+### Changed
+
+- `.markdownlint.json` adds `MD034` (bare URL detection) and `MD026` (trailing punctuation in headings) toggles to match the lint baseline
+
 ## [2026.05.21] — Case studies, rebalanced practice set, mental models
 
 Still aligned to the 2026-03-12 blueprint. Follow-up additions surfaced by the senior-data-engineer review.

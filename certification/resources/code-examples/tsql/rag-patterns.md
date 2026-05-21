@@ -17,6 +17,7 @@ Retrieval-Augmented Generation (RAG) in Azure SQL Database and Microsoft Fabric 
 The typical pipeline is: **embed query → vector search → retrieve context → call LLM → return answer**.
 
 > [!abstract] What You'll Learn
+>
 > - Database scoped credential setup for Azure OpenAI REST calls
 > - Generating embeddings via sp_invoke_external_rest_endpoint
 > - Building RAG prompts from retrieved document context

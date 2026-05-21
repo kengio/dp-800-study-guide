@@ -1,0 +1,15 @@
+// markdownlint-cli2 configuration for the DP-800 Study Guide.
+// Inherits rule settings from .markdownlint.json and adds the glob set + ignore list.
+{
+  "config": {
+    "extends": ".markdownlint.json"
+  },
+  "globs": [
+    "**/*.md"
+  ],
+  "ignores": [
+    ".obsidian/**",
+    "node_modules/**",
+    ".git/**"
+  ]
+}

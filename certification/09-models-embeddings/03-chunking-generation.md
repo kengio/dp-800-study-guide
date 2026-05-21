@@ -15,11 +15,13 @@ tags:
 Before generating embeddings, you must decide which columns to embed and how to prepare the text. For long documents, you must also chunk the text into segments that fit within the model's token limit. The **chunking strategy** significantly affects retrieval quality. After chunking, embeddings are generated via an external model call and stored in a vector column.
 
 > [!abstract]
+>
 > - Covers chunking strategies for preparing documents for embedding: fixed-size, semantic, and overlap
 > - Documents must be split into chunks before embedding because models have token limits
 > - Key exam topics: fixed vs semantic chunking trade-offs, overlap purpose, chunk size effects on retrieval quality
 
 > [!tip] What the Exam Tests
+>
 > - **Fixed-size chunking**: split every N tokens; simple and predictable; may split mid-sentence
 > - **Semantic chunking**: split on sentence/paragraph boundaries; better context preservation; more complex
 > - **Overlap**: include last M tokens of previous chunk in the start of next chunk — prevents losing context at boundaries
@@ -342,6 +344,7 @@ WHERE TokenCount > 7500;  -- Leave headroom below 8192 limit
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - Embedding models have a **token limit** — chunk text before embedding; ~4 chars per token for English
 > - **Overlapping chunks** improve recall at chunk boundaries — use when retrieval quality matters more than cost
 > - `VECTOR(1536)` stores 1536 floats × 4 bytes = 6KB per row — plan storage accordingly

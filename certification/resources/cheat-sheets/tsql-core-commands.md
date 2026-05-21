@@ -14,6 +14,7 @@ tags:
 Compact reference for the most frequently tested T-SQL commands on the DP-800 exam.
 
 > [!abstract] Quick Reference
+>
 > - Core DDL (CREATE/ALTER TABLE, indexes, partitioning) and DML (INSERT, UPDATE, DELETE, MERGE) syntax
 > - Window functions, CTEs, APPLY, PIVOT, and control flow patterns
 > - Use during practice questions when you need to quickly verify T-SQL syntax

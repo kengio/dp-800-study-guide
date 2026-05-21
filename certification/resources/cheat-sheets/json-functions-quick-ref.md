@@ -13,6 +13,7 @@ tags:
 All JSON functions available in Azure SQL Database and SQL Server 2022+, with syntax and examples.
 
 > [!abstract] Quick Reference
+>
 > - All JSON functions: scalar extraction, construction, OPENJSON parsing, and FOR JSON serialization
 > - Lax vs strict mode, JSON indexing strategies, and common JSON manipulation patterns
 > - Use when practicing JSON-related questions or building JSON query patterns

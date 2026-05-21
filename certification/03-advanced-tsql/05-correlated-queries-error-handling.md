@@ -16,11 +16,13 @@ tags:
 Correlated subqueries reference the outer query and execute once per outer row. Error handling with `TRY/CATCH` and `THROW` provides structured exception management comparable to application-level try/catch blocks.
 
 > [!abstract]
+>
 > - Covers correlated subqueries, EXISTS/NOT EXISTS, TRY/CATCH error handling, THROW vs RAISERROR, and transaction state
 > - Correlated subqueries reference the outer query; EXISTS is usually more efficient than IN for large datasets
 > - Key exam topics: XACT_STATE() values, THROW vs RAISERROR behavior, ERROR_* functions inside CATCH
 
 > [!tip] What the Exam Tests
+>
 > - `XACT_STATE() = -1` = uncommittable transaction (must ROLLBACK); `= 1` = active committable transaction; `= 0` = no active transaction
 > - `THROW` re-raises with the original error number and severity; `RAISERROR` creates a new error message (can specify severity)
 > - `EXISTS (SELECT 1 FROM …)` stops scanning as soon as one row is found — more efficient than `IN (SELECT col FROM …)` for correlated checks
@@ -360,6 +362,7 @@ END;
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - `NOT EXISTS` is preferred over `NOT IN` when the subquery might return NULLs
 > - `CROSS APPLY` vs `OUTER APPLY`: same semantics as INNER JOIN vs LEFT JOIN
 > - `THROW` inside `CATCH` re-raises the original error — preserves error number and message

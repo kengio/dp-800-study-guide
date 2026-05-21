@@ -16,11 +16,13 @@ tags:
 Designing and implementing tables is foundational to the DP-800 exam. This covers choosing appropriate data types, designing clustered and non-clustered indexes, and when to use column store indexes for analytical workloads.
 
 > [!abstract]
+>
 > - Covers B-tree indexes (clustered, non-clustered), columnstore indexes (CCI, NCCI), and index maintenance
 > - Heap tables have no clustered index; adding a CI converts the heap
 > - Key exam topics: choosing index type for OLTP vs analytics, fill factor, index fragmentation
 
 > [!tip] What the Exam Tests
+>
 > - Choose between **clustered columnstore (CCI)** and clustered B-tree based on workload: CCI = analytics/bulk-load; B-tree = OLTP point lookups
 > - Recognize that a **non-clustered columnstore index (NCCI)** can be added to an existing rowstore table for mixed workloads
 > - Know that **fill factor** reduces page splits by leaving space in leaf pages — lower fill factor = less splits, more space used
@@ -263,6 +265,7 @@ Choosing which columns to index — and how — has a significant impact on quer
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - Know the difference between **clustered columnstore** (replaces rowstore) vs **non-clustered columnstore** (supplements rowstore)
 > - Batch mode execution is available with columnstore indexes — a key performance differentiator
 > - `datetime2` is preferred over `datetime` for new development (greater precision, more range)

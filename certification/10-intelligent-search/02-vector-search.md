@@ -17,16 +17,19 @@ tags:
 Vector search finds rows whose vector embeddings are mathematically similar to a query vector. This enables semantic search — finding conceptually related content even when exact keywords don't match. SQL Database in Fabric and Azure SQL support native vector search with the `VECTOR` data type, `VECTOR_DISTANCE` function, and `VECTOR_SEARCH` function with approximate nearest neighbor (ANN) indexing via DiskANN.
 
 > [!abstract]
+>
 > - Covers the VECTOR data type, VECTOR_DISTANCE (exact search), VECTOR_SEARCH (approximate search), and DiskANN indexing
 > - Vector search enables semantic similarity queries — finding conceptually related content, not just keyword matches
 > - Key exam topics: ENN vs ANN distinction, choosing the right distance metric, VECTOR_NORMALIZE requirement
 
 > [!tip] What the Exam Tests
+>
 > - `VECTOR_DISTANCE('cosine', v1, v2)` = **exact** nearest neighbor (ENN) — compares all rows; use when accuracy > speed
 > - `VECTOR_SEARCH(TABLE, VECTOR(col), JSON_ARRAY(query_vector), top_n)` = **approximate** (ANN) via DiskANN — faster at scale
 > - DiskANN supports `cosine`, `dot`, and `euclidean` metrics — the index metric **must match** the metric used in `VECTOR_SEARCH`
 
 > [!note] 2026 status
+>
 > - `VECTOR` and `VECTOR_DISTANCE` — **GA** in SQL Server 2025 and Azure SQL Database.
 > - `VECTOR_SEARCH`, `VECTOR_NORMALIZE`, `VECTORPROPERTY` — **public preview** on SQL Server 2025, Azure SQL Database, and SQL database in Microsoft Fabric. Fully testable on the exam.
 > - **DiskANN vector index** — **public preview** across SQL Server 2025, Azure SQL Database, Azure SQL Managed Instance, and SQL database in Microsoft Fabric. SQL Server 2025 additionally requires `PREVIEW_FEATURES = ON`. Expect questions on metric matching.
@@ -338,6 +341,7 @@ ORDER BY vs.distance ASC;
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - `VECTOR_DISTANCE('cosine', ...)` returns a **distance** (lower = more similar) — not a similarity score
 > - `VECTOR_SEARCH` uses the DiskANN index (ANN); `VECTOR_DISTANCE` in ORDER BY is always ENN (exact)
 > - The vector index metric (`cosine`, `euclidean`, `dot`) must match the metric used in `VECTOR_SEARCH`

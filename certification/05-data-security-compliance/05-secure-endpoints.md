@@ -17,11 +17,13 @@ tags:
 AI-enabled database solutions expose multiple endpoint types: AI model endpoints, REST APIs (via Data API Builder), GraphQL endpoints, and MCP servers. Each must be secured appropriately using Managed Identity, API authentication, and network controls.
 
 > [!abstract]
+>
 > - Covers network security for Azure SQL: firewall rules, private endpoints, service endpoints, and authentication
 > - Network access and authentication are layered — both must be correct for a connection to succeed
 > - Key exam topics: private endpoint vs service endpoint differences, Azure AD authentication vs SQL auth, managed identity
 
 > [!tip] What the Exam Tests
+>
 > - **Private endpoint**: assigns a private IP in your VNet; traffic never leaves Azure network; the SQL endpoint is no longer publicly reachable
 > - **Service endpoint**: routes traffic via Azure backbone; endpoint is still a public IP — it's a routing optimization, not full privatization
 > - **Managed identity**: no passwords or connection strings; Azure AD token auth; system-assigned (per resource) vs user-assigned (shared)
@@ -303,6 +305,7 @@ Microsoft Defender for SQL provides two capabilities under a single plan:
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - `DATABASE SCOPED CREDENTIAL` with `IDENTITY = 'Managed Identity'` is the correct syntax for passwordless model calls
 > - DAB `permissions` array maps roles to allowed CRUD actions per entity
 > - Disable GraphQL introspection in production to prevent schema discovery

@@ -11,6 +11,7 @@ tags:
 A reference of key terms and concepts for the DP-800: Developing AI-Enabled Database Solutions exam.
 
 > [!abstract] TL;DR
+>
 > - 79 terms across all three exam domains — Design & Develop, Secure/Optimize/Deploy, and AI Capabilities
 > - Use as a lookup during study when you encounter unfamiliar acronyms or Azure SQL concepts
 > - Terms marked with bold are the ones most frequently tested on the exam

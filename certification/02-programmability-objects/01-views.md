@@ -15,11 +15,13 @@ tags:
 Views are stored SELECT statements that act as virtual tables. SQL Server supports standard views, schema-bound views, and indexed (materialized) views — each with different performance and maintenance characteristics.
 
 > [!abstract]
+>
 > - Covers standard views, indexed views, and updatable views
 > - Views are virtual tables; indexed views materialize results with a unique clustered index
 > - Key exam topics: indexed view requirements (SCHEMABINDING + UNIQUE CLUSTERED INDEX), updatable view rules, WITH CHECK OPTION
 
 > [!tip] What the Exam Tests
+>
 > - Indexed views require `WITH SCHEMABINDING` on the view AND a `UNIQUE CLUSTERED INDEX` on it — both are mandatory
 > - `WITH CHECK OPTION` ensures INSERT/UPDATE through a view stays within the view's WHERE clause filter
 > - Non-deterministic functions (GETDATE, NEWID) are forbidden in indexed views
@@ -200,6 +202,7 @@ Use `INSTEAD OF` triggers on views for complex update logic involving multiple b
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - Indexed views require `WITH SCHEMABINDING` and a `UNIQUE CLUSTERED` index as the first index
 > - `COUNT_BIG(*)` is required in grouped indexed views — `COUNT(*)` is not allowed
 > - On non-Enterprise editions, use `WITH (NOEXPAND)` to force the optimizer to use the indexed view

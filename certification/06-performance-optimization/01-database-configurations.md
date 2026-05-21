@@ -16,11 +16,13 @@ tags:
 Database configuration choices — service tier, compatibility level, memory grants, and database-scoped options — significantly impact performance. The DP-800 exam tests recommending appropriate configurations for specific workloads.
 
 > [!abstract]
+>
 > - Covers database-scoped configurations (MAXDOP, cost threshold, auto-stats), compatibility levels, and Query Store setup
 > - Configuration changes affect all queries unless overridden at the query level with hints
 > - Key exam topics: MAXDOP values, compatibility level effects, auto-create/update statistics behavior
 
 > [!tip] What the Exam Tests
+>
 > - `MAXDOP = 0` = use all CPUs; `MAXDOP = 1` = disable parallelism; override per query with `OPTION (MAXDOP n)`
 > - `ALTER DATABASE SCOPED CONFIGURATION SET MAXDOP = n` sets the database default (does not affect server default)
 > - **Compatibility level** controls optimizer behavior and feature availability — independent of the SQL Server engine version
@@ -351,6 +353,7 @@ OPTION(USE HINT('ENABLE_QUERY_OPTIMIZER_HOTFIXES'));
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - **RCSI** (Read Committed Snapshot Isolation) eliminates reader/writer blocking — enable for OLTP
 > - Compatibility level 160 enables the latest optimizer features — test before changing in production
 > - Azure SQL Business Critical has a **built-in read-only replica** at no extra cost

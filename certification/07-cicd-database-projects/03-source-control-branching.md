@@ -15,11 +15,13 @@ tags:
 Storing SQL Database Projects in Git enables collaboration, history tracking, and structured review of schema changes. Branching strategies control how schema changes move from development to production, while branch policies and pull requests enforce quality gates before changes are merged.
 
 > [!abstract]
+>
 > - Covers Git-based source control for database schema files, branching strategies, and merge conflict resolution
 > - Database schema files (.sql) in a project are treated the same as application code — same Git workflows apply
 > - Key exam topics: feature branch workflow, PR-based review, handling schema file merge conflicts
 
 > [!tip] What the Exam Tests
+>
 > - Database schema changes go through the same feature branch → PR → merge → deploy workflow as application code
 > - Merge conflicts in schema `.sql` files must be resolved manually — Git cannot auto-resolve SQL syntax conflicts
 > - The `.sqlproj` file itself can have conflicts if two branches add different objects
@@ -84,6 +86,7 @@ git clone https://dev.azure.com/myorg/myproject/_git/my-database
 ```
 
 SQL Database Projects extension in VS Code / Azure Data Studio provides:
+
 - Schema compare between database and project
 - One-click "Update Project from Database" to capture current state
 - Integrated Git panel for staging and committing schema changes
@@ -177,6 +180,7 @@ ALTER TABLE dbo.Orders ADD AuditUser NVARCHAR(50) NOT NULL
 ```
 
 **Schema change review checklist:**
+
 - Are new NOT NULL columns backward compatible? (have defaults)
 - Do column type changes risk data truncation?
 - Are new indexes created `WITH (ONLINE = ON)` for live tables?
@@ -260,6 +264,7 @@ CREATE TABLE [dbo].[Orders]
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - Branch policies in Azure DevOps (require reviewers, require build success) enforce quality gates — know how to configure them
 > - CODEOWNERS files automatically add reviewers based on file paths — critical for database change governance
 > - `main` branch should always reflect production-deployable state — use feature/release branches for in-progress work

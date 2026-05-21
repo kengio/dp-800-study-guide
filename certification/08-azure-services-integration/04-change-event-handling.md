@@ -16,11 +16,13 @@ tags:
 Reacting to data changes is fundamental to building event-driven systems. SQL Server and Azure SQL offer several mechanisms at different granularities: **Change Tracking** (did a row change?), **CDC** (what did the row change from/to?), and **CES** (Change Event Streaming in Fabric — push-based streaming). These feed downstream systems via Azure Functions SQL trigger binding, Logic Apps, or direct streaming.
 
 > [!abstract]
+>
 > - Covers Change Data Capture (CDC) and Change Tracking (CT): what changed, when, and how to consume it
 > - CDC and CT both track data changes but differ in detail captured and infrastructure required
 > - Key exam topics: CDC vs CT differences, CDC agent dependency, CT lightweight use cases
 
 > [!tip] What the Exam Tests
+>
 > - **CDC**: captures full before/after row values; requires SQL Server Agent; stores changes in capture tables; used for ETL/replication
 > - **Change Tracking**: captures only that a row changed (row ID + operation); no Agent required; used for sync scenarios where you only need to know *what* changed, not *how*
 > - CDC has latency (agent job); CT is synchronous (committed with the transaction)
@@ -247,6 +249,7 @@ Setup in Fabric Portal:
 ```
 
 CES works in near-real-time and delivers change events with:
+
 - Table name, operation type (Insert/Update/Delete)
 - Changed row values (after image)
 - LSN and timestamp
@@ -339,6 +342,7 @@ END;
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - **CDC**: Captures before AND after values; requires SQL Agent (on-prem) or runs automatically (Azure SQL)
 > - **Change Tracking**: Only tracks that a row changed; no before image; lighter weight; requires join to get current values
 > - **Azure Functions SQL trigger**: Uses Change Tracking under the hood — enables it automatically on the source table

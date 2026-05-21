@@ -16,11 +16,13 @@ tags:
 Full-text search (FTS) enables linguistic searching of character-based data — matching words, phrases, proximity, and inflected forms. Unlike LIKE queries (which do character pattern matching), FTS uses an **inverted index** and understands language semantics (stems, synonyms, stop words). The key predicates are `CONTAINS` (precise term matching) and `FREETEXT` (natural language matching).
 
 > [!abstract]
+>
 > - Covers full-text search in Azure SQL: CONTAINS, FREETEXT, CONTAINSTABLE, FREETEXTTABLE, and full-text indexes
 > - Full-text search enables linguistic and proximity searches beyond LIKE pattern matching
 > - Key exam topics: CONTAINS vs FREETEXT use cases, full-text index requirement, ranked results with TABLE variants
 
 > [!tip] What the Exam Tests
+>
 > - `CONTAINS` = **precision**: exact terms, prefix (`"data*"`), proximity (`NEAR`), weighted terms (`ISABOUT`)
 > - `FREETEXT` = **recall**: natural language query, inflections and synonyms, broader match
 > - `CONTAINSTABLE` / `FREETEXTTABLE` return a table with a `RANK` column (0–1000) — use when you need ranked results or want to join with other tables
@@ -323,6 +325,7 @@ SELECT lcid, name FROM sys.fulltext_languages ORDER BY name;
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - `CONTAINS` returns a boolean match — use in WHERE clause; `CONTAINSTABLE` returns ranked results — use as a table
 > - `FREETEXT` is for natural language; `CONTAINS` is for precise control (prefix, proximity, boolean)
 > - **Stop words** can suppress expected results — if "product" is in the stop list, searching for "product" returns nothing

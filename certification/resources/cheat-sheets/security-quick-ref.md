@@ -15,6 +15,7 @@ tags:
 Encryption, masking, row-level security, permissions, and auditing for Azure SQL Database.
 
 > [!abstract] Quick Reference
+>
 > - Encryption methods (TDE, Always Encrypted, column-level), Dynamic Data Masking, and Row-Level Security
 > - Permissions model (GRANT/DENY/REVOKE), database roles, and auditing setup
 > - Use when reviewing security scenarios or comparing encryption approaches on the exam

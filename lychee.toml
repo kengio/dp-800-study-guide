@@ -1,0 +1,36 @@
+# lychee configuration for the DP-800 Study Guide.
+#
+# CI policy:
+# - Verify every relative .md / image / file link resolves to an existing path
+# - Skip external HTTP/HTTPS URLs (their health is verified manually during
+#   PR review; flaky external endpoints would otherwise constantly fail CI)
+# - Skip mailto:, tel:, ftp:, data:, javascript:
+
+# Skip external URLs and other non-file schemes
+exclude = [
+  "^https?://",
+  "^mailto:",
+  "^tel:",
+  "^ftp://",
+  "^data:",
+  "^javascript:",
+]
+
+# Don't check links inside fenced code blocks (SQL, Python, JSON, etc.)
+include_verbatim = false
+
+# Cache to speed up repeated checks
+cache = true
+max_cache_age = "1d"
+
+# Exclude paths we don't author
+exclude_path = [
+  ".obsidian/",
+  "node_modules/",
+  ".git/",
+  # RELEASE_NOTES.md uses GitHub release-page-relative paths (../../README.md)
+  # that resolve correctly when rendered on the release page but not from the
+  # file's location in the repo root. It is a transient artifact, not a
+  # canonical file, so we exclude it from link checks.
+  "RELEASE_NOTES.md",
+]

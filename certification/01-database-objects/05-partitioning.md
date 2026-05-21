@@ -15,11 +15,13 @@ tags:
 Table and index partitioning divides large tables into smaller, manageable chunks based on a partition key — typically a date column. This enables partition elimination, efficient data archiving (partition switching), and parallel operations across partitions.
 
 > [!abstract]
+>
 > - Covers table and index partitioning: partition functions, partition schemes, and partition switching
 > - Partitioning improves manageability and query performance on large tables by physically separating data ranges
 > - Key exam topics: function vs scheme (two separate objects), $PARTITION, partition switching for bulk operations
 
 > [!tip] What the Exam Tests
+>
 > - **Partition function** defines value boundaries (ranges); **partition scheme** maps those ranges to filegroups — they are two distinct objects
 > - `$PARTITION.FunctionName(column)` returns the partition number for a given value
 > - **Partition switching** (`ALTER TABLE … SWITCH`) moves an entire partition instantly — used for bulk load staging and archiving
@@ -261,6 +263,7 @@ A **non-aligned index** has a different partitioning scheme (or is not partition
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - **Partition function** defines the rules; **partition scheme** maps to filegroups
 > - `RANGE RIGHT` is standard for date partitioning — boundary value starts the new partition
 > - Partition switching is a **metadata-only operation** — extremely fast even for billions of rows

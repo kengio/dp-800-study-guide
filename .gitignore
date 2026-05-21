@@ -12,3 +12,9 @@ Thumbs.db
 
 # Python virtual environments
 .venv/
+
+# lychee link-checker cache
+.lycheecache
+
+# Transient release-notes artifact (used as gh release --notes-file source)
+RELEASE_NOTES.md

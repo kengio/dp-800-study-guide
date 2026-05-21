@@ -28,6 +28,7 @@ D. `EXEC sp_create_external_model 'EmbeddingModel', 'text-embedding-3-small'`
 > **B. `CREATE EXTERNAL MODEL EmbeddingModel WITH (LOCATION = '...', CREDENTIAL = ..., MODEL_TYPE = EMBEDDINGS, MODEL = 'text-embedding-3-small')`**
 >
 > The full `CREATE EXTERNAL MODEL` syntax requires:
+>
 > - `LOCATION` — the Azure OpenAI endpoint URL
 > - `CREDENTIAL` — a database-scoped credential holding the API key
 > - `MODEL_TYPE` — `EMBEDDINGS` or `COMPLETIONS` (this is the T-SQL keyword; some non-SQL frameworks call this "task")
@@ -250,6 +251,7 @@ D. The full-text index key value
 > **B. A relevance score (higher = more relevant) used to sort results by match quality**
 >
 > `CONTAINSTABLE` (and `FREETEXTTABLE`) return a result set with `KEY` (the full-text key column value) and `RANK` (an integer relevance score from 0–1000, higher is more relevant). This enables ranked results:
+>
 > ```sql
 > SELECT a.Title, ct.[RANK]
 > FROM CONTAINSTABLE(dbo.Articles, BodyText, 'database') ct

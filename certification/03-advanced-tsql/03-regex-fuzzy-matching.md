@@ -16,11 +16,13 @@ tags:
 SQL Server (and especially SQL databases in Microsoft Fabric) provide regex functions for pattern-based string matching and fuzzy string matching functions for similarity scoring — essential for data quality, deduplication, and AI-assisted search.
 
 > [!abstract]
+>
 > - Covers pattern matching (LIKE, PATINDEX), phonetic matching (SOUNDEX, DIFFERENCE), and full-text search (CONTAINS, FREETEXT)
 > - T-SQL lacks true regex — LIKE with wildcards is the native pattern tool; full-text search handles natural language
 > - Key exam topics: CONTAINS vs FREETEXT use cases, full-text index requirement, PATINDEX return value
 
 > [!tip] What the Exam Tests
+>
 > - `CONTAINS` = **precision** — exact terms, prefix terms, proximity (`NEAR`), weighted terms
 > - `FREETEXT` = **recall** — natural language, broader match, no exact syntax control
 > - Both `CONTAINS` and `FREETEXT` require a **full-text index** on the column — they will not work on a regular index
@@ -312,6 +314,7 @@ SELECT Name FROM Customers WHERE Name = N'José' COLLATE Latin1_General_CS_AS;  
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - Regex and fuzzy functions are primarily tested in the context of **SQL databases in Microsoft Fabric**
 > - `EDIT_DISTANCE` returns an absolute count; `EDIT_DISTANCE_SIMILARITY` returns a 0–100 percentage
 > - `JARO_WINKLER_DISTANCE` returns 0.0–1.0 (not 0–100) — note the different scale

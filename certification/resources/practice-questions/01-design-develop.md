@@ -28,6 +28,7 @@ D. A non-clustered columnstore index on the aggregation columns
 > **C. A clustered columnstore index**
 >
 > A **clustered columnstore index (CCI)** is optimal for tables used exclusively for analytics. It:
+>
 > - Stores data by column (maximum compression)
 > - Enables vectorized **batch mode execution** (~900 rows per batch)
 > - Replaces the rowstore clustered index entirely
@@ -312,6 +313,7 @@ D. NOT IN cannot be used with subqueries
 > `NOT IN` returns no rows when the subquery result contains a NULL, because SQL cannot determine whether any value is "not equal to NULL" (NULL comparisons are always UNKNOWN).
 >
 > **Fix**: Use `NOT EXISTS` instead, which handles NULLs correctly:
+>
 > ```sql
 > SELECT * FROM dbo.Customers c
 > WHERE NOT EXISTS (SELECT 1 FROM dbo.Orders o WHERE o.CustomerId = c.CustomerId)

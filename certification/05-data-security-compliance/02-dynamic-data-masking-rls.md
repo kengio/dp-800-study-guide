@@ -16,11 +16,13 @@ tags:
 **Dynamic Data Masking** (DDM) obfuscates sensitive column values for unauthorized users without changing stored data. Row-Level Security (RLS) controls which rows a user can access based on a security predicate function.
 
 > [!abstract]
+>
 > - Covers Dynamic Data Masking (DDM) and Row-Level Security (RLS) — two complementary data access control features
 > - DDM hides column values; RLS hides entire rows — both are transparent to the application
 > - Key exam topics: DDM mask types, DDM limitations, RLS predicate function creation, filter vs block predicates
 
 > [!tip] What the Exam Tests
+>
 > - **DDM**: hides values at query time; does NOT encrypt; privileged users with `UNMASK` see everything; four mask types: `default()`, `email()`, `partial()`, `random()`
 > - **RLS**: `CREATE SECURITY POLICY` attaches a predicate function to a table; **filter predicate** = limits SELECT; **block predicate** = prevents DML that violates the policy
 > - RLS is completely transparent — the filtered user gets fewer rows with no indication rows are missing
@@ -217,6 +219,7 @@ SELECT * FROM sys.security_predicates;
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - DDM masks values but **doesn't prevent access** — determined users can infer data
 > - RLS uses inline TVFs with `SCHEMABINDING` — always use `WITH SCHEMABINDING`
 > - `SESSION_CONTEXT` is the recommended pattern for passing tenant context to RLS

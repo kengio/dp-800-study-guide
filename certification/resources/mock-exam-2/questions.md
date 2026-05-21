@@ -251,11 +251,13 @@ D. `GROUPING SETS`
 > **B. `PIVOT`**
 >
 > `PIVOT` rotates rows into columns. The basic structure is:
+>
 > ```sql
 > SELECT Region, [Q1],[Q2],[Q3],[Q4]
 > FROM dbo.SalesData
 > PIVOT (SUM(Amount) FOR Quarter IN ([Q1],[Q2],[Q3],[Q4])) AS pvt
 > ```
+>
 > `UNPIVOT` does the reverse (columns to rows). `GROUPING SETS` creates multi-level GROUP BY results without transposing.
 
 ---

@@ -333,6 +333,7 @@ D. SDK-style projects eliminate the need for sqlpackage
 > **B. SDK-style projects use MSBuild and support cross-platform builds and NuGet references**
 >
 > SDK-style `.sqlproj` files (using `Microsoft.Build.Sql` SDK) are:
+>
 > - Cross-platform (build on Linux/macOS/Windows)
 > - Compatible with `dotnet build`
 > - Support NuGet package references for database dependencies
@@ -422,6 +423,7 @@ D. Use the Azure CLI task to call `az keyvault secret show` and echo the value
 > **C. Link the Key Vault to an Azure DevOps variable group using a service connection with appropriate permissions**
 >
 > The recommended pattern is:
+>
 > 1. Create an Azure DevOps **variable group** linked to the Key Vault
 > 2. Grant the service connection's service principal `Key Vault Secrets User` role on the vault
 > 3. Reference secrets as pipeline variables — they are masked in logs automatically

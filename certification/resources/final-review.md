@@ -10,6 +10,7 @@ tags:
 # DP-800 Final Review — Exam Morning
 
 > [!abstract] Read This in 20 Minutes
+>
 > - Highest-probability testable facts across all three exam domains
 > - One scroll, no deep dives — orient your brain before walking in
 > - After reading: open your cheat sheets and run through the "Before the Exam, I Can…" checklists

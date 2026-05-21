@@ -15,11 +15,13 @@ tags:
 **Embeddings** stored in a vector column go stale when the source text changes. Maintaining embeddings means detecting when source data changes, re-generating embeddings for affected rows, and updating the vector column. Several approaches exist — each with different tradeoffs in complexity, latency, cost, and infrastructure requirements.
 
 > [!abstract]
+>
 > - Covers when and how to regenerate embeddings: model changes, schema changes, data updates, and dirty tracking
 > - Embeddings are point-in-time snapshots of text meaning — they go stale when the underlying text or model changes
 > - Key exam topics: model version incompatibility, dirty tracking with a flag column, batch vs incremental refresh
 
 > [!tip] What the Exam Tests
+>
 > - Changing embedding models requires **regenerating ALL embeddings** — vectors from different models are in different dimensional spaces and cannot be mixed
 > - Dirty tracking: add an `EmbeddingDirty BIT DEFAULT 1` column; set to 0 after embedding; UPDATE sets back to 1 via trigger or app logic
 > - Batch refresh = regenerate all at once (simple, offline); incremental = process only dirty rows (complex, online)
@@ -69,6 +71,7 @@ END;
 ```
 
 **Tradeoffs:**
+
 - Simple — no external infrastructure
 - Adds latency to every INSERT/UPDATE (synchronous API call)
 - If the AI endpoint is unavailable, the write transaction fails
@@ -122,6 +125,7 @@ WHERE TableName = 'Products';
 ```
 
 **Tradeoffs:**
+
 - Decouples write performance from embedding generation
 - Latency = polling interval (seconds to minutes)
 - Resilient to AI endpoint failures (retry at next poll)
@@ -195,6 +199,7 @@ public static async Task Run(
 ```
 
 **Tradeoffs:**
+
 - Event-driven — near real-time with minimal polling overhead
 - Infrastructure: requires Azure Functions deployment and configuration
 - Resilient: Azure Functions handles retries on failure
@@ -327,6 +332,7 @@ flowchart TD
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - **Triggers**: Simplest but synchronous — adds AI API latency to every write; risky if endpoint is down
 > - **Change Tracking**: Best for batch scenarios — decouple embedding from write path
 > - **Azure Functions SQL trigger**: Event-driven alternative to polling — uses Change Tracking internally

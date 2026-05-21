@@ -12,6 +12,7 @@ tags:
 Quick reference for error messages you are likely to encounter in Azure SQL Database and Fabric SQL when developing AI-enabled database solutions.
 
 > [!abstract] TL;DR
+>
 > - 20 common error messages organized into 8 categories (constraints, JSON, concurrency, security, AI, etc.)
 > - Each entry includes the exact error text, cause, and a working solution with T-SQL code
 > - Focus on Msg 1205 (deadlocks), Msg 3960 (snapshot conflicts), and vector dimension mismatches — these are the most exam-relevant

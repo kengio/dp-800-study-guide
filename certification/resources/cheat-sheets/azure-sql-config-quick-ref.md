@@ -15,6 +15,7 @@ tags:
 Database configurations, Query Store, Data API Builder (DAB), and sqlpackage for Azure SQL Database.
 
 > [!abstract] Quick Reference
+>
 > - Database scoped configurations, compatibility levels, and Query Store setup
 > - Data API Builder (DAB) configuration, REST/GraphQL endpoints, and sqlpackage actions
 > - Use when reviewing deployment, configuration, or API integration questions

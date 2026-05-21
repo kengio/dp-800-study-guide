@@ -16,11 +16,13 @@ tags:
 SQL Server provides multiple encryption layers: Transparent Data Encryption (TDE) for data at rest, Always Encrypted for client-side column-level encryption, and server-side column encryption using certificates and asymmetric keys.
 
 > [!abstract]
+>
 > - Covers TDE (at rest, database-wide), Always Encrypted (in memory, column-level), and column-level encryption (manual)
 > - The three encryption methods differ in threat model: who/what is the data protected from
 > - Key exam topics: which encryption method for which threat, CMK/CEK hierarchy, TDE default-on behavior in Azure SQL
 
 > [!tip] What the Exam Tests
+>
 > - **TDE**: protects at rest (stolen backup/disk); server sees plaintext; zero app changes; on by default in Azure SQL
 > - **Always Encrypted**: server NEVER sees plaintext; CMK lives in key store (Azure Key Vault / HSM / Windows cert store), accessed only by the client driver; driver handles encrypt/decrypt; app must use Always Encrypted-aware driver
 > - **Column-level** (`ENCRYPTBYKEY`): manual encrypt/decrypt in app or T-SQL; server sees plaintext; most flexible but most effort
@@ -344,6 +346,7 @@ CLOSE SYMMETRIC KEY MySymKey;
 ## Exam Tips
 
 > [!tip] Exam Tips
+>
 > - **Always Encrypted**: encryption happens client-side; SQL Server only sees ciphertext
 > - **DETERMINISTIC** allows `=` comparisons; **RANDOMIZED** allows no comparisons without a secure enclave
 > - **Secure enclaves** unlock range queries and LIKE on RANDOMIZED encrypted columns
