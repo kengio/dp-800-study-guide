@@ -194,7 +194,9 @@ SELECT @response = CAST(
     AS NVARCHAR(MAX));
 
 -- Parse the completion response
-SELECT JSON_VALUE(@response, '$.choices[0].message.content') AS Answer;
+-- Note: external-model responses (including those routed through
+-- sp_invoke_external_rest_endpoint) wrap the API payload under `$.result`.
+SELECT JSON_VALUE(@response, '$.result.choices[0].message.content') AS Answer;
 ```
 
 ---
@@ -215,8 +217,8 @@ SELECT @result = PREDICT(
     DATA = (SELECT @messages AS messages)
 );
 
--- Extract the response text
-SELECT JSON_VALUE(@result, '$.choices[0].message.content') AS Classification;
+-- Extract the response text — note the `$.result` envelope
+SELECT JSON_VALUE(@result, '$.result.choices[0].message.content') AS Classification;
 ```
 
 ---
