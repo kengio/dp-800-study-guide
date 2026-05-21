@@ -107,11 +107,18 @@ You don't need to be taking the exam to get value — the guide doubles as a ref
 
 ### Domain weights
 
-```text
-Domain 1: Design and develop database solutions             ████████████████  35–40 %
-Domain 2: Secure, optimize, and deploy database solutions   ████████████████  35–40 %
-Domain 3: Implement AI capabilities in database solutions   ███████████       25–30 %
+```mermaid
+pie showData title DP-800 Exam Domain Distribution
+    "Design and develop database solutions" : 37
+    "Secure, optimize, and deploy database solutions" : 37
+    "Implement AI capabilities in database solutions" : 26
 ```
+
+| Domain | Weight | Sections in this guide |
+| :--- | :---: | :--- |
+| **1. Design and develop database solutions** | 35–40 % | `01` – `04` |
+| **2. Secure, optimize, and deploy database solutions** | 35–40 % | `05` – `08` |
+| **3. Implement AI capabilities in database solutions** | 25–30 % | `09` – `11` |
 
 ### Skills measured (high level)
 
@@ -349,6 +356,9 @@ dp-800-study-guide/
 
 ## Official Microsoft resources
 
+<details>
+<summary><b>📋 Exam and certification</b></summary>
+
 ### Exam and certification
 
 - [DP-800 skills measured (official study guide)](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-800)
@@ -357,6 +367,11 @@ dp-800-study-guide/
 - [Free Microsoft Learn practice assessment](https://learn.microsoft.com/en-us/credentials/certifications/azure-administrator/practice/assessment?assessment-type=practice&assessmentId=1704375541&practice-assessment-type=certification)
 - [Exam sandbox (try the testing UI)](https://aka.ms/examdemo)
 - [Request accommodations](https://learn.microsoft.com/en-us/credentials/certifications/request-accommodations)
+
+</details>
+
+<details>
+<summary><b>📚 Documentation by topic</b></summary>
 
 ### Documentation by topic
 
@@ -384,6 +399,11 @@ dp-800-study-guide/
 - [GitHub Copilot in VS Code](https://docs.github.com/en/copilot)
 - [Copilot in Microsoft Fabric](https://learn.microsoft.com/en-us/fabric/fundamentals/copilot-fabric-overview)
 
+</details>
+
+<details>
+<summary><b>👥 Community and learning paths</b></summary>
+
 ### Community and learning paths
 
 - [Microsoft Learn — DP-800 learning path](https://learn.microsoft.com/en-us/training/courses/dp-800t00)
@@ -393,6 +413,8 @@ dp-800-study-guide/
 - [Azure SQL Dev Corner](https://devblogs.microsoft.com/azure-sql/)
 - [Data Exposed (video series)](https://learn.microsoft.com/en-us/shows/data-exposed/)
 - [Exam Readiness Zone](https://learn.microsoft.com/en-us/shows/exam-readiness-zone/)
+
+</details>
 
 ## Contributing
 
