@@ -102,6 +102,7 @@ pie title Exam Domain Distribution
 | [Official Links](resources/official-links.md) | Microsoft documentation and registration |
 | [Code Examples](resources/code-examples/tsql/tsql-code-examples.md) | Standalone T-SQL code example files (incl. end-to-end RAG walkthrough) |
 | [Cheat Sheets](resources/cheat-sheets/cheat-sheets.md) | Quick-reference guides for exam topics (each includes Gotchas & Traps + Before the Exam checklist) |
+| [Anki Deck](resources/anki/anki-deck.md) | ~130 spaced-repetition cards generated from the cheat sheets, with tag-based filtering |
 | [Final Review](resources/final-review.md) | 20-minute exam-morning scan: top facts and last-minute traps for all three domains |
 | [Appendix](resources/appendix/appendix.md) | Glossary, comparison tables, error messages |
 

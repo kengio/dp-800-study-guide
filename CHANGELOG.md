@@ -4,6 +4,12 @@ Notable changes to the DP-800 study guide.
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/). Dates use ISO 8601. Each section is grouped under the Microsoft blueprint date it tracks, so future readers can match guide versions to the version of the exam they were preparing for.
 
+## [Unreleased]
+
+### Added
+
+- **Anki deck** (`certification/resources/anki/dp-800.tsv`) — ~130 spaced-repetition cards generated from the 6 cheat sheets, with tag-based filtering and an import-instructions readme
+
 ## [1.0.0] — 2026-05-21 — Initial tagged release
 
 First tagged release of the open-sourced DP-800 study guide. Aligned to the Microsoft skills-measured list updated **2026-03-12**. Bundles all prior 2026.05 + 2026.05.21 content under a stable `v1.0.0` tag for reference.
