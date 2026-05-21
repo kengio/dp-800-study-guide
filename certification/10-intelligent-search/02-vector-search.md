@@ -223,9 +223,19 @@ The vector index is used automatically by `VECTOR_SEARCH` — it is not used by 
 
 ## ANN vs ENN
 
+```mermaid
+flowchart TD
+    Q["Vector query"] --> D{"Query uses<br/>WITH APPROXIMATE<br/>or VECTOR_SEARCH TVF?"}
+    D -- "yes" --> M{"Matching DiskANN<br/>index on column<br/>+ same METRIC?"}
+    D -- "no" --> E["ENN — exact scan<br/>O(n) all rows<br/>guaranteed top-K"]
+    M -- "yes" --> A["ANN — DiskANN graph traversal<br/>sub-second on millions of rows<br/>may miss a few close neighbours"]
+    M -- "no" --> W["Warning logged<br/>silent fallback to ENN<br/>(performance trap)"]
+```
+
 | | ANN (Approximate) | ENN (Exact) |
 | :--- | :--- | :--- |
-| **Function** | `VECTOR_SEARCH` with vector index | `VECTOR_DISTANCE` in `ORDER BY` |
+| **Syntax (current)** | `SELECT TOP (N) ... ORDER BY VECTOR_DISTANCE(...) WITH APPROXIMATE` | `SELECT TOP (N) ... ORDER BY VECTOR_DISTANCE(...)` (no `WITH APPROXIMATE`) |
+| **Syntax (legacy)** | `VECTOR_SEARCH(... TOP_N=N)` TVF — deprecated on latest indexes | `VECTOR_DISTANCE` in `ORDER BY` |
 | **Accuracy** | May miss a few close neighbors | Guaranteed exact top-K |
 | **Performance** | Sub-second on millions of rows | Linear scan — slow on large tables |
 | **Use case** | Production search with large datasets | Small tables or validation |

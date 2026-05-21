@@ -11,6 +11,33 @@ tags:
 
 # RAG Use Cases and Architecture
 
+## RAG Flow at a Glance
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant App as Application
+    participant DB as Azure SQL Database
+    participant E as Azure OpenAI (embeddings)
+    participant L as Azure OpenAI (chat)
+
+    U->>App: question
+    App->>DB: pass question
+    DB->>E: PREDICT — embed question
+    E-->>DB: query VECTOR(1536)
+    DB->>DB: VECTOR_DISTANCE + WITH APPROXIMATE<br/>(top-K chunks)
+    DB->>DB: build prompt<br/>(system + context + user)
+    DB->>L: sp_invoke_external_rest_endpoint
+    L-->>DB: JSON in $.result envelope
+    DB->>DB: JSON_VALUE(@resp, '$.result.choices[0].message.content')
+    DB-->>App: grounded answer
+    App-->>U: response
+```
+
+> **Mental model**: RAG is **open-book exam** — the model reads the notes you handed it for this one question; its weights do not change. Fine-tuning is **studying** — it changes what the student knows.
+
+---
+
 ## Overview
 
 Retrieval-Augmented Generation (RAG) grounds large language model (LLM) responses in data from a database, preventing **hallucinations** and providing up-to-date, accurate answers. Rather than relying on what the model "knows" from training, RAG retrieves relevant context from a trusted data source and includes it in the prompt. SQL Database in Fabric and Azure SQL are natural RAG backends because they store both structured data and embeddings in one place.
