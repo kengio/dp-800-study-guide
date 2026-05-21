@@ -95,6 +95,11 @@ DP-800 includes interactive case studies — a multi-paragraph scenario with sev
 - **The "best" answer is the one that satisfies every stated constraint** — eliminate options that fail any single requirement before comparing the remainder
 - **If two answers both satisfy the constraints, pick the one with the lowest operational cost / least new infrastructure** — Microsoft consistently rewards the more managed option (e.g., DAB over a custom API, Managed Identity over API keys, CES over polling)
 
+> **Practice with the case studies in this guide:**
+>
+> - [Mock 1 — Contoso HR Migration](./mock-exam/questions.md#case-study-contoso-hr-migration-5-linked-questions-10-minutes) — encryption, RLS with pooled connections, passwordless model endpoints, CES
+> - [Mock 2 — Northwind RAG Catalog](./mock-exam-2/questions.md#case-study-northwind-rag-product-catalog-5-linked-questions-10-minutes) — chunking, embedding maintenance at scale, DiskANN, hybrid search, RAG grounding
+
 ## Time Budget (120 min / ~50 questions)
 
 | Block | Allocation |

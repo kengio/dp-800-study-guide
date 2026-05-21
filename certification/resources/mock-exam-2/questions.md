@@ -8,7 +8,7 @@ tags:
 
 # DP-800 Mock Exam 2 — Questions
 
-Complete all 45 questions before checking answers. Time limit: 60 minutes.
+Complete all 50 questions (45 standalone + 5-question case study) before checking answers. Time limit: 70 minutes.
 
 ---
 

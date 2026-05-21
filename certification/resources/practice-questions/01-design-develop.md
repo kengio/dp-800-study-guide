@@ -319,7 +319,7 @@ D. NOT IN cannot be used with subqueries
 
 ---
 
-## Question 16: Graph — SHORTEST_PATH Edge Direction *(Hard)*
+## Question 16: Graph — SHORTEST_PATH Edge Direction
 
 **Question** *(Hard)*:
 
@@ -339,7 +339,7 @@ D. `MATCH SHORTEST_PATH((start)-(Knows+)->(end))` followed by a second `MATCH` f
 
 ---
 
-## Question 17: Memory-Optimized Table Prerequisite *(Hard)*
+## Question 17: Memory-Optimized Table Prerequisite
 
 **Question** *(Hard)*:
 
@@ -365,7 +365,7 @@ D. The table must use the `bwin` storage engine
 
 ---
 
-## Question 18: REGEXP_SPLIT_TO_TABLE *(Medium)*
+## Question 18: REGEXP_SPLIT_TO_TABLE
 
 **Question** *(Medium)*:
 

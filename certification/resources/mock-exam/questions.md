@@ -8,7 +8,7 @@ tags:
 
 # DP-800 Mock Exam 1 — Questions
 
-Complete all 45 questions before checking answers. Time limit: 60 minutes.
+Complete all 50 questions (45 standalone + 5-question case study) before checking answers. Time limit: 70 minutes.
 
 ---
 
@@ -809,29 +809,29 @@ The policy-lookup assistant needs `sp_invoke_external_rest_endpoint` to call Azu
 
 A. Store the key in a DATABASE SCOPED CREDENTIAL with `IDENTITY = 'HTTPEndpointHeaders'`
 B. Pass the key in the `@headers` parameter at call time
-C. Enable Managed Identity on the Azure SQL Database; grant it `Cognitive Services User` on the Azure OpenAI resource; create a DATABASE SCOPED CREDENTIAL with `IDENTITY = 'Managed Identity'`
+C. Enable Managed Identity on the Azure SQL Database; grant it `Cognitive Services OpenAI User` on the Azure OpenAI resource; create a DATABASE SCOPED CREDENTIAL with `IDENTITY = 'Managed Identity'`
 D. Store the key encrypted in a table and decrypt at call time using `DECRYPTBYPASSPHRASE`
 
 > [!success]- Answer
-> **C. Managed Identity on Azure SQL → granted on Azure OpenAI → DATABASE SCOPED CREDENTIAL with `IDENTITY = 'Managed Identity'`**
+> **C. Managed Identity on Azure SQL → `Cognitive Services OpenAI User` on Azure OpenAI → DATABASE SCOPED CREDENTIAL with `IDENTITY = 'Managed Identity'`**
 >
-> True passwordless: the SQL database's managed identity obtains an Entra ID token to call Azure OpenAI. No key stored anywhere. Option A still stores a key (just in the credential store). Option B passes the key in plaintext. Option D adds complexity without removing the secret.
+> True passwordless: the SQL database's managed identity obtains an Entra ID token to call Azure OpenAI. The documented role for Azure OpenAI inference access is **`Cognitive Services OpenAI User`** (or `Cognitive Services OpenAI Contributor` for write access) — not the generic `Cognitive Services User`. No key stored anywhere. Option A still stores a key (just in the credential store). Option B passes the key in plaintext. Option D adds complexity without removing the secret.
 
 ---
 
 ### Question 50: Near-real-time change feed to Fabric Lakehouse *(Hard)*
 
-When `Employees` rows change, a Lakehouse in Microsoft Fabric must receive the change near real-time. Requirements: **no SQL Agent**, **no polling**, **no Azure Functions to operate**. Which mechanism fits?
+Contoso decides to migrate `Employees` to **SQL database in Microsoft Fabric** so it lands in OneLake alongside other Fabric data. When rows change, a Lakehouse table must receive the change near real-time. Requirements: **no SQL Agent**, **no polling**, **no Azure Functions to operate**. Which mechanism fits?
 
 A. CDC with a custom .NET reader running on a VM
 B. Change Tracking with a 30-second polling job in Azure Automation
-C. **Change Event Streaming (CES)** publishing to Fabric Eventstream, with the Lakehouse hop configured downstream
+C. **Change Event Streaming (CES)** in Fabric SQL, with the Lakehouse selected as the destination
 D. A DML trigger on `Employees` calling `sp_invoke_external_rest_endpoint` to push to a Fabric REST endpoint
 
 > [!success]- Answer
-> **C. Change Event Streaming (CES) publishing to Fabric Eventstream**
+> **C. Change Event Streaming (CES) in Fabric SQL, with the Lakehouse selected as the destination**
 >
-> CES is engine-side, push-based, and requires no SQL Agent, no polling, and no consumer infrastructure. Its native destinations are Fabric Eventstream and Azure Event Hubs; routing to the Lakehouse is a one-step Eventstream configuration. CDC needs a consumer process. Polling violates the requirement. A synchronous trigger calling an external endpoint blocks the DML transaction.
+> CES is engine-side, push-based, and requires no SQL Agent, no polling, and no consumer infrastructure. Available on **SQL database in Microsoft Fabric**, it streams changes to **Eventstream, Lakehouse, or KQL Database** as native destinations. CDC needs a consumer process. Polling violates the requirement. A synchronous trigger calling an external endpoint blocks the DML transaction.
 
 ---
 

@@ -35,8 +35,8 @@ tags:
 1. **Topic files** (`01-topic-name.md`) — core study material with SQL examples, comparison tables, and practice questions. Start here.
 2. **Section READMEs** — overview flowcharts and topic indexes. Use to orient before diving into a section.
 3. **Cheat sheets** (`resources/cheat-sheets/`) — compact quick-reference for exam day and review. Each ends with a `## Gotchas & Traps` section and a `## Before the Exam, I Can…` checklist. Use after studying a section to reinforce.
-4. **Practice questions** (`resources/practice-questions/`) — 15–20 questions per domain (Domain 2 has 20; Domains 1 and 3 have 15 each), with explanations. Use to test knowledge after each domain.
-5. **Mock exams** (`resources/mock-exam/`, `resources/mock-exam-2/`) — full 45-question timed exams. Take after completing all domains.
+4. **Practice questions** (`resources/practice-questions/`) — 60+ questions across the three domains (Domain 1: 18, Domain 2: 22, Domain 3: 20), with explanations. Use to test knowledge after each domain.
+5. **Mock exams** (`resources/mock-exam/`, `resources/mock-exam-2/`) — full 50-question timed exams (45 standalone + 5-question case study mirroring the real DP-800 format). After each, use the matching **debrief** file (`mock-exam-N-debrief.md`) to map missed questions back to study material.
 6. **Final Review** (`resources/final-review.md`) — 20-minute exam-morning scan: highest-probability facts across all three domains and 10 last-minute traps. Read the morning of the exam.
 
 > Study path: topic files → cheat sheets → practice questions → mock exams → **final-review.md** (exam morning)
@@ -93,12 +93,14 @@ pie title Exam Domain Distribution
 
 | Resource | Description |
 | :--- | :--- |
-| [Practice Questions](resources/practice-questions/practice-questions.md) | Domain-specific practice questions |
-| [Mock Exam 1](resources/mock-exam/mock-exam-1.md) | Full-length practice exam |
-| [Mock Exam 2](resources/mock-exam-2/mock-exam-2.md) | Alternative practice exam |
-| [Exam Tips](resources/exam-tips.md) | Strategies and exam format guide |
+| [Practice Questions](resources/practice-questions/practice-questions.md) | 60+ domain-specific practice questions |
+| [Mock Exam 1](resources/mock-exam/mock-exam-1.md) | 50-question exam (45 standalone + 5-question case study) |
+| [Mock Exam 1 — Debrief](resources/mock-exam/mock-exam-1-debrief.md) | Per-question map to topic files + study plan by miss count |
+| [Mock Exam 2](resources/mock-exam-2/mock-exam-2.md) | Second 50-question exam (different questions; includes case study) |
+| [Mock Exam 2 — Debrief](resources/mock-exam-2/mock-exam-2-debrief.md) | Per-question map to topic files + study plan by miss count |
+| [Exam Tips](resources/exam-tips.md) | Strategies, common-traps table, case-study playbook |
 | [Official Links](resources/official-links.md) | Microsoft documentation and registration |
-| [Code Examples](resources/code-examples/tsql/tsql-code-examples.md) | Standalone T-SQL code example files |
+| [Code Examples](resources/code-examples/tsql/tsql-code-examples.md) | Standalone T-SQL code example files (incl. end-to-end RAG walkthrough) |
 | [Cheat Sheets](resources/cheat-sheets/cheat-sheets.md) | Quick-reference guides for exam topics (each includes Gotchas & Traps + Before the Exam checklist) |
 | [Final Review](resources/final-review.md) | 20-minute exam-morning scan: top facts and last-minute traps for all three domains |
 | [Appendix](resources/appendix/appendix.md) | Glossary, comparison tables, error messages |

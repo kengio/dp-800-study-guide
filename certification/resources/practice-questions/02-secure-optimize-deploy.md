@@ -430,7 +430,7 @@ D. Use the Azure CLI task to call `az keyvault secret show` and echo the value
 
 ---
 
-## Question 21: Role Membership — Adding a User *(Easy)*
+## Question 21: Role Membership — Adding a User
 
 **Question** *(Easy)*:
 
@@ -448,7 +448,7 @@ D. `CREATE ROLE [ReportReader] AS db_datareader`
 
 ---
 
-## Question 22: TDE — Default State on Azure SQL *(Easy)*
+## Question 22: TDE — Default State on Azure SQL
 
 **Question** *(Easy)*:
 
