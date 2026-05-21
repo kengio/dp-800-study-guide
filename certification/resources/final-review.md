@@ -68,9 +68,9 @@ tags:
 
 ## 2026 Updates — What Microsoft Added or Emphasized
 
-- **SQL Server 2025 RTM:** `VECTOR`, `VECTOR_DISTANCE`, `VECTOR_SEARCH`, `VECTOR_NORMALIZE`, and `VECTORPROPERTY` are **GA** in SQL Server 2025 and Azure SQL Database. Treat them as fully testable.
-- **DiskANN vector index:** **public preview** in SQL Server 2025; private preview in Azure SQL. Index `METRIC` (`cosine`/`euclidean`/`dot`) must match the metric passed to `VECTOR_SEARCH` or the query errors.
-- **Half-precision (16-bit) vectors:** preview; halves storage and roughly doubles dimensions per row (~4 000). Know the tradeoff: smaller storage, slight recall loss.
+- **SQL Server 2025 GA:** `VECTOR` and `VECTOR_DISTANCE` are **GA** in SQL Server 2025 and Azure SQL Database. `VECTOR_SEARCH`, `VECTOR_NORMALIZE`, and `VECTORPROPERTY` are in **public preview** on the same platforms — fully testable per Microsoft's preview-features note.
+- **DiskANN vector index:** **public preview** across SQL Server 2025, Azure SQL Database, Azure SQL Managed Instance, and SQL database in Microsoft Fabric. On SQL Server 2025 also needs `PREVIEW_FEATURES = ON`. Index `METRIC` (`cosine`/`euclidean`/`dot`) must match the metric passed to `VECTOR_SEARCH` — **a mismatch produces a warning and falls back to exact kNN**, it does not error.
+- **Half-precision (`float16`) vectors:** preview; halves storage at the same dimension count. The documented `VECTOR` type cap is **1 998** dimensions — half-precision does not raise that cap.
 - **MCP server endpoints:** explicitly tested. `stdio` for local, `HTTP+SSE` for remote/hosted (e.g., Fabric lakehouse). Always pass credentials through env vars, never inline in config. MCP runs with the **connection-string user's permissions** — least privilege matters.
 - **Microsoft Foundry** is now a listed embedding-maintenance option alongside triggers, CT, CDC, CES, Azure Functions, and Logic Apps. Foundry = the most managed/declarative option in Fabric.
 - **Change Event Streaming (CES):** push-based change stream from SQL Database in Fabric to Lakehouse/Eventstream/KQL DB. Zero-infrastructure alternative to CDC + custom consumer.
@@ -84,11 +84,11 @@ tags:
 ## Last-Minute Traps
 
 1. **JSON_VALUE on an object/array path returns NULL** — not an error. Use `JSON_QUERY` to extract objects or arrays.
-2. **DiskANN index metric must match the query metric** — DiskANN supports `cosine`, `dot`, and `euclidean`, but the metric on the index must match what you pass to `VECTOR_SEARCH`. Mixing metrics causes an error.
+2. **DiskANN index metric must match the query metric** — DiskANN supports `cosine`, `dot`, and `euclidean`. The metric on the index must match the metric used in the query. **A mismatch does NOT error** — it logs a warning and silently falls back to exact kNN (no index used). Build one index per metric you need.
 3. **DENY always overrides GRANT** — even if the GRANT came through a role. There is no way to "un-deny" except REVOKE of the DENY.
 4. **DDM ≠ encryption** — DDM hides values at display time; the data is stored in plaintext. Users with `UNMASK` or admin rights see everything.
 5. **SNAPSHOT isolation ≠ RCSI** — SNAPSHOT = application sets it per transaction; RCSI = database setting that changes the *default* READ COMMITTED behavior to row-versioning.
-6. **VECTOR_SEARCH is approximate** — it can miss the true nearest neighbor for speed. VECTOR_DISTANCE is exact but slower.
+6. **VECTOR_SEARCH / `WITH APPROXIMATE` is approximate** — it can miss the true nearest neighbor for speed. `VECTOR_DISTANCE` in `ORDER BY` without `WITH APPROXIMATE` is exact (ENN) but slower. On latest-version indexes use `SELECT TOP (N) … WITH APPROXIMATE` (the legacy `TOP_N` parameter is deprecated and raises Msg 42274).
 7. **CMK stays client-side** — Always Encrypted: the Column Master Key lives in Key Vault (or cert store), never uploaded to SQL Server. The server only holds the encrypted CEK.
 8. **SqlPackage /Action:Extract ≠ Publish** — Extract creates a dacpac FROM an existing database. Publish deploys a dacpac TO a database.
 9. **Partition function ≠ partition scheme** — function defines value boundaries; scheme maps them to filegroups. Need both to partition a table.

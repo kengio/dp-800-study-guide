@@ -27,9 +27,10 @@ Vector search finds rows whose vector embeddings are mathematically similar to a
 > - DiskANN supports `cosine`, `dot`, and `euclidean` metrics — the index metric **must match** the metric used in `VECTOR_SEARCH`
 
 > [!note] 2026 status
-> - `VECTOR`, `VECTOR_DISTANCE`, `VECTOR_SEARCH`, `VECTOR_NORMALIZE`, `VECTORPROPERTY` — **GA** in SQL Server 2025 RTM and Azure SQL Database.
-> - **DiskANN vector index** — public preview in SQL Server 2025; private preview in Azure SQL. Expect questions on syntax and metric matching.
-> - **Half-precision (16-bit) vectors** — preview; halves storage and roughly doubles the dimensions you can pack per row (~4 000 dims).
+> - `VECTOR` and `VECTOR_DISTANCE` — **GA** in SQL Server 2025 and Azure SQL Database.
+> - `VECTOR_SEARCH`, `VECTOR_NORMALIZE`, `VECTORPROPERTY` — **public preview** on SQL Server 2025, Azure SQL Database, and SQL database in Microsoft Fabric. Fully testable on the exam.
+> - **DiskANN vector index** — **public preview** across SQL Server 2025, Azure SQL Database, Azure SQL Managed Instance, and SQL database in Microsoft Fabric. SQL Server 2025 additionally requires `PREVIEW_FEATURES = ON`. Expect questions on metric matching.
+> - **Half-precision (`float16`) vectors** — preview; halves storage at the same dimension count. The `VECTOR` type documented cap is **1 998** dimensions.
 
 ---
 
@@ -349,6 +350,8 @@ ORDER BY vs.distance ASC;
 - [01-Full-Text Search](./01-fulltext-search.md)
 - [03-Hybrid Search & RRF](./03-hybrid-search-rrf.md)
 - [03-Chunking & Generation](../09-models-embeddings/03-chunking-generation.md)
+- [11-RAG: Use Cases](../11-rag/01-rag-use-cases.md) — vector search is the retrieval engine for RAG
+- [11-RAG: Prompts and Responses](../11-rag/02-prompts-and-responses.md)
 
 ---
 

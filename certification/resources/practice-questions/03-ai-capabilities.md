@@ -20,18 +20,18 @@ Domain 3 covers 20–25% of the DP-800 exam.
 A developer wants to call Azure OpenAI's `text-embedding-3-small` model from T-SQL to generate embeddings. Which statement correctly registers this model in Azure SQL Database?
 
 A. `CREATE MODEL EmbeddingModel TYPE = AZURE_OPENAI WITH (MODEL = 'text-embedding-3-small')`
-B. `CREATE EXTERNAL MODEL EmbeddingModel WITH (LOCATION = '...', CREDENTIAL = ..., TASK = EMBEDDINGS, MODEL = 'text-embedding-3-small')`
+B. `CREATE EXTERNAL MODEL EmbeddingModel WITH (LOCATION = '...', CREDENTIAL = ..., MODEL_TYPE = EMBEDDINGS, MODEL = 'text-embedding-3-small')`
 C. `CREATE EXTERNAL MODEL EmbeddingModel WITH (ENDPOINT = '...', KEY = '...', TYPE = 'OpenAI')`
 D. `EXEC sp_create_external_model 'EmbeddingModel', 'text-embedding-3-small'`
 
 > [!success]- Answer
-> **B. `CREATE EXTERNAL MODEL EmbeddingModel WITH (LOCATION = '...', CREDENTIAL = ..., TASK = EMBEDDINGS, MODEL = 'text-embedding-3-small')`**
+> **B. `CREATE EXTERNAL MODEL EmbeddingModel WITH (LOCATION = '...', CREDENTIAL = ..., MODEL_TYPE = EMBEDDINGS, MODEL = 'text-embedding-3-small')`**
 >
 > The full `CREATE EXTERNAL MODEL` syntax requires:
-> - `LOCATION`: The Azure OpenAI endpoint URL
-> - `CREDENTIAL`: A database-scoped credential holding the API key
-> - `TASK`: The model's task type (e.g., `EMBEDDINGS`, `CHAT_COMPLETION`, `CLASSIFICATION`)
-> - `MODEL`: The deployment name in Azure OpenAI
+> - `LOCATION` — the Azure OpenAI endpoint URL
+> - `CREDENTIAL` — a database-scoped credential holding the API key
+> - `MODEL_TYPE` — `EMBEDDINGS` or `COMPLETIONS` (this is the T-SQL keyword; some non-SQL frameworks call this "task")
+> - `MODEL` — the deployment name in Azure OpenAI
 >
 > Once created, the model is invoked with `SELECT * FROM PREDICT(MODEL = EmbeddingModel, ...)`.
 
@@ -331,15 +331,15 @@ D. Encrypt the key using `ENCRYPTBYPASSPHRASE` and store it in a table
 
 A developer creates a DiskANN vector index `WITH (METRIC = 'cosine')` on the `EmbeddingVector` column. They then call `VECTOR_SEARCH(... METRIC = 'euclidean' ...)` against the same column. What is the expected result?
 
-A. The query runs and silently falls back to an exact (ENN) scan
+A. The query runs but a warning is raised and the engine falls back to exact kNN (no index used)
 B. The query runs and uses the cosine index, ignoring the `METRIC` parameter
 C. An error is raised — the index metric and the query metric must match
 D. The query runs and rebuilds the index automatically with the new metric
 
 > [!success]- Answer
-> **C — An error is raised; the index metric and the query metric must match**
+> **A — A warning is raised and the engine falls back to exact kNN (the index is not used)**
 >
-> DiskANN is metric-specific: the index is built around the distance function. Using a different metric in `VECTOR_SEARCH` raises an error. To support multiple metrics, build multiple indexes (one per metric). This is a very common 2026 exam trap.
+> Per the official `VECTOR_SEARCH` documentation: *"An ANN index is used only if a matching ANN index, with the same metric and on the same column, is found. If there are no compatible ANN indexes, a warning is raised and the kNN (k-nearest neighbor) algorithm is used."* So a metric mismatch is **not** an error — it silently degrades to exact scan with a warning, which can be a nasty performance surprise in production. To support multiple metrics, build multiple indexes (one per metric).
 
 ---
 
@@ -347,17 +347,17 @@ D. The query runs and rebuilds the index automatically with the new metric
 
 **Question** *(Medium)*:
 
-A team wants to reduce vector storage cost in SQL Server 2025 by half while still supporting embeddings up to ~4 000 dimensions. Which feature should they evaluate?
+A team wants to reduce vector storage cost in SQL Server 2025 by half while keeping use of vector operators (`VECTOR_DISTANCE`, `VECTOR_SEARCH`). Which feature should they evaluate?
 
 A. Switch to `VECTOR(n)` with bit-packed storage
 B. Compress the table with `DATA_COMPRESSION = PAGE`
-C. Use the preview half-precision (16-bit) `VECTOR` storage option
+C. Use the preview half-precision (`float16`, 16-bit) `VECTOR` storage option
 D. Store vectors as `varbinary(max)` and compress at the application layer
 
 > [!success]- Answer
-> **C — Use the preview half-precision (16-bit) `VECTOR` storage option**
+> **C — Use the preview half-precision (`float16`) `VECTOR` storage option**
 >
-> Half-precision vectors are a preview feature in SQL Server 2025 that store each component as 16-bit floats instead of 32-bit. Storage is halved and roughly twice as many dimensions can be packed per row (up to ~4 000). Page compression (B) is ineffective on dense float data. `varbinary(max)` loses vector operator support.
+> Half-precision vectors are a preview feature in SQL Server 2025 that store each component as a 16-bit float instead of 32-bit. Storage is halved at the same dimension count. The documented `VECTOR` type cap remains **1 998 dimensions** — half-precision does not raise that ceiling. Page compression (B) is ineffective on dense float data. `varbinary(max)` (D) loses vector operator support.
 
 ---
 
@@ -383,17 +383,17 @@ D. Azure Logic Apps polling on a 1-minute recurrence
 
 **Question** *(Hard)*:
 
-A SQL Database in Microsoft Fabric must stream row changes to a Fabric Lakehouse table in near real-time. The team prefers zero infrastructure to operate. Which is the most appropriate choice?
+A SQL Database in Microsoft Fabric must publish row changes for near-real-time consumption by a downstream Lakehouse pipeline. The team prefers zero infrastructure to operate. Which is the most appropriate choice?
 
 A. CDC with a custom pipeline reading from `cdc.fn_cdc_get_all_changes_*`
-B. Change Event Streaming (CES) routed to an Eventstream and into the Lakehouse
+B. Change Event Streaming (CES) publishing to Fabric Eventstream / Azure Event Hubs, with the Lakehouse hop handled downstream
 C. Azure Functions with `SqlTrigger` binding
 D. Azure Logic Apps SQL connector on a 1-minute recurrence
 
 > [!success]- Answer
-> **B — Change Event Streaming (CES) routed to an Eventstream and into the Lakehouse**
+> **B — Change Event Streaming (CES) publishing to Fabric Eventstream / Azure Event Hubs**
 >
-> CES is a Fabric-native push-based stream from SQL Database in Fabric to downstream Fabric workloads. No SQL Agent, no Azure Functions, no polling — the events are produced by the engine and delivered to the destination. Azure Functions and Logic Apps work but require operational ownership. CDC requires a custom consumer.
+> CES is the engine-side, push-based change stream from SQL Database in Fabric. Its native destinations are Fabric Eventstream or Azure Event Hubs; the Lakehouse hop is configured downstream (Eventstream → Lakehouse). No SQL Agent, no Azure Functions, no polling. Azure Functions and Logic Apps work but require operational ownership. CDC requires a custom consumer.
 
 ---
 
@@ -401,17 +401,17 @@ D. Azure Logic Apps SQL connector on a 1-minute recurrence
 
 **Question** *(Medium)*:
 
-A developer notices that `VECTOR_SEARCH` is occasionally missing relevant items that an exact `VECTOR_DISTANCE` query would surface. They cannot afford to give up the ANN performance gain. Which tuning lever is the right first step?
+A developer notices that `VECTOR_SEARCH` against a latest-version DiskANN index is occasionally missing relevant items that an exact `VECTOR_DISTANCE` query would surface. They cannot afford to give up the ANN performance gain. Which is the recommended way to raise recall?
 
 A. Drop the DiskANN index and re-create it with `METRIC = 'dot'`
-B. Increase the `TOP_N` candidate count returned by `VECTOR_SEARCH`
+B. Increase the candidate count via `SELECT TOP (N) WITH APPROXIMATE …` (the current syntax)
 C. Normalize the stored vectors with `VECTOR_NORMALIZE`
 D. Switch from `VECTOR(1536)` to `VECTOR(3072)`
 
 > [!success]- Answer
-> **B — Increase the `TOP_N` candidate count returned by `VECTOR_SEARCH`**
+> **B — Use `SELECT TOP (N) WITH APPROXIMATE …` and raise N**
 >
-> `TOP_N` controls how many candidates the DiskANN index returns to the query. A larger `TOP_N` raises recall at modest CPU/latency cost — the standard tuning lever for ANN. Re-creating the index with a different metric (A) changes the meaning of the search; normalization (C) is required before using `dot`, not a recall fix; increasing dimensions (D) requires a different model and re-embedding.
+> On latest-version vector indexes, the candidate count is controlled by `SELECT TOP (N) WITH APPROXIMATE …`. Increasing N raises recall at modest CPU/latency cost. The older `TOP_N` parameter on `VECTOR_SEARCH` is **deprecated** and is preserved only for backward compatibility with earlier-version indexes (passing it against a latest-version index raises Msg 42274). Re-creating the index with a different metric (A) changes the meaning of the search; normalization (C) is required before using `dot`, not a recall fix; increasing dimensions (D) requires a different model and re-embedding.
 
 ---
 

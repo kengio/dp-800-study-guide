@@ -17,9 +17,9 @@ tags:
 > [!info] What's New for the 2026 Exam (updated May 2026)
 > Microsoft refreshed the official DP-800 skills measured list on **March 12, 2026**. This guide is aligned to that blueprint. The biggest 2026 changes you should know cold:
 >
-> - **SQL Server 2025 is RTM.** The `VECTOR` data type, `VECTOR_DISTANCE`, `VECTOR_SEARCH`, `VECTOR_NORMALIZE`, and `VECTORPROPERTY` are **GA** in SQL Server 2025 and Azure SQL Database.
-> - **DiskANN vector index** is in **public preview** for SQL Server 2025; private preview in Azure SQL Database. The exam may include preview features that are commonly used — know the syntax and the `METRIC` clause.
-> - **Half-precision (16-bit) vectors** are in preview — allows ~2× larger dimensions per row.
+> - **SQL Server 2025 is GA.** The `VECTOR` data type and `VECTOR_DISTANCE` are **generally available** in SQL Server 2025 and Azure SQL Database. `VECTOR_SEARCH`, `VECTOR_NORMALIZE`, and `VECTORPROPERTY` are in **public preview** on the same platforms — the exam regularly tests preview features that are commonly used (per Microsoft's own note on the study guide).
+> - **DiskANN vector index** is in **public preview** across SQL Server 2025, Azure SQL Database, Azure SQL Managed Instance, and SQL database in Microsoft Fabric. On SQL Server 2025 also requires `PREVIEW_FEATURES = ON`. Know the syntax and the `METRIC` clause cold.
+> - **Half-precision (`float16`) vectors** are in preview — halves storage at the same dimension count. The documented `VECTOR` type cap is **1 998** dimensions.
 > - **MCP server endpoints** are explicitly tested: connecting Copilot to SQL Server and Fabric lakehouse MCP endpoints, plus **securing MCP/REST/GraphQL endpoints**.
 > - **Passwordless database access** and **Managed Identity for model endpoints** are now called out as secure-access requirements.
 > - **Microsoft Foundry** is listed alongside Change Tracking, CDC, CES, Azure Functions, and Logic Apps as a valid embedding-maintenance method.
