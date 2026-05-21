@@ -4,13 +4,21 @@ Notable changes to the DP-800 study guide.
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/). Dates use ISO 8601. Each section is grouped under the Microsoft blueprint date it tracks, so future readers can match guide versions to the version of the exam they were preparing for.
 
-## [Unreleased]
+## [1.1.0] — 2026-05-22 — Anki + translation scaffolding + live practice quiz
+
+Same 2026-03-12 Microsoft blueprint as v1.0.0. Adds three large companion artefacts and the docs to support them.
 
 ### Added
 
 - **Anki deck** (`certification/resources/anki/dp-800.tsv`) — ~130 spaced-repetition cards generated from the 6 cheat sheets, with tag-based filtering and an import-instructions readme
 - **Translation scaffolding** — `TRANSLATING.md` (translator guide: BCP-47 locale codes, `i18n/<locale>/` mirror layout, suggested priority order, currency policy, quality bar) and `i18n/README.md` (locale index, no locales yet). New `## Translations` section in `README.md` linking to both; `CONTRIBUTING.md` and `CLAUDE.md` updated to document the convention
-- **Adaptive practice quiz** (`practice/`) — browser-based JSON-driven quiz with adaptive question selection (down-weights recently-correct, up-weights recently-wrong + never-attempted), per-bank `localStorage` progress, exam timer, domain/difficulty filters, light/dark/auto themes. Sources from `certification/resources/practice-questions/*.md` (60 questions) plus both mock exams (50 + 50 = 100 questions) for **160 questions across 3 banks**. `build.py` is a Python 3 stdlib markdown → JSON converter; `deploy-practice.yml` auto-deploys to GitHub Pages on any change to `practice/` or the source markdown
+- **Adaptive practice quiz** (`practice/`) — browser-based JSON-driven quiz with adaptive question selection (down-weights recently-correct, up-weights recently-wrong + never-attempted), per-bank `localStorage` progress, exam timer, domain/difficulty filters, light/dark/auto themes. Sources from `certification/resources/practice-questions/*.md` (60 questions) plus both mock exams (50 + 50 = 100 questions) for **160 questions across 3 banks**. `build.py` is a Python 3 stdlib markdown → JSON converter; `deploy-practice.yml` auto-deploys to GitHub Pages on any change to `practice/` or the source markdown. Live at <https://kengio.github.io/dp-800-study-guide/>
+- **Live-quiz cross-links** in `README.md` (top `> [!TIP]` callout + "How to use this guide" steps 4–5), `certification/dp-800-overview.md` (Practice & Resources row), `certification/resources/practice-questions/practice-questions.md`, `certification/resources/mock-exam/mock-exam-1.md`, and `certification/resources/mock-exam-2/mock-exam-2.md`
+- **`README.md` repo-layout tree** updated to surface `practice/`, `i18n/`, `anki/`, `.github/workflows/`, and the top-level community files (`CHANGELOG.md`, `CONTRIBUTING.md`, `CONTRIBUTORS.md`, `TRANSLATING.md`)
+
+### Changed
+
+- `certification/dp-800-overview.md` — flipped `status: draft` → `status: complete` on all 11 topic-section indexes (the v1.0.0 content is no longer draft)
 
 ## [1.0.0] — 2026-05-21 — Initial tagged release
 

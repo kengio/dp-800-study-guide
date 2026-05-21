@@ -16,6 +16,9 @@ tags:
 - **Scoring**: Check answers only after completing all 50 questions
 - **Review**: For any incorrect answers, use the [debrief](./mock-exam-1-debrief.md) to find the topic file to re-read
 
+> [!tip] Take it timed in your browser
+> Mock 1 is also available as a bank in the **[live practice quiz](https://kengio.github.io/dp-800-study-guide/)** — pick the **70-minute** exam timer and the **DP-800 — Mock Exam 1** bank. Progress saves to your browser only.
+
 > Treat this as a real exam attempt. Resist the urge to look up answers mid-session. The case-study block at the end mirrors the real DP-800 format — read the whole scenario before answering.
 
 ---

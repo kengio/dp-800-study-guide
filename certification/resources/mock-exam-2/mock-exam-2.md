@@ -16,6 +16,9 @@ tags:
 - **Scoring**: Check answers only after completing all 50 questions
 - **Review**: For any incorrect answers, use the [debrief](./mock-exam-2-debrief.md) to find the topic file to re-read
 
+> [!tip] Take it timed in your browser
+> Mock 2 is also available as a bank in the **[live practice quiz](https://kengio.github.io/dp-800-study-guide/)** — pick the **70-minute** exam timer and the **DP-800 — Mock Exam 2** bank. Progress saves to your browser only.
+
 > This exam uses entirely different questions from Mock Exam 1. Complete Mock Exam 1 first for best results. The case-study block at the end mirrors the real DP-800 format.
 
 ---

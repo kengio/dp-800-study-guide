@@ -361,7 +361,15 @@ dp-800-study-guide/
 │       ├── appendix/                # glossary, comparisons, error reference
 │       ├── final-review.md          # 20-minute exam-morning scan
 │       ├── exam-tips.md             # strategy and time management
+│       ├── anki/                    # spaced-repetition deck (130 cards) + import readme
 │       └── official-links.md        # Microsoft docs and exam registration
+├── practice/                        # adaptive practice quiz — HTML/JS/CSS + build.py + JSON banks
+│                                    # auto-deployed to GitHub Pages
+├── i18n/                            # community translations — parallel tree per locale
+├── .github/workflows/               # CI: markdownlint + lychee (lint.yml), Pages deploy (deploy-practice.yml)
+├── CHANGELOG.md                     # versioned change log
+├── CONTRIBUTING.md / CONTRIBUTORS.md # contribution guide and roster
+├── TRANSLATING.md                   # translation conventions
 ├── LICENSE                          # MIT
 └── README.md                        # this file
 ```
