@@ -135,6 +135,108 @@ The [main overview](./certification/dp-800-overview.md) opens with the full "Wha
 
 > The guide works in any Markdown viewer. It's also optimized for **Obsidian** — wikilinks, callouts, Mermaid diagrams, and Graph View all render correctly.
 
+## Study roadmap
+
+Pick the plan that matches the time you have. All three end with the same outcome — sitting the exam with confidence. The hours are realistic averages for an experienced T-SQL developer; double them if you're newer to relational databases or to the Microsoft stack.
+
+### 🏃 4-week sprint (~30–35 hours total — ~1 hour/day)
+
+Best for: experienced SQL developers brushing up on AI features. Tight but doable.
+
+| Week | Focus | Files | Hours |
+| :--- | :--- | :--- | :---: |
+| **1** | Domain 1 — Design & develop | `01-database-objects`, `02-programmability-objects`, `03-advanced-tsql`, `04-ai-assisted-tools` | 9 |
+| **2** | Domain 2 — Secure, optimize, deploy | `05-data-security-compliance`, `06-performance-optimization`, `07-cicd-database-projects`, `08-azure-services-integration` | 9 |
+| **3** | Domain 3 — AI capabilities | `09-models-embeddings`, `10-intelligent-search`, `11-rag` + cheat sheets | 9 |
+| **4** | Practice & polish | Practice questions (all 3 domains) → Mock Exam 1 → review → Mock Exam 2 → final-review.md | 6 |
+
+### 🚶 8-week balanced (~55–65 hours total — ~1 hour/day, 7 days/week)
+
+Best for: working professionals fitting study around a job. The recommended default.
+
+| Week | Focus | Hours |
+| :--- | :--- | :---: |
+| **1** | `01-database-objects` (all 5 sub-topics) + read the [overview](./certification/dp-800-overview.md) | 7 |
+| **2** | `02-programmability-objects` + `03-advanced-tsql` part 1 (CTEs, window, JSON) | 8 |
+| **3** | `03-advanced-tsql` part 2 (regex, graph, error handling) + `04-ai-assisted-tools` | 7 |
+| **4** | **Checkpoint:** Domain 1 cheat sheets + Domain 1 practice questions (target 70 %+) | 5 |
+| **5** | `05-data-security-compliance` + `06-performance-optimization` | 8 |
+| **6** | `07-cicd-database-projects` + `08-azure-services-integration` | 7 |
+| **7** | Domain 2 practice questions + `09-models-embeddings` + `10-intelligent-search` | 8 |
+| **8** | `11-rag` + Domain 3 practice → **Mock Exam 1 (timed)** → review weak areas → **Mock Exam 2** → final-review.md | 8 |
+
+### 🧘 12-week comprehensive (~80–100 hours total — ~1 hour/day, with weekends off)
+
+Best for: newcomers to AI features, career changers, or anyone wanting deeper retention.
+
+| Week | Focus | Hours |
+| :--- | :--- | :---: |
+| **1** | `01-database-objects/01–02` (tables, specialized tables) | 6 |
+| **2** | `01-database-objects/03–05` (JSON columns, constraints, partitioning) | 6 |
+| **3** | `02-programmability-objects` (views, functions, procs, triggers) + first hands-on lab | 7 |
+| **4** | `03-advanced-tsql/01–03` (CTEs, JSON, regex) | 7 |
+| **5** | `03-advanced-tsql/04–05` + `04-ai-assisted-tools` + Domain 1 practice questions | 7 |
+| **6** | **Checkpoint:** Domain 1 cheat sheets + retake weak Domain 1 questions | 5 |
+| **7** | `05-data-security-compliance` (all 5 sub-topics) | 8 |
+| **8** | `06-performance-optimization` + isolation/concurrency hands-on | 7 |
+| **9** | `07-cicd-database-projects` + `08-azure-services-integration` | 8 |
+| **10** | Domain 2 practice questions + `09-models-embeddings` | 8 |
+| **11** | `10-intelligent-search` + `11-rag` (build a small RAG demo) | 9 |
+| **12** | Domain 3 practice → **Mock Exam 1** → gap-fill → **Mock Exam 2** → final-review.md → exam | 8 |
+
+### Suggested daily cadence
+
+```text
+Weekday    (45–60 min):  Read 1 topic sub-file + work the examples in your own DB
+Weekend    (90–120 min): Cheat sheet review + practice questions + flashcards
+Pre-exam   (last 3 days): Stop new material. Re-read cheat sheets and final-review.md only.
+Exam day:                Read final-review.md once over coffee. Eat. Go pass it.
+```
+
+### Time-budget per resource (single sitting, end-to-end)
+
+| Resource | Realistic time |
+| :--- | :--- |
+| Each numbered topic file | 30–45 min reading + 15 min experimentation |
+| Each section index | 5 min |
+| One cheat sheet | 15–20 min |
+| One domain's practice questions (15–20 Qs) | 30–45 min |
+| Mock Exam (45 Qs, timed) | 90 min + 30 min review |
+| `final-review.md` | 20 min |
+
+## Roadmap for the guide itself
+
+This guide ships as a living resource. The roadmap below is what's planned for the next two quarters — issues and PRs against any of these are welcome.
+
+### Q2–Q3 2026 (next 6 months)
+
+- ✅ **Align to March 2026 blueprint** — complete (this release)
+- ✅ **MIT license + open-source release** — complete
+- ✅ **2026 update callouts** in overview and final-review — complete
+- 🔄 **Expand Domain 1 & 2 practice questions** with newer-blueprint coverage (target +15 questions)
+- 🔄 **Add 2026-update questions to mock exams** (target 5–8 per mock)
+- 🔄 **Hands-on lab pack** — runnable T-SQL scripts that set up sample data and walk through vector search, RAG, full-text, and MCP scenarios
+- 🔄 **Half-precision vector** examples once the feature reaches public preview in Azure SQL
+- 🔄 **Microsoft Foundry walkthrough** as an embedding-maintenance method
+- 🔄 **Video walkthroughs** of the hardest topics (vector index metric matching, RLS predicate functions, CES vs CDC)
+
+### Q4 2026 (3–6 months out)
+
+- ⏳ **Azure SQL DiskANN GA** content updates (expected to leave private preview)
+- ⏳ **Half-precision vector GA** content updates
+- ⏳ **Updated mock exams** following any Microsoft blueprint refresh
+- ⏳ **Community contributor list** in CONTRIBUTORS.md
+- ⏳ **Spaced-repetition deck (Anki)** generated from cheat-sheet facts
+- ⏳ **Translation scaffolding** so non-English learners can fork and translate
+
+### Q1 2027 (6–12 months out)
+
+- 🌱 **Renewal-assessment guide** for those who took DP-800 in 2026 and need to renew
+- 🌱 **Companion guide for related exams** (e.g., DP-700 Fabric Data Engineer, AI-102 AI Engineer cross-references)
+- 🌱 **Adaptive practice questions** — JSON-driven question bank with difficulty tagging
+
+Legend: ✅ done · 🔄 in progress / next up · ⏳ planned · 🌱 ideas being explored
+
 ## Quick navigation
 
 | Resource | Description |
