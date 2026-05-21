@@ -14,7 +14,7 @@ tags:
 
 <p align="center">
   <a href="https://learn.microsoft.com/en-us/credentials/certifications/developing-ai-enabled-database-solutions/">
-    <img src="https://learn.microsoft.com/en-us/media/logos/logo-ms-social-default.png" alt="Microsoft" height="60">
+    <img src="https://img.shields.io/badge/Microsoft%20Certified-SQL%20AI%20Developer%20Associate-0078D4?style=for-the-badge&logo=microsoft&logoColor=white&labelColor=0078D4" alt="Microsoft Certified: SQL AI Developer Associate" height="44">
   </a>
 </p>
 
@@ -80,14 +80,12 @@ You don't need to be taking the exam to get value — the guide doubles as a ref
 | **Full Name** | Developing AI-Enabled Database Solutions |
 | **Credential** | Microsoft Certified: SQL AI Developer Associate |
 | **Passing Score** | 700 / 1000 |
-| **Question Count** | 40–60 |
-| **Duration** | ~100 minutes (varies by language) |
-| **Cost (USD)** | $165 (varies by region) |
+| **Duration** | 120 minutes |
+| **Cost** | Varies by region (commonly ~$165 USD in the US) |
 | **Renewal** | Annual (free Microsoft Learn assessment) |
 | **Platforms tested** | SQL Server (incl. 2025), Azure SQL, SQL databases in Microsoft Fabric |
 | **Language** | T-SQL |
 | **Blueprint date** | March 12, 2026 |
-| **Format** | Multiple choice, case studies, interactive scenarios |
 
 ### Domain weights
 
@@ -113,9 +111,9 @@ External models · embedding maintenance (triggers, CT, CDC, CES, Azure Function
 > [!IMPORTANT]
 > Microsoft refreshed the DP-800 skills measured on **March 12, 2026**. Highlights:
 
-- **SQL Server 2025 is GA.** The `VECTOR` data type, `VECTOR_DISTANCE`, `VECTOR_SEARCH`, `VECTOR_NORMALIZE`, and `VECTORPROPERTY` are now generally available in SQL Server 2025 and Azure SQL Database.
-- **DiskANN vector indexes** are in public preview for SQL Server 2025 (private preview in Azure SQL).
-- **Half-precision (16-bit) vectors** are in preview — half the storage, roughly twice the dimensions per row (~4 000).
+- **SQL Server 2025 is GA.** The `VECTOR` data type and `VECTOR_DISTANCE` are **generally available** in SQL Server 2025 and Azure SQL Database. `VECTOR_SEARCH`, `VECTOR_NORMALIZE`, and `VECTORPROPERTY` are in **public preview** on the same platforms.
+- **DiskANN vector indexes** are in **public preview** across SQL Server 2025, Azure SQL Database, Azure SQL Managed Instance, and SQL database in Microsoft Fabric. On SQL Server 2025 also requires `PREVIEW_FEATURES = ON`.
+- **Half-precision (16-bit) `float16` vectors** are in preview — halves storage for the same dimension count (the documented type cap is **1 998** dimensions).
 - **MCP server endpoints** (SQL Server + Fabric lakehouse) are explicitly tested.
 - **Microsoft Foundry** is named as a valid embedding-maintenance method alongside CDC, Change Tracking, and CES.
 - **Change Event Streaming (CES)** in Fabric is now in the blueprint.
@@ -123,6 +121,45 @@ External models · embedding maintenance (triggers, CT, CDC, CES, Azure Function
 - **Schema drift detection** in SQL Database Projects is now an explicit skill.
 
 The [main overview](./certification/dp-800-overview.md) opens with the full "What's New" callout.
+
+## Getting started with Obsidian (recommended)
+
+This guide is written in [Obsidian Flavored Markdown](https://help.obsidian.md/). It renders fine on GitHub, but in **Obsidian** you get callouts, foldable practice-question answers, Mermaid diagrams, backlinks, and a navigable Graph View of every cross-link — which makes studying meaningfully better.
+
+### 5-minute onboarding
+
+1. **Install [Obsidian](https://obsidian.md/download)** (free; macOS, Windows, Linux).
+2. **Clone this repo** somewhere on your machine:
+
+   ```bash
+   git clone https://github.com/kengio/dp-800-study-guide.git
+   cd dp-800-study-guide
+   ```
+
+3. **Open the vault**: launch Obsidian → *Open folder as vault* → pick the cloned `dp-800-study-guide/` directory.
+4. **Trust the author** when Obsidian asks (the included `.obsidian/` config has pre-tuned settings — line numbers, tab width, no inline titles).
+5. **Open `certification/dp-800-overview.md`** — that's your study path entry point. Press `Cmd/Ctrl + O` to fuzzy-find any topic.
+6. **Toggle Graph View** (`Cmd/Ctrl + G`) to see how all 11 sections cross-link — surprisingly useful for spotting weak areas.
+
+### Recommended plugins
+
+Two are essential, the rest are quality-of-life. Install via **Settings → Community plugins → Browse**.
+
+- **Obsidian Git** — back up your notes and progress checkboxes to your own fork.
+- **Linter** — keeps your edits consistent with the project's markdown conventions.
+- **Advanced Tables** — auto-aligns Markdown tables as you type.
+- **Codeblock Customizer** (or *Better CodeBlock*) — line numbers, titles, copy buttons on code blocks.
+- **Copilot** (by logancyang) — chat with Claude / GPT-4o / Ollama inside Obsidian; **Vault QA** mode indexes the guide so the AI can quiz you using your actual notes.
+
+> 📖 **See [`OBSIDIAN-SETUP.md`](./OBSIDIAN-SETUP.md)** for the full setup walkthrough — plugin configuration details, Copilot Vault QA setup, recommended study prompts, and tips for using AI to generate active-recall questions from your notes.
+
+### Don't want Obsidian?
+
+No problem. The guide also renders perfectly in:
+
+- **GitHub** — browse the files online; callouts and Mermaid diagrams render natively
+- **VS Code** with the [Markdown All in One](https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one) extension
+- **Any Markdown reader** that supports GFM — you'll lose callouts and Graph View, but the content is fully readable
 
 ## How to use this guide
 
@@ -288,7 +325,7 @@ dp-800-study-guide/
 
 - [DP-800 skills measured (official study guide)](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-800)
 - [DP-800 certification page](https://learn.microsoft.com/en-us/credentials/certifications/developing-ai-enabled-database-solutions/)
-- [Schedule the exam (Pearson VUE)](https://learn.microsoft.com/en-us/credentials/certifications/exams/dp-800/)
+- [Schedule the exam](https://learn.microsoft.com/en-us/credentials/certifications/developing-ai-enabled-database-solutions/#schedule-exam)
 - [Free Microsoft Learn practice assessment](https://learn.microsoft.com/en-us/credentials/certifications/azure-administrator/practice/assessment?assessment-type=practice&assessmentId=1704375541&practice-assessment-type=certification)
 - [Exam sandbox (try the testing UI)](https://aka.ms/examdemo)
 - [Request accommodations](https://learn.microsoft.com/en-us/credentials/certifications/request-accommodations)
@@ -302,14 +339,15 @@ dp-800-study-guide/
 - [VECTOR data type](https://learn.microsoft.com/en-us/sql/t-sql/data-types/vector-data-type)
 - [VECTOR_DISTANCE](https://learn.microsoft.com/en-us/sql/t-sql/functions/vector-distance-transact-sql)
 - [VECTOR_SEARCH](https://learn.microsoft.com/en-us/sql/t-sql/functions/vector-search-transact-sql)
-- [Vector indexes (DiskANN)](https://learn.microsoft.com/en-us/azure/azure-sql/database/vector-index)
+- [Vector search and indexes overview](https://learn.microsoft.com/en-us/sql/sql-server/ai/vectors)
+- [Public preview of DiskANN in Azure SQL (Azure SQL Dev Corner)](https://devblogs.microsoft.com/azure-sql/public-preview-of-vector-indexing-in-azure-sql-db-azure-sql-mi-and-sql-database-in-microsoft-fabric/)
 - [sp_invoke_external_rest_endpoint](https://learn.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sp-invoke-external-rest-endpoint-transact-sql)
 - [CREATE EXTERNAL MODEL](https://learn.microsoft.com/en-us/sql/t-sql/statements/create-external-model-transact-sql)
 - [Data API Builder (DAB)](https://learn.microsoft.com/en-us/azure/data-api-builder/)
 - [SQL Database Projects](https://learn.microsoft.com/en-us/sql/azure-data-studio/extensions/sql-database-project-extension)
 - [Change Data Capture](https://learn.microsoft.com/en-us/sql/relational-databases/track-changes/about-change-data-capture-sql-server)
 - [Change Tracking](https://learn.microsoft.com/en-us/sql/relational-databases/track-changes/about-change-tracking-sql-server)
-- [Change Event Streaming (CES) in Fabric](https://learn.microsoft.com/en-us/fabric/database/sql/change-event-streaming)
+- [Change Event Streaming (CES) overview](https://learn.microsoft.com/en-us/sql/relational-databases/track-changes/change-event-streaming/overview)
 - [Always Encrypted](https://learn.microsoft.com/en-us/sql/relational-databases/security/encryption/always-encrypted-database-engine)
 - [Row-Level Security](https://learn.microsoft.com/en-us/sql/relational-databases/security/row-level-security)
 - [Dynamic Data Masking](https://learn.microsoft.com/en-us/sql/relational-databases/security/dynamic-data-masking)

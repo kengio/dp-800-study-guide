@@ -68,9 +68,9 @@ tags:
 
 ## 2026 Updates — What Microsoft Added or Emphasized
 
-- **SQL Server 2025 RTM:** `VECTOR`, `VECTOR_DISTANCE`, `VECTOR_SEARCH`, `VECTOR_NORMALIZE`, and `VECTORPROPERTY` are **GA** in SQL Server 2025 and Azure SQL Database. Treat them as fully testable.
-- **DiskANN vector index:** **public preview** in SQL Server 2025; private preview in Azure SQL. Index `METRIC` (`cosine`/`euclidean`/`dot`) must match the metric passed to `VECTOR_SEARCH` or the query errors.
-- **Half-precision (16-bit) vectors:** preview; halves storage and roughly doubles dimensions per row (~4 000). Know the tradeoff: smaller storage, slight recall loss.
+- **SQL Server 2025 GA:** `VECTOR` and `VECTOR_DISTANCE` are **GA** in SQL Server 2025 and Azure SQL Database. `VECTOR_SEARCH`, `VECTOR_NORMALIZE`, and `VECTORPROPERTY` are in **public preview** on the same platforms — fully testable per Microsoft's preview-features note.
+- **DiskANN vector index:** **public preview** across SQL Server 2025, Azure SQL Database, Azure SQL Managed Instance, and SQL database in Microsoft Fabric. On SQL Server 2025 also needs `PREVIEW_FEATURES = ON`. Index `METRIC` (`cosine`/`euclidean`/`dot`) must match the metric passed to `VECTOR_SEARCH` — **a mismatch produces a warning and falls back to exact kNN**, it does not error.
+- **Half-precision (`float16`) vectors:** preview; halves storage at the same dimension count. The documented `VECTOR` type cap is **1 998** dimensions — half-precision does not raise that cap.
 - **MCP server endpoints:** explicitly tested. `stdio` for local, `HTTP+SSE` for remote/hosted (e.g., Fabric lakehouse). Always pass credentials through env vars, never inline in config. MCP runs with the **connection-string user's permissions** — least privilege matters.
 - **Microsoft Foundry** is now a listed embedding-maintenance option alongside triggers, CT, CDC, CES, Azure Functions, and Logic Apps. Foundry = the most managed/declarative option in Fabric.
 - **Change Event Streaming (CES):** push-based change stream from SQL Database in Fabric to Lakehouse/Eventstream/KQL DB. Zero-infrastructure alternative to CDC + custom consumer.
