@@ -47,7 +47,7 @@ tags:
 | 16 | sp_describe_first_result_set | Inspect first result set of a procedure | [03-stored-procedures.md](../../02-programmability-objects/03-stored-procedures.md) | — |
 | 17 | STRING_SPLIT — Ordered | `STRING_SPLIT(string, sep, 1)` — preserves order (SQL Server 2022+) | [01-ctes-window-functions.md](../../03-advanced-tsql/01-ctes-window-functions.md) | — |
 
-### Domain 2 — Secure, optimize, deploy (Qs 18–32)
+### Domain 2 — Secure, optimize, deploy (Qs 18–34)
 
 | # | Topic | Key concept tested | Re-read | Cheat sheet |
 | :---: | :--- | :--- | :--- | :--- |

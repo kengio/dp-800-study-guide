@@ -47,7 +47,7 @@ tags:
 | 16 | FOR JSON PATH vs AUTO | Manual path control vs auto-naming | [02-json-functions.md](../../03-advanced-tsql/02-json-functions.md) | [json-functions](../cheat-sheets/json-functions-quick-ref.md) |
 | 17 | Partitioning — Sliding Window | Partition switching for archive/load | [05-partitioning.md](../../01-database-objects/05-partitioning.md) | — |
 
-### Domain 2 — Secure, optimize, deploy (Qs 18–32)
+### Domain 2 — Secure, optimize, deploy (Qs 18–34)
 
 | # | Topic | Key concept tested | Re-read | Cheat sheet |
 | :---: | :--- | :--- | :--- | :--- |

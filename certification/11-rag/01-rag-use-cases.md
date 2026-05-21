@@ -11,6 +11,22 @@ tags:
 
 # RAG Use Cases and Architecture
 
+## Overview
+
+Retrieval-Augmented Generation (RAG) grounds large language model (LLM) responses in data from a database, preventing **hallucinations** and providing up-to-date, accurate answers. Rather than relying on what the model "knows" from training, RAG retrieves relevant context from a trusted data source and includes it in the prompt. SQL Database in Fabric and Azure SQL are natural RAG backends because they store both structured data and embeddings in one place.
+
+> [!abstract]
+> - Covers the RAG pattern (Retrieve-Augment-Generate), use cases, and Azure SQL as a RAG backend
+> - RAG grounds LLM responses in real data, preventing hallucinations and using current information
+> - Key exam topics: RAG pattern steps, grounding vs fine-tuning distinction, combined vector+FTS retrieval
+
+> [!tip] What the Exam Tests
+> - RAG pattern: (1) embed user query → (2) search DB with VECTOR_SEARCH + CONTAINS → (3) retrieve top-K chunks → (4) build prompt → (5) call LLM → (6) return grounded response
+> - **Grounding ≠ fine-tuning** — RAG injects context at inference time; the model's weights are not changed
+> - Azure SQL is a natural RAG backend: stores both structured data AND vector embeddings in one database
+
+---
+
 ## RAG Flow at a Glance
 
 ```mermaid
@@ -25,32 +41,18 @@ sequenceDiagram
     App->>DB: pass question
     DB->>E: PREDICT — embed question
     E-->>DB: query VECTOR(1536)
-    DB->>DB: VECTOR_DISTANCE + WITH APPROXIMATE<br/>(top-K chunks)
-    DB->>DB: build prompt<br/>(system + context + user)
+    DB->>DB: VECTOR_DISTANCE + WITH APPROXIMATE (top-K chunks)
+    DB->>DB: build prompt (system + context + user)
     DB->>L: sp_invoke_external_rest_endpoint
     L-->>DB: JSON in $.result envelope
-    DB->>DB: JSON_VALUE(@resp, '$.result.choices[0].message.content')
+    DB->>DB: JSON_VALUE(@resp, $.result.choices[0].message.content)
     DB-->>App: grounded answer
     App-->>U: response
 ```
 
 > **Mental model**: RAG is **open-book exam** — the model reads the notes you handed it for this one question; its weights do not change. Fine-tuning is **studying** — it changes what the student knows.
 
----
-
-## Overview
-
-Retrieval-Augmented Generation (RAG) grounds large language model (LLM) responses in data from a database, preventing **hallucinations** and providing up-to-date, accurate answers. Rather than relying on what the model "knows" from training, RAG retrieves relevant context from a trusted data source and includes it in the prompt. SQL Database in Fabric and Azure SQL are natural RAG backends because they store both structured data and embeddings in one place.
-
-> [!abstract]
-> - Covers the RAG pattern (Retrieve-Augment-Generate), use cases, and Azure SQL as a RAG backend
-> - RAG grounds LLM responses in real data, preventing hallucinations and using current information
-> - Key exam topics: RAG pattern steps, grounding vs fine-tuning distinction, combined vector+FTS retrieval
-
-> [!tip] What the Exam Tests
-> - RAG pattern: (1) embed user query → (2) search DB with VECTOR_SEARCH + CONTAINS → (3) retrieve top-K chunks → (4) build prompt → (5) call LLM → (6) return grounded response
-> - **Grounding ≠ fine-tuning** — RAG injects context at inference time; the model's weights are not changed
-> - Azure SQL is a natural RAG backend: stores both structured data AND vector embeddings in one database
+For a full T-SQL walkthrough that builds this entire flow in ~80 lines, see [End-to-End RAG Walkthrough](../resources/code-examples/tsql/rag-end-to-end-walkthrough.md).
 
 ---
 

@@ -48,4 +48,5 @@ tags:
 ## Links
 
 - **[Start the exam → questions.md](./questions.md)**
+- **[Review with the debrief → mock-exam-2-debrief.md](./mock-exam-2-debrief.md)** *(use after completing the exam)*
 - **[← Back to Resources](../exam-resources.md)**
