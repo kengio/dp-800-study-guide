@@ -7,7 +7,7 @@ tags:
   - tables
   - indexes
   - constraints
-status: draft
+status: complete
 ---
 
 # Design and Implement Database Objects (Domain 1 — 35–40%)

@@ -8,7 +8,7 @@ tags:
   - hybrid-search
   - rrf
   - ann
-status: draft
+status: complete
 ---
 
 # Design and Implement Intelligent Search (Domain 3 — 25–30%)

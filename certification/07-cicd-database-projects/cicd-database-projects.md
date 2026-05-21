@@ -7,7 +7,7 @@ tags:
   - sql-database-projects
   - github
   - deployment
-status: draft
+status: complete
 ---
 
 # Implement CI/CD by Using SQL Database Projects (Domain 2 — 35–40%)

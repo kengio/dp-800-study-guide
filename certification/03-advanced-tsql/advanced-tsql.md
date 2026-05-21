@@ -9,7 +9,7 @@ tags:
   - json
   - regex
   - graph
-status: draft
+status: complete
 ---
 
 # Write Advanced T-SQL Code (Domain 1 — 35–40%)

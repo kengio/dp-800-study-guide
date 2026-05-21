@@ -7,7 +7,7 @@ tags:
   - embeddings
   - external-models
   - vector
-status: draft
+status: complete
 ---
 
 # Design and Implement Models and Embeddings (Domain 3 — 25–30%)

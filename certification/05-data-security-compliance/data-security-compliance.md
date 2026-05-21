@@ -8,7 +8,7 @@ tags:
   - rls
   - dynamic-data-masking
   - auditing
-status: draft
+status: complete
 ---
 
 # Implement Data Security and Compliance (Domain 2 — 35–40%)

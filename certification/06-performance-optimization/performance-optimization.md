@@ -8,7 +8,7 @@ tags:
   - dmv
   - execution-plans
   - concurrency
-status: draft
+status: complete
 ---
 
 # Optimize Database Performance (Domain 2 — 35–40%)

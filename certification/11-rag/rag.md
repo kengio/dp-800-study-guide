@@ -7,7 +7,7 @@ tags:
   - llm
   - sp-invoke-external-rest-endpoint
   - ai
-status: draft
+status: complete
 ---
 
 # Design and Implement Retrieval-Augmented Generation (RAG) (Domain 3 — 25–30%)

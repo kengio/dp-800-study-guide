@@ -8,7 +8,7 @@ tags:
   - functions
   - stored-procedures
   - triggers
-status: draft
+status: complete
 ---
 
 # Implement Programmability Objects (Domain 1 — 35–40%)

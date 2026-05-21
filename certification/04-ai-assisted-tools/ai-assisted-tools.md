@@ -7,7 +7,7 @@ tags:
   - mcp
   - ai-tools
   - copilot-in-fabric
-status: draft
+status: complete
 ---
 
 # Design and Implement SQL Solutions Using AI-Assisted Tools (Domain 1 — 35–40%)

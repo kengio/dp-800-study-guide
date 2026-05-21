@@ -9,7 +9,7 @@ tags:
   - graphql
   - cdc
   - azure-monitor
-status: draft
+status: complete
 ---
 
 # Integrate SQL Solutions with Azure Services (Domain 2 — 35–40%)
