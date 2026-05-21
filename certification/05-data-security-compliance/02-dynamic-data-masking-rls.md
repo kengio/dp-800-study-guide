@@ -139,13 +139,14 @@ WITH (STATE = ON);
 ```
 
 **Predicate types:**
-| Type | Applies To | Blocks |
-| :--- | :--- | :--- |
-| `FILTER` | SELECT, UPDATE, DELETE | ==Invisible rows (not an error)== |
-| `BLOCK AFTER INSERT` | INSERT | Inserts that would be invisible |
-| `BLOCK AFTER UPDATE` | UPDATE | Updates that result in invisible rows |
-| `BLOCK BEFORE UPDATE` | UPDATE | Updates on currently invisible rows |
-| `BLOCK BEFORE DELETE` | DELETE | Deletes on currently invisible rows |
+
+| Type                  | Applies To             | Blocks                                |
+| :-------------------- | :--------------------- | :------------------------------------ |
+| `FILTER`              | SELECT, UPDATE, DELETE | ==Invisible rows (not an error)==     |
+| `BLOCK AFTER INSERT`  | INSERT                 | Inserts that would be invisible       |
+| `BLOCK AFTER UPDATE`  | UPDATE                 | Updates that result in invisible rows |
+| `BLOCK BEFORE UPDATE` | UPDATE                 | Updates on currently invisible rows   |
+| `BLOCK BEFORE DELETE` | DELETE                 | Deletes on currently invisible rows   |
 
 ### Using SESSION_CONTEXT for Multi-Tenant RLS
 

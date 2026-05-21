@@ -1,6 +1,8 @@
 # CLAUDE.md
 
-Study notes for the Microsoft DP-800: Developing AI-Enabled Database Solutions certification exam.
+Open-source community study guide for the Microsoft **DP-800: Developing AI-Enabled Database Solutions** certification exam. Licensed under MIT (see `LICENSE`). Aligned to the official skills-measured list updated **March 12, 2026**.
+
+The repository is public; contributions arrive as pull requests. Keep this in mind: every change is visible to the community. Prefer additive, well-justified edits over silent rewrites, and verify factual claims against the [official skills measured](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-800) page before merging.
 
 ## Repository Structure
 
@@ -23,6 +25,23 @@ dp-800-study-guide/
 ```
 
 Each topic folder contains a named index file (e.g., `database-objects.md`, `advanced-tsql.md`) and numbered `.md` topic files.
+
+Top-level files:
+
+- `README.md` — public-facing entry point with badges, exam overview, and quick navigation. Rewrite when the blueprint date or major features change.
+- `LICENSE` — MIT.
+- `CLAUDE.md` — this file. Project conventions for AI assistants and contributors.
+- `OBSIDIAN-SETUP.md` — optional setup notes for editing the guide in Obsidian.
+
+## Currency Policy
+
+The exam blueprint is the source of truth. When Microsoft updates the [skills-measured list](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-800):
+
+- Update the **"What's New for the 2026 Exam"** callout at the top of `certification/dp-800-overview.md` with the new blueprint date and the diff vs. the prior version.
+- Update the **"2026 Updates"** section in `certification/resources/final-review.md` to surface the highest-leverage new facts for exam day.
+- Update the blueprint date badge in `README.md`.
+- Mark questions that target newly added skills with a `*(YYYY update)*` suffix in the question heading so studiers can find them.
+- Move features from "Preview" to "GA" labelling as their status changes (currently: SQL Server 2025 `VECTOR` family GA; DiskANN public preview in SS2025 / private preview in Azure SQL; half-precision vectors preview).
 
 ## Content Guidelines
 

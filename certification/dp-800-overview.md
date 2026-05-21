@@ -14,6 +14,22 @@ tags:
 
 # Microsoft DP-800: Developing AI-Enabled Database Solutions
 
+> [!info] What's New for the 2026 Exam (updated May 2026)
+> Microsoft refreshed the official DP-800 skills measured list on **March 12, 2026**. This guide is aligned to that blueprint. The biggest 2026 changes you should know cold:
+>
+> - **SQL Server 2025 is RTM.** The `VECTOR` data type, `VECTOR_DISTANCE`, `VECTOR_SEARCH`, `VECTOR_NORMALIZE`, and `VECTORPROPERTY` are **GA** in SQL Server 2025 and Azure SQL Database.
+> - **DiskANN vector index** is in **public preview** for SQL Server 2025; private preview in Azure SQL Database. The exam may include preview features that are commonly used — know the syntax and the `METRIC` clause.
+> - **Half-precision (16-bit) vectors** are in preview — allows ~2× larger dimensions per row.
+> - **MCP server endpoints** are explicitly tested: connecting Copilot to SQL Server and Fabric lakehouse MCP endpoints, plus **securing MCP/REST/GraphQL endpoints**.
+> - **Passwordless database access** and **Managed Identity for model endpoints** are now called out as secure-access requirements.
+> - **Microsoft Foundry** is listed alongside Change Tracking, CDC, CES, Azure Functions, and Logic Apps as a valid embedding-maintenance method.
+> - **Change Event Streaming (CES)** in Fabric is now explicitly named in the blueprint as a change-handling mechanism.
+> - **Schema drift detection** in SQL Database Projects is now an explicit skill.
+> - **`REGEXP_MATCHES` and `REGEXP_SPLIT_TO_TABLE`** appear in the regex skills list — make sure you can write both.
+>
+> > [!tip] Coming in the next 6 months
+> > Expect Azure SQL DiskANN GA, half-precision vector GA, and broader Microsoft Foundry / Copilot in Fabric coverage. The exam typically lags GA by 4–8 weeks before adding feature questions; preview features only appear if they're commonly used (per Microsoft's own note on the study guide).
+
 ## How to Use This Guide
 
 1. **Topic files** (`01-topic-name.md`) — core study material with SQL examples, comparison tables, and practice questions. Start here.

@@ -325,4 +325,94 @@ D. Encrypt the key using `ENCRYPTBYPASSPHRASE` and store it in a table
 
 ---
 
+## Question 16: DiskANN Index Metric Mismatch *(2026 update)*
+
+**Question** *(Hard)*:
+
+A developer creates a DiskANN vector index `WITH (METRIC = 'cosine')` on the `EmbeddingVector` column. They then call `VECTOR_SEARCH(... METRIC = 'euclidean' ...)` against the same column. What is the expected result?
+
+A. The query runs and silently falls back to an exact (ENN) scan
+B. The query runs and uses the cosine index, ignoring the `METRIC` parameter
+C. An error is raised — the index metric and the query metric must match
+D. The query runs and rebuilds the index automatically with the new metric
+
+> [!success]- Answer
+> **C — An error is raised; the index metric and the query metric must match**
+>
+> DiskANN is metric-specific: the index is built around the distance function. Using a different metric in `VECTOR_SEARCH` raises an error. To support multiple metrics, build multiple indexes (one per metric). This is a very common 2026 exam trap.
+
+---
+
+## Question 17: Half-Precision Vectors (Preview) *(2026 update)*
+
+**Question** *(Medium)*:
+
+A team wants to reduce vector storage cost in SQL Server 2025 by half while still supporting embeddings up to ~4 000 dimensions. Which feature should they evaluate?
+
+A. Switch to `VECTOR(n)` with bit-packed storage
+B. Compress the table with `DATA_COMPRESSION = PAGE`
+C. Use the preview half-precision (16-bit) `VECTOR` storage option
+D. Store vectors as `varbinary(max)` and compress at the application layer
+
+> [!success]- Answer
+> **C — Use the preview half-precision (16-bit) `VECTOR` storage option**
+>
+> Half-precision vectors are a preview feature in SQL Server 2025 that store each component as 16-bit floats instead of 32-bit. Storage is halved and roughly twice as many dimensions can be packed per row (up to ~4 000). Page compression (B) is ineffective on dense float data. `varbinary(max)` loses vector operator support.
+
+---
+
+## Question 18: Microsoft Foundry as Embedding Maintenance *(2026 update)*
+
+**Question** *(Medium)*:
+
+A team wants the simplest, lowest-code option for keeping embeddings synchronized with a source SQL column in Microsoft Fabric — no SQL Agent jobs, no Azure Functions to operate. Which option from the DP-800 blueprint best fits?
+
+A. CDC with a custom .NET reader
+B. A DML trigger that calls `sp_invoke_external_rest_endpoint`
+C. Microsoft Foundry data pipeline
+D. Azure Logic Apps polling on a 1-minute recurrence
+
+> [!success]- Answer
+> **C — Microsoft Foundry data pipeline**
+>
+> The 2026 blueprint explicitly lists Microsoft Foundry alongside triggers, Change Tracking, CES, CDC, Azure Functions, and Logic Apps as a valid embedding-maintenance method. Foundry is the most managed: declarative source/embed/sink with built-in retry and monitoring, no infrastructure to operate. Logic Apps (D) is low-code but still requires connector configuration and a polling cadence.
+
+---
+
+## Question 19: CES vs Azure Functions SQL Trigger *(2026 update)*
+
+**Question** *(Hard)*:
+
+A SQL Database in Microsoft Fabric must stream row changes to a Fabric Lakehouse table in near real-time. The team prefers zero infrastructure to operate. Which is the most appropriate choice?
+
+A. CDC with a custom pipeline reading from `cdc.fn_cdc_get_all_changes_*`
+B. Change Event Streaming (CES) routed to an Eventstream and into the Lakehouse
+C. Azure Functions with `SqlTrigger` binding
+D. Azure Logic Apps SQL connector on a 1-minute recurrence
+
+> [!success]- Answer
+> **B — Change Event Streaming (CES) routed to an Eventstream and into the Lakehouse**
+>
+> CES is a Fabric-native push-based stream from SQL Database in Fabric to downstream Fabric workloads. No SQL Agent, no Azure Functions, no polling — the events are produced by the engine and delivered to the destination. Azure Functions and Logic Apps work but require operational ownership. CDC requires a custom consumer.
+
+---
+
+## Question 20: VECTOR_SEARCH — Recall Tuning *(2026 update)*
+
+**Question** *(Medium)*:
+
+A developer notices that `VECTOR_SEARCH` is occasionally missing relevant items that an exact `VECTOR_DISTANCE` query would surface. They cannot afford to give up the ANN performance gain. Which tuning lever is the right first step?
+
+A. Drop the DiskANN index and re-create it with `METRIC = 'dot'`
+B. Increase the `TOP_N` candidate count returned by `VECTOR_SEARCH`
+C. Normalize the stored vectors with `VECTOR_NORMALIZE`
+D. Switch from `VECTOR(1536)` to `VECTOR(3072)`
+
+> [!success]- Answer
+> **B — Increase the `TOP_N` candidate count returned by `VECTOR_SEARCH`**
+>
+> `TOP_N` controls how many candidates the DiskANN index returns to the query. A larger `TOP_N` raises recall at modest CPU/latency cost — the standard tuning lever for ANN. Re-creating the index with a different metric (A) changes the meaning of the search; normalization (C) is required before using `dot`, not a recall fix; increasing dimensions (D) requires a different model and re-embedding.
+
+---
+
 **[← Back to Practice Questions](./practice-questions.md)**

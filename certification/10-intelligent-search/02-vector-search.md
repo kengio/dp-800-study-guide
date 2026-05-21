@@ -26,6 +26,11 @@ Vector search finds rows whose vector embeddings are mathematically similar to a
 > - `VECTOR_SEARCH(TABLE, VECTOR(col), JSON_ARRAY(query_vector), top_n)` = **approximate** (ANN) via DiskANN — faster at scale
 > - DiskANN supports `cosine`, `dot`, and `euclidean` metrics — the index metric **must match** the metric used in `VECTOR_SEARCH`
 
+> [!note] 2026 status
+> - `VECTOR`, `VECTOR_DISTANCE`, `VECTOR_SEARCH`, `VECTOR_NORMALIZE`, `VECTORPROPERTY` — **GA** in SQL Server 2025 RTM and Azure SQL Database.
+> - **DiskANN vector index** — public preview in SQL Server 2025; private preview in Azure SQL. Expect questions on syntax and metric matching.
+> - **Half-precision (16-bit) vectors** — preview; halves storage and roughly doubles the dimensions you can pack per row (~4 000 dims).
+
 ---
 
 ## VECTOR Data Type
