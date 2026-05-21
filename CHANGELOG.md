@@ -10,6 +10,7 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/). 
 
 - **Anki deck** (`certification/resources/anki/dp-800.tsv`) — ~130 spaced-repetition cards generated from the 6 cheat sheets, with tag-based filtering and an import-instructions readme
 - **Translation scaffolding** — `TRANSLATING.md` (translator guide: BCP-47 locale codes, `i18n/<locale>/` mirror layout, suggested priority order, currency policy, quality bar) and `i18n/README.md` (locale index, no locales yet). New `## Translations` section in `README.md` linking to both; `CONTRIBUTING.md` and `CLAUDE.md` updated to document the convention
+- **Adaptive practice quiz** (`practice/`) — browser-based JSON-driven quiz with adaptive question selection (down-weights recently-correct, up-weights recently-wrong + never-attempted), per-bank `localStorage` progress, exam timer, domain/difficulty filters, light/dark/auto themes. Sources from `certification/resources/practice-questions/*.md` (60 questions) plus both mock exams (50 + 50 = 100 questions) for **160 questions across 3 banks**. `build.py` is a Python 3 stdlib markdown → JSON converter; `deploy-practice.yml` auto-deploys to GitHub Pages on any change to `practice/` or the source markdown
 
 ## [1.0.0] — 2026-05-21 — Initial tagged release
 

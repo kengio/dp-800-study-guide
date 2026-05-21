@@ -1,0 +1,61 @@
+---
+name: Deploy practice quiz to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'practice/**'
+      - 'certification/resources/practice-questions/**'
+      - 'certification/resources/mock-exam/**'
+      - 'certification/resources/mock-exam-2/**'
+      - '.github/workflows/deploy-practice.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build Pages artifact (practice/)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rebuild question banks from current markdown
+        # Source of truth is certification/resources/{practice-questions,mock-exam,mock-exam-2}/*.md.
+        # We regenerate practice/data/*.json on every deploy so the live site
+        # always reflects the latest committed markdown, even if the author
+        # forgot to re-run build.py locally before pushing.
+        # build.py uses Python 3 stdlib only — no setup-python step needed
+        # because ubuntu-latest ships with python3 pre-installed.
+        run: python3 practice/build.py
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Disable Jekyll processing
+        run: touch practice/.nojekyll
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: practice/
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

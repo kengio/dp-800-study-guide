@@ -1,0 +1,988 @@
+{
+  "cert": "dp-800",
+  "certTitle": "DP-800: Developing AI-Enabled Database Solutions",
+  "blueprintVersion": "2026-03-12",
+  "generated": "2026-05-22",
+  "domains": [
+    {
+      "id": "design-develop",
+      "name": "Design and Develop Database Solutions",
+      "sourceFile": "certification/resources/practice-questions/01-design-develop.md",
+      "questionCount": 18
+    },
+    {
+      "id": "secure-optimize-deploy",
+      "name": "Secure, Optimize, and Deploy",
+      "sourceFile": "certification/resources/practice-questions/02-secure-optimize-deploy.md",
+      "questionCount": 22
+    },
+    {
+      "id": "ai-capabilities",
+      "name": "Implement AI Capabilities",
+      "sourceFile": "certification/resources/practice-questions/03-ai-capabilities.md",
+      "questionCount": 20
+    }
+  ],
+  "questions": [
+    {
+      "id": "practice-questions-01-design-develop-q001",
+      "domain": "design-develop",
+      "title": "Column Store Index Type",
+      "difficulty": "medium",
+      "question": "A data engineer is creating a table in Azure SQL that will be used exclusively for analytical queries aggregating hundreds of millions of rows. They want the maximum query performance for these aggregations. Which index should they create?",
+      "choices": {
+        "A": "A clustered B-tree index on the date column",
+        "B": "A non-clustered B-tree index on each aggregation column",
+        "C": "A clustered columnstore index",
+        "D": "A non-clustered columnstore index on the aggregation columns"
+      },
+      "correctAnswer": "C",
+      "shortAnswer": "A **clustered columnstore index (CCI)** is optimal for tables used exclusively for analytics. It:",
+      "explanation": "- Stores data by column (maximum compression)\n- Enables vectorized **batch mode execution** (~900 rows per batch)\n- Replaces the rowstore clustered index entirely\n\nOption D (non-clustered columnstore) is added alongside an existing rowstore — useful for hybrid OLTP/analytics, but not the best choice for an exclusively analytical table."
+    },
+    {
+      "id": "practice-questions-01-design-develop-q002",
+      "domain": "design-develop",
+      "title": "Temporal Table Query",
+      "difficulty": "medium",
+      "question": "A developer needs to retrieve the salary value for employee ID 42 as it was on January 15, 2024. The `dbo.Employees` table is a system-versioned temporal table. Which query is correct?",
+      "choices": {
+        "A": "`SELECT Salary FROM dbo.Employees WHERE EmployeeId = 42 AND ValidTo > '2024-01-15'`",
+        "B": "`SELECT Salary FROM dbo.Employees FOR SYSTEM_TIME AS OF '2024-01-15' WHERE EmployeeId = 42`",
+        "C": "`SELECT Salary FROM dbo.Employees FOR SYSTEM_TIME ALL WHERE EmployeeId = 42 AND '2024-01-15' BETWEEN ValidFrom AND ValidTo`",
+        "D": "`SELECT Salary FROM dbo.EmployeesHistory WHERE EmployeeId = 42 AND ValidFrom <= '2024-01-15'`"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "`FOR SYSTEM_TIME AS OF <date>` returns the row as it existed at that exact point in time. SQL Server automatically queries both the current and history tables as needed.",
+      "explanation": "Option C uses `FOR SYSTEM_TIME ALL` which returns all historical rows — you'd need an additional `ORDER BY ValidFrom DESC` + `TOP 1` to get the correct row. Option D queries the history table directly but would miss the current row if it's still active."
+    },
+    {
+      "id": "practice-questions-01-design-develop-q003",
+      "domain": "design-develop",
+      "title": "Always Encrypted Encryption Type",
+      "difficulty": "hard",
+      "question": "A developer is implementing Always Encrypted for a `SSN` column that must support `WHERE SSN = '123-45-6789'` filter queries from the application. Which encryption type must be used?",
+      "choices": {
+        "A": "RANDOMIZED",
+        "B": "DETERMINISTIC",
+        "C": "SYMMETRIC",
+        "D": "AES_256"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "With **DETERMINISTIC** encryption, the same plaintext always produces the same ciphertext — this enables equality comparisons (`=`, `IN`, `JOIN`, `GROUP BY`) from the client application.",
+      "explanation": "**RANDOMIZED** produces different ciphertext each time and cannot be filtered. SYMMETRIC and AES_256 are encryption algorithms, not Always Encrypted types."
+    },
+    {
+      "id": "practice-questions-01-design-develop-q004",
+      "domain": "design-develop",
+      "title": "JSON Function Selection",
+      "difficulty": "easy",
+      "question": "A developer has a column `Metadata nvarchar(max)` storing JSON like `{\"address\":{\"city\":\"Seattle\",\"zip\":\"98101\"}}`. They want to return the city value as a scalar string. Which function is correct?",
+      "choices": {
+        "A": "`JSON_QUERY(Metadata, '$.address')`",
+        "B": "`JSON_VALUE(Metadata, '$.address')`",
+        "C": "`JSON_VALUE(Metadata, '$.address.city')`",
+        "D": "`JSON_QUERY(Metadata, '$.address.city')`"
+      },
+      "correctAnswer": "C",
+      "shortAnswer": "`JSON_VALUE` returns a scalar string value from a JSON path. The path `$.address.city` correctly navigates to the nested property.",
+      "explanation": "Option A returns the entire `address` object as a JSON fragment (use `JSON_QUERY` for objects/arrays). Option B returns NULL because `$.address` is an object, not a scalar. Option D returns NULL because `$.address.city` is a scalar value, not an object/array."
+    },
+    {
+      "id": "practice-questions-01-design-develop-q005",
+      "domain": "design-develop",
+      "title": "Recursive CTE",
+      "difficulty": "medium",
+      "question": "A developer is writing a recursive CTE to traverse an org chart. The CTE is running indefinitely and timing out. Which is the most likely cause?",
+      "choices": {
+        "A": "The anchor member is returning too many rows",
+        "B": "The recursive member is missing a proper termination condition causing circular references",
+        "C": "The `UNION ALL` should be `UNION DISTINCT`",
+        "D": "Recursive CTEs don't support `JOIN` in the recursive member"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "Recursive CTEs must have a condition in the recursive member that eventually evaluates to FALSE (or returns no rows) to terminate. Without this, the recursion continues until the default `MAXRECURSION` limit (100) is hit — or indefinitely if the limit is raised.",
+      "explanation": "Common fix: Ensure a WHERE clause like `WHERE e.ManagerId IS NOT NULL` and that the data has no circular manager references. Use `OPTION (MAXRECURSION 0)` with caution — it removes the safety limit."
+    },
+    {
+      "id": "practice-questions-01-design-develop-q006",
+      "domain": "design-develop",
+      "title": "Window Function — Running Total",
+      "difficulty": "medium",
+      "question": "A developer wants to calculate a running total of `TotalAmount` for each customer ordered by `OrderDate`. Which window function syntax is correct?",
+      "choices": {
+        "A": "`SUM(TotalAmount) OVER (PARTITION BY CustomerId ORDER BY OrderDate)`",
+        "B": "`SUM(TotalAmount) OVER (PARTITION BY CustomerId)`",
+        "C": "`SUM(TotalAmount) OVER (ORDER BY OrderDate PARTITION BY CustomerId ROWS UNBOUNDED PRECEDING)`",
+        "D": "`SUM(TotalAmount) GROUP BY CustomerId ORDER BY OrderDate`"
+      },
+      "correctAnswer": "A",
+      "shortAnswer": "This is the correct syntax for a running total: `PARTITION BY CustomerId` resets the running total per customer, and `ORDER BY OrderDate` defines the cumulative order.",
+      "explanation": "The default frame when `ORDER BY` is specified is `RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`, which produces the running total. Option C has incorrect keyword order (`ROWS` must come after `ORDER BY`, not between `ORDER BY` and `PARTITION BY`)."
+    },
+    {
+      "id": "practice-questions-01-design-develop-q007",
+      "domain": "design-develop",
+      "title": "Graph Table MATCH",
+      "difficulty": "hard",
+      "question": "A developer has node tables `Person` and `Restaurant`, and an edge table `Likes`. They want to find all restaurants liked by friends of Alice (two-hop traversal). Which MATCH pattern is correct?",
+      "choices": {
+        "A": "`MATCH(alice-(likes)->restaurant AND alice-(friendOf)->friend)`",
+        "B": "`MATCH(alice-(friendOf)->friend-(likes)->restaurant)`",
+        "C": "`MATCH(alice<-(friendOf)-friend-(likes)->restaurant)`",
+        "D": "`MATCH(alice-(likes)->friend AND friend-(friendOf)->restaurant)`"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "MATCH supports chained patterns: `node1-(edge1)->node2-(edge2)->node3` traverses two hops in a single MATCH expression. Alice → (friendOf) → friend → (likes) → restaurant correctly expresses the two-hop relationship.",
+      "explanation": "Option C uses reverse arrow for friendOf, which would find people who are friends with Alice (others point to Alice), not Alice's friends."
+    },
+    {
+      "id": "practice-questions-01-design-develop-q008",
+      "domain": "design-develop",
+      "title": "Scalar Function Performance",
+      "difficulty": "easy",
+      "question": "A developer created a scalar UDF `dbo.fn_CalculateTax(@Amount decimal)` and uses it in a SELECT against a 50-million row table: `SELECT dbo.fn_CalculateTax(Amount) FROM dbo.Sales`. Performance is poor. What is the primary cause?",
+      "choices": {
+        "A": "Scalar UDFs are not supported on large tables",
+        "B": "The function lacks an index",
+        "C": "Scalar UDFs execute row-by-row and prevent parallelism",
+        "D": "The function needs `WITH SCHEMABINDING`"
+      },
+      "correctAnswer": "C",
+      "shortAnswer": "Scalar UDFs in T-SQL execute once per row and prevent the query optimizer from using parallel execution plans, causing severe performance degradation on large tables.",
+      "explanation": "**Fix**: Rewrite as an **inline table-valued function** (which can be inlined by the optimizer) or inline the expression directly in the SELECT. SQL Server 2019+ can automatically inline simple scalar UDFs."
+    },
+    {
+      "id": "practice-questions-01-design-develop-q009",
+      "domain": "design-develop",
+      "title": "Partitioning — RANGE Direction",
+      "difficulty": "medium",
+      "question": "A developer creates a partition function: `CREATE PARTITION FUNCTION PF_Daily (date) AS RANGE RIGHT FOR VALUES ('2025-01-01', '2025-02-01')`. A row with value `'2025-01-01'` belongs to which partition?",
+      "choices": {
+        "A": "Partition 1 (before January 2025)",
+        "B": "Partition 2 (January 2025)",
+        "C": "Partition 3 (February 2025 onward)",
+        "D": "It depends on the partition scheme"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "With `RANGE RIGHT`, the boundary value is the **first value in the right (newer) partition**. So `'2025-01-01'` belongs to partition 2 — the partition that starts at January 1, 2025.",
+      "explanation": "RANGE RIGHT means: values < `'2025-01-01'` → partition 1; values >= `'2025-01-01'` AND < `'2025-02-01'` → partition 2; values >= `'2025-02-01'` → partition 3."
+    },
+    {
+      "id": "practice-questions-01-design-develop-q010",
+      "domain": "design-develop",
+      "title": "Copilot Instruction Files",
+      "difficulty": "easy",
+      "question": "A team wants GitHub Copilot to automatically use project-specific SQL conventions (like always using `datetime2` instead of `datetime`) in every chat session without manually specifying them. What should they create?",
+      "choices": {
+        "A": "A `.vscode/settings.json` file with SQL preferences",
+        "B": "A `.github/copilot-instructions.md` file at the repository root",
+        "C": "A `CLAUDE.md` file at the repository root",
+        "D": "A GitHub Actions workflow that sets Copilot context"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "GitHub Copilot automatically reads `.github/copilot-instructions.md` and includes its content as context in every chat session. This is the official mechanism for providing repository-specific instructions to Copilot.",
+      "explanation": ""
+    },
+    {
+      "id": "practice-questions-01-design-develop-q011",
+      "domain": "design-develop",
+      "title": "Indexed View Requirements",
+      "difficulty": "hard",
+      "question": "A developer wants to create an indexed view on `dbo.Sales` with a `GROUP BY ProductId` aggregation. Which combination of requirements must be met? (Select two)",
+      "choices": {
+        "A": "The view must include `WITH SCHEMABINDING`",
+        "B": "The first index must be a non-clustered unique index",
+        "C": "The view must use `COUNT_BIG(*)` in the GROUP BY",
+        "D": "The first index must be a unique clustered index"
+      },
+      "correctAnswer": "A",
+      "shortAnswer": "**A. `WITH SCHEMABINDING`** is required — prevents underlying tables from being modified.",
+      "explanation": "**D. Unique clustered index** — the first index on an indexed view MUST be a UNIQUE CLUSTERED index. This materializes the view.\n\nNote: `COUNT_BIG(*)` (not `COUNT(*)`) is required when GROUP BY is present — but this is a requirement for the view definition, not the index. The question asks about the required combination, so A and D are the two from the options that directly match the requirement."
+    },
+    {
+      "id": "practice-questions-01-design-develop-q012",
+      "domain": "design-develop",
+      "title": "JSON_ARRAYAGG Availability",
+      "difficulty": "medium",
+      "question": "A developer wants to use `JSON_ARRAYAGG()` to aggregate product names into a JSON array per category. On which platform is this function available?",
+      "choices": {
+        "A": "SQL Server 2019 and later",
+        "B": "SQL Server 2016 and later",
+        "C": "SQL Server 2022 and later",
+        "D": "Only in Azure SQL Managed Instance"
+      },
+      "correctAnswer": "C",
+      "shortAnswer": "`JSON_ARRAYAGG` was introduced in SQL Server 2022 and Azure SQL Database. It is not available in SQL Server 2019 or earlier. On older versions, you can achieve similar results with `FOR JSON PATH` or `STRING_AGG`.",
+      "explanation": ""
+    },
+    {
+      "id": "practice-questions-01-design-develop-q013",
+      "domain": "design-develop",
+      "title": "Ledger Table Properties",
+      "difficulty": "medium",
+      "question": "A compliance team requires a table where historical records can never be deleted or modified after insertion — to serve as a tamper-evident audit trail. Which table type best meets this requirement?",
+      "choices": {
+        "A": "A temporal table with `SYSTEM_VERSIONING = ON`",
+        "B": "An append-only ledger table with `LEDGER = ON, APPEND_ONLY = ON`",
+        "C": "An updatable ledger table with `LEDGER = ON`",
+        "D": "A table with a DML trigger that prevents DELETE"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "**Append-only ledger tables** prevent UPDATE and DELETE at the engine level — not just through triggers that could be disabled. They also maintain a cryptographic hash chain for tamper-evidence verification via `sp_verify_database_ledger`.",
+      "explanation": "Temporal tables track history but allow modifying and deleting current rows. DML triggers can be disabled by privileged users."
+    },
+    {
+      "id": "practice-questions-01-design-develop-q014",
+      "domain": "design-develop",
+      "title": "MCP Connection Authentication",
+      "difficulty": "easy",
+      "question": "A developer is configuring an MCP server connection to Azure SQL for use with GitHub Copilot. Which authentication method is recommended for production use?",
+      "choices": {
+        "A": "Username and password in the connection string",
+        "B": "SQL Server authentication with a strong password",
+        "C": "Active Directory Managed Identity authentication",
+        "D": "Windows authentication"
+      },
+      "correctAnswer": "C",
+      "shortAnswer": "Managed Identity eliminates the need for credentials in configuration files — the Azure resource authenticates using its identity from Azure AD. The connection string uses `Authentication=ActiveDirectoryManagedIdentity`.",
+      "explanation": "Hardcoded credentials (options A and B) risk exposure in source control or configuration files."
+    },
+    {
+      "id": "practice-questions-01-design-develop-q015",
+      "domain": "design-develop",
+      "title": "NOT IN vs NOT EXISTS",
+      "difficulty": "medium",
+      "question": "A developer writes `SELECT * FROM dbo.Customers WHERE CustomerId NOT IN (SELECT CustomerId FROM dbo.Orders)`. The query returns zero rows even though there are clearly customers without orders. What is the most likely cause?",
+      "choices": {
+        "A": "The subquery returns too many rows",
+        "B": "There is a NULL value in the `CustomerId` column of `dbo.Orders`",
+        "C": "The `CustomerId` columns have different data types",
+        "D": "NOT IN cannot be used with subqueries"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "`NOT IN` returns no rows when the subquery result contains a NULL, because SQL cannot determine whether any value is \"not equal to NULL\" (NULL comparisons are always UNKNOWN).",
+      "explanation": "**Fix**: Use `NOT EXISTS` instead, which handles NULLs correctly:\n\n```sql\nSELECT * FROM dbo.Customers c\nWHERE NOT EXISTS (SELECT 1 FROM dbo.Orders o WHERE o.CustomerId = c.CustomerId)\n```"
+    },
+    {
+      "id": "practice-questions-01-design-develop-q016",
+      "domain": "design-develop",
+      "title": "Graph — SHORTEST_PATH Edge Direction",
+      "difficulty": "hard",
+      "question": "A developer writes a SQL graph query using `SHORTEST_PATH` to find paths between people through a `Knows` edge table. The query must follow the edge in **either direction** (A knows B implies B knows A for this traversal). Which pattern correctly expresses bidirectional traversal?",
+      "choices": {
+        "A": "`MATCH (start)-(Knows+)->(end)` — single direction is sufficient because graph queries are undirected by default",
+        "B": "`MATCH (start)-(Knows+)-(end)` — omit the arrow to make the edge undirected",
+        "C": "`MATCH (start)-(Knows+)->(end) OR (start)<-(Knows+)-(end)` — explicit `OR` between two directed patterns",
+        "D": "`MATCH SHORTEST_PATH((start)-(Knows+)->(end))` followed by a second `MATCH` for the reverse — UNION the results"
+      },
+      "correctAnswer": "D",
+      "shortAnswer": "SQL graph edges are **directed** — there is no built-in undirected operator. `SHORTEST_PATH` follows the declared edge direction. To traverse \"either direction\", define the relationship as two directional patterns and UNION them, OR store each undirected relationship as two rows in the edge table (A→B and B→A) at insert time. Option B's \"omit the arrow\" syntax does not exist. Option C is invalid syntax for SHORTEST_PATH (`OR` is not allowed inside the MATCH expression).",
+      "explanation": "**Exam trap**: candidates often assume `MATCH` is undirected like Cypher (Neo4j). SQL graph follows edge direction strictly."
+    },
+    {
+      "id": "practice-questions-01-design-develop-q017",
+      "domain": "design-develop",
+      "title": "Memory-Optimized Table Prerequisite",
+      "difficulty": "hard",
+      "question": "A team wants to create memory-optimized tables in an on-premises SQL Server 2022 instance for an OLTP hot path. The first `CREATE TABLE` with `WITH (MEMORY_OPTIMIZED = ON, DURABILITY = SCHEMA_AND_DATA)` fails. Which prerequisite is most likely missing?",
+      "choices": {
+        "A": "The database must be in `SIMPLE` recovery model",
+        "B": "The database must have a filegroup with `CONTAINS MEMORY_OPTIMIZED_DATA`",
+        "C": "The database must enable `READ_COMMITTED_SNAPSHOT`",
+        "D": "The table must use the `bwin` storage engine"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "Memory-optimized tables require a dedicated filegroup of type `MEMORY_OPTIMIZED_DATA` to persist their checkpoint files (for `DURABILITY = SCHEMA_AND_DATA`). Syntax:",
+      "explanation": "```sql\nALTER DATABASE MyDB ADD FILEGROUP MemFG CONTAINS MEMORY_OPTIMIZED_DATA;\nALTER DATABASE MyDB ADD FILE (name='MemFile', filename='C:\\Data\\MemFile')\n    TO FILEGROUP MemFG;\n```\n\nRecovery model (A) is irrelevant. RCSI (C) is unrelated. There is no \"bwin storage engine\" (D) — `bw-tree` is the index structure used internally but isn't named in DDL. Azure SQL Database manages this filegroup automatically — but on-prem SQL Server requires the explicit setup."
+    },
+    {
+      "id": "practice-questions-01-design-develop-q018",
+      "domain": "design-develop",
+      "title": "REGEXP_SPLIT_TO_TABLE",
+      "difficulty": "medium",
+      "question": "A developer has a column `Tags nvarchar(200)` storing comma-separated values like `'azure,sql,ai,vector'`. They need to return one row per tag for joining and aggregation. Which approach uses the regex family added to Azure SQL / Fabric SQL?",
+      "choices": {
+        "A": "`STRING_SPLIT(Tags, ',')` — the legacy function, fine for this case",
+        "B": "`REGEXP_SPLIT_TO_TABLE(Tags, ',')` — returns one row per split element",
+        "C": "`REGEXP_MATCHES(Tags, '[^,]+')` — returns a scalar count of matches",
+        "D": "`REGEXP_REPLACE(Tags, ',', CHAR(10))` followed by `STRING_SPLIT`"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "`REGEXP_SPLIT_TO_TABLE` (added in Azure SQL Database and SQL database in Microsoft Fabric, 2025+) takes a regex separator and returns a result set with one row per split element. It is the regex-aware sibling of `STRING_SPLIT`. Both A and B would solve this specific case; the **regex family** matters when the separator is a pattern (e.g., `'[,;|]'`) rather than a single literal.",
+      "explanation": "`REGEXP_MATCHES` (C) is the wrong function for splitting. `REGEXP_REPLACE` (D) is convoluted. The other regex functions you should know cold for the exam: `REGEXP_LIKE`, `REGEXP_REPLACE`, `REGEXP_SUBSTR`, `REGEXP_INSTR`, `REGEXP_COUNT`, `REGEXP_MATCHES`, `REGEXP_SPLIT_TO_TABLE`."
+    },
+    {
+      "id": "practice-questions-02-secure-optimize-deploy-q001",
+      "domain": "secure-optimize-deploy",
+      "title": "Always Encrypted — Encryption Type for Filtering",
+      "difficulty": "medium",
+      "question": "A security team requires that a `CreditCardNumber` column be encrypted using Always Encrypted. The application must be able to search for records by exact credit card number using a WHERE clause. Which encryption type must be used?",
+      "choices": {
+        "A": "RANDOMIZED",
+        "B": "DETERMINISTIC",
+        "C": "AES_256_GCM",
+        "D": "RANDOMIZED with enclave support"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "**DETERMINISTIC** encryption always produces the same ciphertext for a given plaintext value, enabling equality-based filtering (`=`, `IN`, `JOIN`, `GROUP BY`) from client applications with the correct column master key.",
+      "explanation": "**RANDOMIZED** produces different ciphertext each time — it cannot be filtered without enclave support. AES_256_GCM is an algorithm, not an Always Encrypted type. RANDOMIZED with enclave support (Always Encrypted with Secure Enclaves) does support filtering but requires additional infrastructure setup."
+    },
+    {
+      "id": "practice-questions-02-secure-optimize-deploy-q002",
+      "domain": "secure-optimize-deploy",
+      "title": "Always Encrypted — Randomized Use Case",
+      "difficulty": "easy",
+      "question": "A developer is adding Always Encrypted to a `MedicalNotes nvarchar(max)` column that stores free-text notes and will never be queried with an equality filter. Which encryption type should they choose and why?",
+      "choices": {
+        "A": "DETERMINISTIC — because it is always more secure",
+        "B": "RANDOMIZED — because it provides stronger security and the column doesn't need filtering",
+        "C": "DETERMINISTIC — because it is required for nvarchar(max) columns",
+        "D": "RANDOMIZED — because it is the only type that supports large columns"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "RANDOMIZED encryption is preferred when equality filtering is not required. It is cryptographically stronger because identical plaintext values produce different ciphertexts, preventing frequency analysis attacks.",
+      "explanation": "DETERMINISTIC is only necessary when the application needs to filter or join on the encrypted column. Both types support nvarchar(max) columns."
+    },
+    {
+      "id": "practice-questions-02-secure-optimize-deploy-q003",
+      "domain": "secure-optimize-deploy",
+      "title": "Dynamic Data Masking — Default Mask",
+      "difficulty": "easy",
+      "question": "A DBA adds a Dynamic Data Masking rule to an `Email nvarchar(256)` column using `MASKED WITH (FUNCTION = 'default()')`. A user without UNMASK permission queries the table. What will they see for a stored value of `alice@contoso.com`?",
+      "choices": {
+        "A": "`alice@contoso.com`",
+        "B": "`xxxx@xxxx.com`",
+        "C": "`XXXX`",
+        "D": "`aXXX@XXXX.com`"
+      },
+      "correctAnswer": "C",
+      "shortAnswer": "The `default()` masking function replaces the entire value with a type-appropriate mask. For string columns (`char`, `nchar`, `varchar`, `nvarchar`), the mask is `XXXX`.",
+      "explanation": "The `email()` function would produce `aXXX@XXXX.com`. Users with the UNMASK permission or `db_owner` membership see the actual value."
+    },
+    {
+      "id": "practice-questions-02-secure-optimize-deploy-q004",
+      "domain": "secure-optimize-deploy",
+      "title": "Dynamic Data Masking — UNMASK Permission",
+      "difficulty": "medium",
+      "question": "A reporting user named `ReportUser` needs to see unmasked values in the `PhoneNumber` column, but the column has DDM applied. Other users should continue to see masked values. What is the correct approach?",
+      "choices": {
+        "A": "Add `ReportUser` to the `db_datareader` role",
+        "B": "Grant `ReportUser` the `UNMASK` permission",
+        "C": "Remove the mask from the column and use a view with masking logic",
+        "D": "Grant `ReportUser` `SELECT` permission on the column"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "The `UNMASK` database permission allows a user to see the actual values of masked columns. Syntax: `GRANT UNMASK TO ReportUser;`",
+      "explanation": "`db_datareader` only grants SELECT access but does not bypass masking. `SELECT` permission alone does not bypass DDM. Members of `db_owner` and users with `CONTROL` automatically bypass masking."
+    },
+    {
+      "id": "practice-questions-02-secure-optimize-deploy-q005",
+      "domain": "secure-optimize-deploy",
+      "title": "Row-Level Security — Filter vs Block Predicate",
+      "difficulty": "hard",
+      "question": "A developer implements Row-Level Security on a `dbo.Orders` table. Salespeople should only see their own orders in SELECT queries, but they should also be prevented from inserting orders for other salespeople. Which predicates must be configured?",
+      "choices": {
+        "A": "One FILTER predicate only",
+        "B": "One BLOCK predicate only",
+        "C": "One FILTER predicate and one BLOCK predicate with AFTER INSERT operation",
+        "D": "Two FILTER predicates — one for SELECT and one for INSERT"
+      },
+      "correctAnswer": "C",
+      "shortAnswer": "- **FILTER predicate**: Silently hides rows that fail the predicate from SELECT, UPDATE, DELETE. Users cannot see or affect rows they don't own.\n- **BLOCK predicate with AFTER INSERT**: Prevents INSERT of rows that would not be visible under the FILTER predicate.",
+      "explanation": "FILTER predicates apply to SELECT/UPDATE/DELETE automatically but do not affect INSERT. A separate BLOCK AFTER INSERT predicate is required to block unauthorized inserts."
+    },
+    {
+      "id": "practice-questions-02-secure-optimize-deploy-q006",
+      "domain": "secure-optimize-deploy",
+      "title": "Row-Level Security — SESSION_CONTEXT",
+      "difficulty": "medium",
+      "question": "An application uses a single SQL login for all connections (connection pooling). RLS must enforce that each end user only sees their own rows. The application sets the current user's ID in `SESSION_CONTEXT(N'UserId')` before executing queries. Which approach correctly uses this in an RLS predicate function?",
+      "choices": {
+        "A": "`WHERE SalesRepId = USER_NAME()`",
+        "B": "`WHERE SalesRepId = CAST(SESSION_CONTEXT(N'UserId') AS int)`",
+        "C": "`WHERE SalesRepId = SYSTEM_USER`",
+        "D": "`WHERE SalesRepId = SUSER_SNAME()`"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "`SESSION_CONTEXT` is the correct mechanism when a single database user (e.g., an application service account) handles all connections. The application calls `EXEC sp_set_session_context N'UserId', @userId` before each query, and the RLS inline TVF reads this value.",
+      "explanation": "`USER_NAME()`, `SYSTEM_USER`, and `SUSER_SNAME()` return the database/login name of the connected SQL user — not useful when all connections share one login."
+    },
+    {
+      "id": "practice-questions-02-secure-optimize-deploy-q007",
+      "domain": "secure-optimize-deploy",
+      "title": "Permission Precedence — DENY Wins",
+      "difficulty": "medium",
+      "question": "User `DataAnalyst` is a member of the `Analysts` role, which has been granted `SELECT` on `dbo.SensitiveData`. An administrator also explicitly `DENY`s `SELECT` on `dbo.SensitiveData` to `DataAnalyst` directly. What happens when `DataAnalyst` queries the table?",
+      "choices": {
+        "A": "The GRANT from the role takes precedence; the query succeeds",
+        "B": "The DENY takes precedence; the query fails",
+        "C": "The most recently applied permission takes precedence",
+        "D": "Both permissions cancel out; the user has no access"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "In SQL Server's permission model, **DENY always wins** over GRANT, regardless of whether the GRANT comes from role membership or explicit assignment. This is a fundamental security principle: an explicit denial cannot be overridden by a grant at any level.",
+      "explanation": "To restore access, the administrator must `REVOKE` the DENY (not just add another GRANT). After REVOKE, the role's GRANT will apply."
+    },
+    {
+      "id": "practice-questions-02-secure-optimize-deploy-q008",
+      "domain": "secure-optimize-deploy",
+      "title": "Managed Identity — Connection String",
+      "difficulty": "medium",
+      "question": "A developer is configuring an application deployed to Azure App Service to connect to Azure SQL Database using Managed Identity (no password). Which connection string property specifies Managed Identity authentication?",
+      "choices": {
+        "A": "`Integrated Security=True`",
+        "B": "`Authentication=Active Directory Password`",
+        "C": "`Authentication=Active Directory Managed Identity`",
+        "D": "`Trusted_Connection=Yes`"
+      },
+      "correctAnswer": "C",
+      "shortAnswer": "The `Authentication=Active Directory Managed Identity` property in the connection string tells the SQL driver to acquire a token from the Azure Instance Metadata Service (IMDS) using the App Service's managed identity. No password or secret is required.",
+      "explanation": "`Integrated Security=True` uses Windows Authentication (Kerberos/NTLM), which is not applicable in Azure. `Active Directory Password` requires explicit credentials."
+    },
+    {
+      "id": "practice-questions-02-secure-optimize-deploy-q009",
+      "domain": "secure-optimize-deploy",
+      "title": "Managed Identity — External Provider Syntax",
+      "difficulty": "hard",
+      "question": "A DBA needs to create a database user for an Azure App Service's system-assigned managed identity in Azure SQL Database. Which T-SQL syntax is correct?",
+      "choices": {
+        "A": "`CREATE USER [MyAppService] WITH PASSWORD = 'managed_identity'`",
+        "B": "`CREATE USER [MyAppService] FROM EXTERNAL PROVIDER`",
+        "C": "`CREATE LOGIN [MyAppService] FROM EXTERNAL PROVIDER`",
+        "D": "`CREATE USER [MyAppService] FOR LOGIN [MyAppService]`"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "`FROM EXTERNAL PROVIDER` creates a contained database user backed by Azure Active Directory (Entra ID). The name must exactly match the managed identity's display name in Azure AD.",
+      "explanation": "In Azure SQL Database (not Managed Instance), logins are not supported for Azure AD identities — you create contained users directly. Option C (`CREATE LOGIN`) is used at the server level and is not how Azure AD identities are provisioned in Azure SQL Database."
+    },
+    {
+      "id": "practice-questions-02-secure-optimize-deploy-q010",
+      "domain": "secure-optimize-deploy",
+      "title": "Auditing — Action Groups",
+      "difficulty": "medium",
+      "question": "A compliance officer requires that all successful and failed login attempts to Azure SQL Database be captured in the audit log. Which audit action group should be configured?",
+      "choices": {
+        "A": "`BATCH_COMPLETED_GROUP`",
+        "B": "`SUCCESSFUL_DATABASE_AUTHENTICATION_GROUP`",
+        "C": "`DATABASE_LOGOUT_GROUP`",
+        "D": "`SUCCESSFUL_LOGIN_GROUP` combined with `FAILED_LOGIN_GROUP`"
+      },
+      "correctAnswer": "D",
+      "shortAnswer": "- `SUCCESSFUL_LOGIN_GROUP`: Captures successful authentication events.\n- `FAILED_LOGIN_GROUP`: Captures failed authentication attempts.",
+      "explanation": "Both groups together provide complete login audit coverage. `BATCH_COMPLETED_GROUP` captures query execution. These are server-level action groups configured in the database audit policy."
+    },
+    {
+      "id": "practice-questions-02-secure-optimize-deploy-q011",
+      "domain": "secure-optimize-deploy",
+      "title": "Transaction Isolation — RCSI vs Snapshot",
+      "difficulty": "hard",
+      "question": "A developer observes that under Read Committed Snapshot Isolation (RCSI), readers don't block writers. A colleague suggests using Snapshot Isolation instead. What is the key difference between RCSI and Snapshot Isolation?",
+      "choices": {
+        "A": "RCSI provides statement-level consistency; Snapshot Isolation provides transaction-level consistency",
+        "B": "RCSI stores versions in tempdb; Snapshot Isolation stores versions in the data files",
+        "C": "Snapshot Isolation prevents all blocking; RCSI still causes some reader-writer blocking",
+        "D": "RCSI requires `SET TRANSACTION ISOLATION LEVEL SNAPSHOT` per session; Snapshot Isolation is the default"
+      },
+      "correctAnswer": "A",
+      "shortAnswer": "- **RCSI**: Each statement sees a consistent view of data as of the start of *that statement*. No code changes required — it replaces the default Read Committed behavior database-wide.\n- **Snapshot Isolation**: Each statement in a transaction sees a consistent view as of the start of *the entire transaction*. Must be explicitly opted into with `SET TRANSACTION ISOLATION LEVEL SNAPSHOT`.",
+      "explanation": "Both use row versioning in tempdb. Snapshot Isolation can detect write conflicts and raise errors; RCSI cannot."
+    },
+    {
+      "id": "practice-questions-02-secure-optimize-deploy-q012",
+      "domain": "secure-optimize-deploy",
+      "title": "Blocking Analysis — DMV",
+      "difficulty": "easy",
+      "question": "A DBA suspects a long-running query is blocking other sessions. Which DMV should they query first to identify the blocking chain?",
+      "choices": {
+        "A": "`sys.dm_exec_query_stats`",
+        "B": "`sys.dm_exec_requests`",
+        "C": "`sys.dm_os_wait_stats`",
+        "D": "`sys.dm_tran_active_transactions`"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "`sys.dm_exec_requests` shows currently executing requests and includes `blocking_session_id` — the session ID of the session blocking the current request. A `blocking_session_id` > 0 indicates the session is being blocked.",
+      "explanation": "Query: `SELECT session_id, blocking_session_id, wait_type, wait_time, status FROM sys.dm_exec_requests WHERE blocking_session_id > 0`\n\n`sys.dm_os_wait_stats` shows cumulative wait statistics (not per-session). `sys.dm_exec_query_stats` shows historical query performance."
+    },
+    {
+      "id": "practice-questions-02-secure-optimize-deploy-q013",
+      "domain": "secure-optimize-deploy",
+      "title": "Deadlocks — Error and Handling",
+      "difficulty": "medium",
+      "question": "An application reports occasional errors with message \"Transaction (Process ID XX) was deadlocked on lock resources with another process and has been chosen as the deadlock victim.\" What error number does this correspond to, and what is the recommended application-level response?",
+      "choices": {
+        "A": "Error 1205; retry the transaction after a short delay",
+        "B": "Error 1205; terminate the application and alert the DBA",
+        "C": "Error 8621; retry the transaction immediately",
+        "D": "Error 1205; increase the lock timeout setting"
+      },
+      "correctAnswer": "A",
+      "shortAnswer": "**Error 1205** is the SQL Server deadlock victim error. The deadlock victim's transaction is rolled back automatically, so the application can safely retry it.",
+      "explanation": "Best practice: implement retry logic with a brief exponential backoff (e.g., 100ms, 200ms, 400ms) to avoid immediately re-creating the deadlock. Investigate root cause with the deadlock graph from the system health extended event session or Query Store."
+    },
+    {
+      "id": "practice-questions-02-secure-optimize-deploy-q014",
+      "domain": "secure-optimize-deploy",
+      "title": "Query Execution Plans — Key Lookup",
+      "difficulty": "medium",
+      "question": "A developer adds a non-clustered index on `dbo.Orders(OrderDate)` to speed up a query that filters by date and also selects `CustomerName`, `TotalAmount`, and `Status`. The plan still shows a Key Lookup operator. What does this indicate?",
+      "choices": {
+        "A": "The non-clustered index is not being used",
+        "B": "SQL Server must go back to the clustered index to retrieve columns not in the non-clustered index",
+        "C": "The query is using a hash join instead of a merge join",
+        "D": "The non-clustered index has too many levels of B-tree"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "A **Key Lookup** (or RID Lookup for heap tables) occurs when the non-clustered index satisfies the WHERE clause but does not cover all columns in the SELECT list. SQL Server uses the index to find matching rows, then performs a separate lookup to the clustered index for each row to retrieve the additional columns.",
+      "explanation": "**Fix**: Create a **covering index** by including the additional columns: `CREATE INDEX IX_Orders_Date ON dbo.Orders(OrderDate) INCLUDE (CustomerName, TotalAmount, Status)`."
+    },
+    {
+      "id": "practice-questions-02-secure-optimize-deploy-q015",
+      "domain": "secure-optimize-deploy",
+      "title": "Query Store — Force Plan",
+      "difficulty": "medium",
+      "question": "A developer notices that a critical query's performance degraded after a statistics update changed its execution plan. They use Query Store to identify the previously good plan. What action should they take to restore performance without rolling back statistics?",
+      "choices": {
+        "A": "Rebuild the index on the table",
+        "B": "Use `sp_recompile` to force the query to recompile",
+        "C": "Use Query Store to force the previously good plan",
+        "D": "Update statistics manually to restore the old plan"
+      },
+      "correctAnswer": "C",
+      "shortAnswer": "Query Store's **Force Plan** feature (`sys.sp_query_store_force_plan`) pins a specific execution plan for a query. The optimizer will use that plan regardless of statistics updates or parameter changes.",
+      "explanation": "In SSMS: Query Store → Regressed Queries → select the query → compare plans → Force Plan. This is the recommended approach for plan regression issues. The forced plan remains until unforced or the query changes significantly."
+    },
+    {
+      "id": "practice-questions-02-secure-optimize-deploy-q016",
+      "domain": "secure-optimize-deploy",
+      "title": "SQL Database Projects — SDK-Style Format",
+      "difficulty": "hard",
+      "question": "A team is migrating their SQL Database Project to the SDK-style format. What is the key advantage of SDK-style projects over the legacy `.sqlproj` format?",
+      "choices": {
+        "A": "SDK-style projects support a wider range of T-SQL syntax",
+        "B": "SDK-style projects use MSBuild and support cross-platform builds and NuGet references",
+        "C": "SDK-style projects produce larger dacpac files with more metadata",
+        "D": "SDK-style projects eliminate the need for sqlpackage"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "SDK-style `.sqlproj` files (using `Microsoft.Build.Sql` SDK) are:",
+      "explanation": "- Cross-platform (build on Linux/macOS/Windows)\n- Compatible with `dotnet build`\n- Support NuGet package references for database dependencies\n- Much cleaner project files (auto-include SQL files without explicit entries)\n\nThey still produce dacpac files and use sqlpackage for deployment — those tools remain unchanged."
+    },
+    {
+      "id": "practice-questions-02-secure-optimize-deploy-q017",
+      "domain": "secure-optimize-deploy",
+      "title": "DAB — Entity Permissions",
+      "difficulty": "hard",
+      "question": "A developer is configuring Data API Builder (DAB) for a public REST API. The `products` entity must allow anonymous GET requests but require authentication for POST. Which configuration section correctly expresses this?",
+      "choices": {
+        "A": "Set `authentication.provider` to `Anonymous` globally",
+        "B": "Configure the entity's `permissions` with `role: anonymous` allowing `read` and `role: authenticated` allowing `create`",
+        "C": "Set the entity's `rest.enabled: false` and use a custom API",
+        "D": "Configure `permissions` with `role: anonymous` allowing all CRUD operations"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "DAB's permission model is role-based. The built-in `anonymous` role applies to unauthenticated requests; `authenticated` applies to any authenticated user. You configure allowed actions (`read`, `create`, `update`, `delete`) per role per entity.",
+      "explanation": "```json\n\"permissions\": [\n  { \"role\": \"anonymous\", \"actions\": [\"read\"] },\n  { \"role\": \"authenticated\", \"actions\": [\"create\"] }\n]\n```"
+    },
+    {
+      "id": "practice-questions-02-secure-optimize-deploy-q018",
+      "domain": "secure-optimize-deploy",
+      "title": "CDC vs Change Tracking",
+      "difficulty": "medium",
+      "question": "A downstream application needs to know which rows in `dbo.Inventory` changed since its last sync, but it only needs to know *that* they changed and their current values — not *what* the old values were. Which change capture method is more appropriate and why?",
+      "choices": {
+        "A": "CDC — because it captures full before/after images of every change",
+        "B": "Change Tracking — because it is lightweight, records which rows changed, and the application can query current values directly",
+        "C": "CDC — because Change Tracking doesn't support DELETE operations",
+        "D": "Change Tracking — because CDC requires a separate database"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "**Change Tracking** records the primary keys of changed rows and the type of change (INSERT/UPDATE/DELETE). The consumer uses `CHANGETABLE(CHANGES ...)` to get changed PKs and then joins to the source table for current values. It has minimal overhead.",
+      "explanation": "**CDC** captures full before/after row images in change tables — necessary when you need the previous values (e.g., for data warehousing or audit). CDC has higher overhead (log reader agent). Change Tracking does support DELETEs."
+    },
+    {
+      "id": "practice-questions-02-secure-optimize-deploy-q019",
+      "domain": "secure-optimize-deploy",
+      "title": "Azure Monitor — KQL for Audit Logs",
+      "difficulty": "medium",
+      "question": "An audit log is being sent to a Log Analytics workspace from Azure SQL Database. A security analyst needs to find all failed login attempts from a specific IP address in the last 7 days. Which KQL query is most appropriate?",
+      "choices": {
+        "A": "`AzureDiagnostics | where Category == 'SQLSecurityAuditEvents' | where action_name_s == 'FAILED_LOGIN' | where client_ip_s == '10.0.0.1'`",
+        "B": "`SecurityEvent | where EventID == 4625 | where IpAddress == '10.0.0.1'`",
+        "C": "`AzureActivity | where OperationName == 'Login Failed'`",
+        "D": "`AzureDiagnostics | where ResourceProvider == 'MICROSOFT.SQL' | where succeeded_s == 'false'`"
+      },
+      "correctAnswer": "A",
+      "shortAnswer": "Azure SQL Database audit logs sent to Log Analytics appear in the `AzureDiagnostics` table with `Category = 'SQLSecurityAuditEvents'`. Fields include `action_name_s` (the audit action), `client_ip_s`, `database_principal_name_s`, and `event_time_t`.",
+      "explanation": "Add `| where TimeGenerated > ago(7d)` to restrict to the last 7 days. `SecurityEvent` contains Windows Security events, not SQL audit events."
+    },
+    {
+      "id": "practice-questions-02-secure-optimize-deploy-q020",
+      "domain": "secure-optimize-deploy",
+      "title": "Secrets Management — Key Vault in Pipelines",
+      "difficulty": "hard",
+      "question": "A CI/CD pipeline in Azure DevOps needs to retrieve a connection string stored in Azure Key Vault during deployment. The pipeline runs on a Microsoft-hosted agent. What is the recommended approach?",
+      "choices": {
+        "A": "Store the connection string as a pipeline variable and reference it with `$(ConnectionString)`",
+        "B": "Hardcode the connection string in the YAML pipeline file",
+        "C": "Link the Key Vault to an Azure DevOps variable group using a service connection with appropriate permissions",
+        "D": "Use the Azure CLI task to call `az keyvault secret show` and echo the value"
+      },
+      "correctAnswer": "C",
+      "shortAnswer": "The recommended pattern is:",
+      "explanation": "1. Create an Azure DevOps **variable group** linked to the Key Vault\n2. Grant the service connection's service principal `Key Vault Secrets User` role on the vault\n3. Reference secrets as pipeline variables — they are masked in logs automatically\n\nHardcoding (option B) is never acceptable. Echoing secret values (option D) risks exposing them in logs. Plain pipeline variables (option A) don't retrieve from Key Vault automatically."
+    },
+    {
+      "id": "practice-questions-02-secure-optimize-deploy-q021",
+      "domain": "secure-optimize-deploy",
+      "title": "Role Membership — Adding a User",
+      "difficulty": "easy",
+      "question": "A DBA needs to grant the user `ReportReader` read-only access to all tables in a database. Which single command achieves this?",
+      "choices": {
+        "A": "`ALTER ROLE db_datareader ADD MEMBER [ReportReader]`",
+        "B": "`GRANT SELECT TO [ReportReader]`",
+        "C": "`EXEC sp_addrolemember 'reader', 'ReportReader'`",
+        "D": "`CREATE ROLE [ReportReader] AS db_datareader`"
+      },
+      "correctAnswer": "A",
+      "shortAnswer": "`db_datareader` is the built-in database role granting `SELECT` on all tables. `ALTER ROLE ... ADD MEMBER` is the modern syntax (replacing the legacy `sp_addrolemember`). Option B's bare `GRANT SELECT TO user` doesn't specify the object/schema. Option C uses deprecated syntax (still works but `ALTER ROLE` is preferred). Option D is invalid — `CREATE ROLE` doesn't take an existing role as a template.",
+      "explanation": ""
+    },
+    {
+      "id": "practice-questions-02-secure-optimize-deploy-q022",
+      "domain": "secure-optimize-deploy",
+      "title": "TDE — Default State on Azure SQL",
+      "difficulty": "easy",
+      "question": "A new Azure SQL Database is provisioned. The team asks whether Transparent Data Encryption (TDE) needs to be explicitly enabled to encrypt data at rest. What is the default behavior?",
+      "choices": {
+        "A": "TDE must be enabled with `ALTER DATABASE ... SET ENCRYPTION ON`",
+        "B": "TDE is enabled **by default** for all new Azure SQL databases — encryption at rest is automatic",
+        "C": "TDE requires Azure Key Vault setup before it can be turned on",
+        "D": "TDE is only available on Premium tier and above"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "Azure SQL Database has TDE enabled by default using a service-managed key — encryption at rest is automatic with no setup required. Customers can optionally bring their own key (BYOK) via Azure Key Vault for additional control, but the default state is encrypted. On **on-prem SQL Server**, TDE must be explicitly configured. This is the difference: Azure SQL = on by default; SQL Server on-prem = off by default.",
+      "explanation": ""
+    },
+    {
+      "id": "practice-questions-03-ai-capabilities-q001",
+      "domain": "ai-capabilities",
+      "title": "CREATE EXTERNAL MODEL Syntax",
+      "difficulty": "medium",
+      "question": "A developer wants to call Azure OpenAI's `text-embedding-3-small` model from T-SQL to generate embeddings. Which statement correctly registers this model in Azure SQL Database?",
+      "choices": {
+        "A": "`CREATE MODEL EmbeddingModel TYPE = AZURE_OPENAI WITH (MODEL = 'text-embedding-3-small')`",
+        "B": "`CREATE EXTERNAL MODEL EmbeddingModel WITH (LOCATION = '...', CREDENTIAL = ..., MODEL_TYPE = EMBEDDINGS, MODEL = 'text-embedding-3-small')`",
+        "C": "`CREATE EXTERNAL MODEL EmbeddingModel WITH (ENDPOINT = '...', KEY = '...', TYPE = 'OpenAI')`",
+        "D": "`EXEC sp_create_external_model 'EmbeddingModel', 'text-embedding-3-small'`"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "The full `CREATE EXTERNAL MODEL` syntax requires:",
+      "explanation": "- `LOCATION` — the Azure OpenAI endpoint URL\n- `CREDENTIAL` — a database-scoped credential holding the API key\n- `MODEL_TYPE` — `EMBEDDINGS` or `COMPLETIONS` (this is the T-SQL keyword; some non-SQL frameworks call this \"task\")\n- `MODEL` — the deployment name in Azure OpenAI\n\nOnce created, the model is invoked with `SELECT * FROM PREDICT(MODEL = EmbeddingModel, ...)`."
+    },
+    {
+      "id": "practice-questions-03-ai-capabilities-q002",
+      "domain": "ai-capabilities",
+      "title": "External Model — Multimodal Task",
+      "difficulty": "easy",
+      "question": "A developer registers an external model with `TASK = CHAT_COMPLETION` pointing to a GPT-4o deployment. Which capability does this enable that a text-only model does not support?",
+      "choices": {
+        "A": "Generating SQL queries from natural language",
+        "B": "Accepting image inputs alongside text prompts",
+        "C": "Producing structured JSON output exclusively",
+        "D": "Running entirely within the SQL Server process"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "**Multimodal** models (like GPT-4o) can process both text and images in a single prompt. This enables scenarios such as analyzing product photos stored in Azure Blob Storage or extracting data from document images.",
+      "explanation": "Text-only models handle natural language and can produce JSON output — these are not exclusive to multimodal models. All external models call remote APIs; they do not run inside SQL Server."
+    },
+    {
+      "id": "practice-questions-03-ai-capabilities-q003",
+      "domain": "ai-capabilities",
+      "title": "VECTOR Data Type",
+      "difficulty": "easy",
+      "question": "A developer creates a column to store embeddings from `text-embedding-ada-002`, which produces 1536-dimensional vectors. Which column definition is correct?",
+      "choices": {
+        "A": "`EmbeddingVector varbinary(max)`",
+        "B": "`EmbeddingVector float NOT NULL`",
+        "C": "`EmbeddingVector VECTOR(1536)`",
+        "D": "`EmbeddingVector nvarchar(max)`"
+      },
+      "correctAnswer": "C",
+      "shortAnswer": "The `VECTOR` data type in Azure SQL Database (preview) is purpose-built for storing dense float vectors. `VECTOR(1536)` declares a 1536-dimensional vector, matching the output of `text-embedding-ada-002`.",
+      "explanation": "`varbinary(max)` could store raw bytes but does not support vector operations (`VECTOR_DISTANCE`, `VECTOR_SEARCH`). Storing embeddings as `nvarchar(max)` (JSON array string) is a legacy workaround that is far less efficient."
+    },
+    {
+      "id": "practice-questions-03-ai-capabilities-q004",
+      "domain": "ai-capabilities",
+      "title": "VECTOR_DISTANCE — Interpreting Results",
+      "difficulty": "medium",
+      "question": "A developer runs a similarity search using `VECTOR_DISTANCE('cosine', queryEmbedding, docEmbedding)`. Two documents return distances of 0.12 and 0.87. Which document is more semantically similar to the query?",
+      "choices": {
+        "A": "The document with distance 0.87, because higher values mean greater similarity",
+        "B": "The document with distance 0.12, because lower cosine distance means greater similarity",
+        "C": "They cannot be compared without normalization",
+        "D": "The document with distance 0.87, because cosine distance ranges from 0 to 1 and 0.87 is closer to 1"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "`VECTOR_DISTANCE` returns a distance metric — **lower values indicate greater similarity** regardless of the metric used (`cosine`, `euclidean`, or `dot`). A cosine distance of 0 means identical vectors; 1 means completely orthogonal (unrelated) vectors.",
+      "explanation": "Sort results `ORDER BY distance ASC` and take `TOP N` to get the most similar documents."
+    },
+    {
+      "id": "practice-questions-03-ai-capabilities-q005",
+      "domain": "ai-capabilities",
+      "title": "VECTOR_DISTANCE — Metric Selection",
+      "difficulty": "medium",
+      "question": "A developer must choose between `cosine`, `euclidean`, and `dot` distance metrics for a semantic search application. The embedding vectors are already normalized (unit vectors). Which metric is equivalent to cosine similarity for normalized vectors?",
+      "choices": {
+        "A": "euclidean",
+        "B": "cosine",
+        "C": "dot (dot product)",
+        "D": "All three are equivalent for normalized vectors"
+      },
+      "correctAnswer": "C",
+      "shortAnswer": "For **unit-normalized vectors** (magnitude = 1), the dot product is mathematically equivalent to cosine similarity. Since `VECTOR_NORMALIZE` or the embedding model has already normalized the vectors, using `dot` is computationally cheaper than `cosine` (fewer operations).",
+      "explanation": "`euclidean` distance is not equivalent to cosine similarity even for normalized vectors. This is why `VECTOR_NORMALIZE` is often applied before indexing — it unlocks the use of the faster `dot` metric."
+    },
+    {
+      "id": "practice-questions-03-ai-capabilities-q006",
+      "domain": "ai-capabilities",
+      "title": "VECTOR_NORMALIZE Purpose",
+      "difficulty": "easy",
+      "question": "What is the primary purpose of `VECTOR_NORMALIZE(vector)` in Azure SQL Database?",
+      "choices": {
+        "A": "To compress the vector to reduce storage size",
+        "B": "To scale the vector to unit length (magnitude = 1) to enable dot-product-based similarity",
+        "C": "To round float values to 4 decimal places",
+        "D": "To convert the vector from VECTOR type to varbinary for storage"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "`VECTOR_NORMALIZE` divides each element of the vector by the vector's Euclidean magnitude, producing a unit vector. This enables using the cheaper dot product metric as a substitute for cosine similarity, and is a prerequisite for building a DiskANN index (which requires normalized vectors for accurate inner-product search).",
+      "explanation": ""
+    },
+    {
+      "id": "practice-questions-03-ai-capabilities-q007",
+      "domain": "ai-capabilities",
+      "title": "Embedding Maintenance — Change Tracking vs CDC",
+      "difficulty": "hard",
+      "question": "A production table `dbo.Articles` has an embedding column that must stay synchronized whenever the `BodyText` column is updated. The team wants minimal overhead and does not need before-images of changed rows — only the current content. Which approach is most appropriate?",
+      "choices": {
+        "A": "CDC (Change Data Capture) — because it captures all column changes",
+        "B": "A DML trigger on `dbo.Articles` that calls `sp_invoke_external_rest_endpoint` inline",
+        "C": "Change Tracking with a background job that queries `CHANGETABLE` and re-generates embeddings for changed PKs",
+        "D": "An Azure Function with a SQL trigger binding monitoring the change table"
+      },
+      "correctAnswer": "C",
+      "shortAnswer": "**Change Tracking** records which rows changed (by PK) with minimal overhead — no full row images stored. A background job uses `CHANGETABLE(CHANGES dbo.Articles, @lastSyncVersion)` to find changed rows, retrieves current `BodyText`, generates new embeddings via the external model, and updates the embedding column.",
+      "explanation": "Triggers calling REST endpoints inline (option B) add latency to every write and can cause timeouts. CDC is heavier than needed when you only need current values. Azure Functions are valid but add external infrastructure complexity."
+    },
+    {
+      "id": "practice-questions-03-ai-capabilities-q008",
+      "domain": "ai-capabilities",
+      "title": "Chunking Strategy — Fixed-Size vs Sentence-Based",
+      "difficulty": "medium",
+      "question": "A developer is preparing legal contract documents for RAG (Retrieval Augmented Generation). The documents have complex sentence structures and paragraph-level semantics. Which chunking strategy best preserves semantic context?",
+      "choices": {
+        "A": "Fixed-size chunking with no overlap — simplest and most consistent",
+        "B": "Fixed-size chunking with 10–20% overlap — prevents context loss at chunk boundaries",
+        "C": "Sentence-based or paragraph-based chunking — preserves natural semantic units",
+        "D": "Single-token chunking — maximum granularity"
+      },
+      "correctAnswer": "C",
+      "shortAnswer": "For documents with rich semantic structure (legal contracts, technical documentation), **sentence-based or paragraph-based chunking** ensures that each chunk contains a complete thought. Fixed-size chunking can split sentences mid-clause, degrading retrieval quality.",
+      "explanation": "Fixed-size with overlap (option B) is a reasonable compromise for less structured text. Single-token chunking is impractical for semantic search. The best strategy depends on document structure, but for legal text, semantic chunking is preferred."
+    },
+    {
+      "id": "practice-questions-03-ai-capabilities-q009",
+      "domain": "ai-capabilities",
+      "title": "VECTORPROPERTY Usage",
+      "difficulty": "easy",
+      "question": "A developer needs to determine the number of dimensions in a `VECTOR` column before performing operations. Which function returns this metadata?",
+      "choices": {
+        "A": "`DATALENGTH(EmbeddingVector)`",
+        "B": "`VECTORPROPERTY(EmbeddingVector, 'Dimensions')`",
+        "C": "`COLUMNPROPERTY(OBJECT_ID('dbo.Articles'), 'EmbeddingVector', 'Dimensions')`",
+        "D": "`LEN(EmbeddingVector)`"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "`VECTORPROPERTY` is a scalar function that returns metadata about a VECTOR value. The `'Dimensions'` property returns the number of elements (dimensions) in the vector. Other valid properties include `'BaseType'` (returns the underlying numeric type, e.g., `'float32'`).",
+      "explanation": "`DATALENGTH` returns bytes; `LEN` is for strings; `COLUMNPROPERTY` is for general column metadata and does not expose vector dimensions."
+    },
+    {
+      "id": "practice-questions-03-ai-capabilities-q010",
+      "domain": "ai-capabilities",
+      "title": "VECTOR_SEARCH — ANN vs ENN",
+      "difficulty": "hard",
+      "question": "A developer is building a real-time product search for an e-commerce site with 50 million product embeddings. They choose `VECTOR_SEARCH` with `METRIC = 'cosine'` and `WITH (index_type = 'DISKANN')`. What tradeoff does ANN (Approximate Nearest Neighbor) search make compared to ENN (Exact Nearest Neighbor)?",
+      "choices": {
+        "A": "ANN is slower but always returns the mathematically closest vectors",
+        "B": "ANN is faster but may occasionally miss some of the true nearest neighbors",
+        "C": "ANN requires more memory but uses less CPU",
+        "D": "ANN and ENN produce identical results; ANN is just the newer algorithm name"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "**ANN (Approximate Nearest Neighbor)** uses index structures (like DiskANN) to find results that are *approximately* the closest vectors, dramatically reducing search time from O(n) to O(log n) or better. In practice, the top results are highly accurate (>95% recall) for most similarity search applications.",
+      "explanation": "**ENN (Exact Nearest Neighbor)** performs a full scan and is guaranteed correct but does not scale to tens of millions of vectors. For production semantic search, the speed gains of ANN far outweigh the marginal accuracy loss."
+    },
+    {
+      "id": "practice-questions-03-ai-capabilities-q011",
+      "domain": "ai-capabilities",
+      "title": "Full-Text Search — CONTAINS vs FREETEXT",
+      "difficulty": "medium",
+      "question": "A developer needs to search a `Description` column for rows where the word \"running\" appears, including its inflectional forms like \"run\", \"ran\", and \"runs\". Which full-text predicate should they use?",
+      "choices": {
+        "A": "`WHERE CONTAINS(Description, '\"running\"')` — for exact phrase matching",
+        "B": "`WHERE FREETEXT(Description, 'running')` — for linguistic inflectional matching",
+        "C": "`WHERE Description LIKE '%running%'` — for pattern matching",
+        "D": "`WHERE CONTAINS(Description, 'running*')` — for prefix matching"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "`FREETEXT` performs linguistic analysis including inflectional matching (run/ran/runs/running), synonym expansion, and thesaurus lookup — ideal for natural language search.",
+      "explanation": "`CONTAINS` with `\"running\"` matches the exact word only. `CONTAINS` with `running*` matches prefixes like \"running\", \"runner\" but not \"ran\". `LIKE '%running%'` cannot use a full-text index and does not do linguistic matching."
+    },
+    {
+      "id": "practice-questions-03-ai-capabilities-q012",
+      "domain": "ai-capabilities",
+      "title": "CONTAINSTABLE — RANK Column",
+      "difficulty": "medium",
+      "question": "A developer uses `CONTAINSTABLE(dbo.Articles, BodyText, 'database')` and joins the result to `dbo.Articles`. What does the `RANK` column in the CONTAINSTABLE result represent?",
+      "choices": {
+        "A": "The row number in the result set",
+        "B": "A relevance score (higher = more relevant) used to sort results by match quality",
+        "C": "The number of times the search term appears in the column",
+        "D": "The full-text index key value"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "`CONTAINSTABLE` (and `FREETEXTTABLE`) return a result set with `KEY` (the full-text key column value) and `RANK` (an integer relevance score from 0–1000, higher is more relevant). This enables ranked results:",
+      "explanation": "```sql\nSELECT a.Title, ct.[RANK]\nFROM CONTAINSTABLE(dbo.Articles, BodyText, 'database') ct\nJOIN dbo.Articles a ON ct.[KEY] = a.ArticleId\nORDER BY ct.[RANK] DESC\n```"
+    },
+    {
+      "id": "practice-questions-03-ai-capabilities-q013",
+      "domain": "ai-capabilities",
+      "title": "Hybrid Search — Reciprocal Rank Fusion",
+      "difficulty": "hard",
+      "question": "A developer implements hybrid search combining full-text search results and vector search results. They use Reciprocal Rank Fusion (RRF) to merge the ranked lists. What is the purpose of RRF?",
+      "choices": {
+        "A": "To eliminate duplicate documents from both result sets",
+        "B": "To combine ranked lists from multiple retrieval methods into a single unified ranking without requiring score normalization",
+        "C": "To re-rank results using a cross-encoder language model",
+        "D": "To weight keyword matches higher than semantic matches"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "**Reciprocal Rank Fusion** computes a combined score as the sum of `1 / (k + rank_i)` across all retrieval methods, where `k` is a constant (typically 60) and `rank_i` is the document's rank in each method's result list. This works without needing to normalize scores across different methods (BM25 scores vs. cosine distances have different scales).",
+      "explanation": "RRF consistently outperforms simple score fusion in retrieval benchmarks. It does not use cross-encoders (that is re-ranking) or eliminate duplicates (those appear as the same document ranked in both lists and receive a boosted combined score)."
+    },
+    {
+      "id": "practice-questions-03-ai-capabilities-q014",
+      "domain": "ai-capabilities",
+      "title": "RAG — sp_invoke_external_rest_endpoint",
+      "difficulty": "hard",
+      "question": "A developer uses `sp_invoke_external_rest_endpoint` to call Azure OpenAI's chat completion API from T-SQL. The payload must be valid JSON. Which T-SQL clause correctly builds the messages array in the request body?",
+      "choices": {
+        "A": "`'{\"messages\": [{\"role\": \"user\", \"content\": \"' + @question + '\"}]}'`",
+        "B": "`JSON_OBJECT('messages': JSON_ARRAY(JSON_OBJECT('role': 'user', 'content': @question)))`",
+        "C": "`(SELECT 'user' AS role, @question AS content FOR JSON PATH)`",
+        "D": "`CONCAT('{\"messages\":[{\"role\":\"user\",\"content\":', @question, '}]}')`"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "SQL Server 2022 / Azure SQL introduced `JSON_OBJECT` and `JSON_ARRAY` functions that safely construct JSON without string concatenation. They properly escape special characters in variable values, preventing JSON injection.",
+      "explanation": "String concatenation (options A and D) breaks if `@question` contains quotes or backslashes. `FOR JSON PATH` (option C) works but returns a JSON array, not the full messages object structure."
+    },
+    {
+      "id": "practice-questions-03-ai-capabilities-q015",
+      "domain": "ai-capabilities",
+      "title": "RAG — DATABASE SCOPED CREDENTIAL",
+      "difficulty": "medium",
+      "question": "A developer needs `sp_invoke_external_rest_endpoint` to authenticate to Azure OpenAI using an API key. The key must not appear in the T-SQL code. What is the correct approach?",
+      "choices": {
+        "A": "Pass the API key in the `@headers` parameter as a plain text string",
+        "B": "Store the key in a SQL Server Agent job step and retrieve it at runtime",
+        "C": "Create a DATABASE SCOPED CREDENTIAL with the API key and reference it in the `@credential` parameter",
+        "D": "Encrypt the key using `ENCRYPTBYPASSPHRASE` and store it in a table"
+      },
+      "correctAnswer": "C",
+      "shortAnswer": "`sp_invoke_external_rest_endpoint` accepts an `@credential` parameter (a `NVARCHAR` name referencing a DATABASE SCOPED CREDENTIAL). The credential stores the API key in the encrypted credential store and is referenced without exposing the key in code:",
+      "explanation": "```sql\nCREATE DATABASE SCOPED CREDENTIAL OpenAICredential\n  WITH IDENTITY = 'HTTPEndpointHeaders',\n  SECRET = '{\"api-key\": \"your-key-here\"}';\n```\n\nThis keeps secrets out of source code and T-SQL scripts. The `IDENTITY = 'HTTPEndpointHeaders'` tells the procedure to inject the SECRET as HTTP headers."
+    },
+    {
+      "id": "practice-questions-03-ai-capabilities-q016",
+      "domain": "ai-capabilities",
+      "title": "DiskANN Index Metric Mismatch *(2026 update)*",
+      "difficulty": "hard",
+      "question": "A developer creates a DiskANN vector index `WITH (METRIC = 'cosine')` on the `EmbeddingVector` column. They then call `VECTOR_SEARCH(... METRIC = 'euclidean' ...)` against the same column. What is the expected result?",
+      "choices": {
+        "A": "The query runs but a warning is raised and the engine falls back to exact kNN (no index used)",
+        "B": "The query runs and uses the cosine index, ignoring the `METRIC` parameter",
+        "C": "An error is raised — the index metric and the query metric must match",
+        "D": "The query runs and rebuilds the index automatically with the new metric"
+      },
+      "correctAnswer": "A",
+      "shortAnswer": "Per the official `VECTOR_SEARCH` documentation: *\"An ANN index is used only if a matching ANN index, with the same metric and on the same column, is found. If there are no compatible ANN indexes, a warning is raised and the kNN (k-nearest neighbor) algorithm is used.\"* So a metric mismatch is **not** an error — it silently degrades to exact scan with a warning, which can be a nasty performance surprise in production. To support multiple metrics, build multiple indexes (one per metric).",
+      "explanation": ""
+    },
+    {
+      "id": "practice-questions-03-ai-capabilities-q017",
+      "domain": "ai-capabilities",
+      "title": "Half-Precision Vectors (Preview) *(2026 update)*",
+      "difficulty": "medium",
+      "question": "A team wants to reduce vector storage cost in SQL Server 2025 by half while keeping use of vector operators (`VECTOR_DISTANCE`, `VECTOR_SEARCH`). Which feature should they evaluate?",
+      "choices": {
+        "A": "Switch to `VECTOR(n)` with bit-packed storage",
+        "B": "Compress the table with `DATA_COMPRESSION = PAGE`",
+        "C": "Use the preview half-precision (`float16`, 16-bit) `VECTOR` storage option",
+        "D": "Store vectors as `varbinary(max)` and compress at the application layer"
+      },
+      "correctAnswer": "C",
+      "shortAnswer": "Half-precision vectors are a preview feature in SQL Server 2025 that store each component as a 16-bit float instead of 32-bit. Storage is halved at the same dimension count. The documented `VECTOR` type cap remains **1 998 dimensions** — half-precision does not raise that ceiling. Page compression (B) is ineffective on dense float data. `varbinary(max)` (D) loses vector operator support.",
+      "explanation": ""
+    },
+    {
+      "id": "practice-questions-03-ai-capabilities-q018",
+      "domain": "ai-capabilities",
+      "title": "Microsoft Foundry as Embedding Maintenance *(2026 update)*",
+      "difficulty": "medium",
+      "question": "A team wants the simplest, lowest-code option for keeping embeddings synchronized with a source SQL column in Microsoft Fabric — no SQL Agent jobs, no Azure Functions to operate. Which option from the DP-800 blueprint best fits?",
+      "choices": {
+        "A": "CDC with a custom .NET reader",
+        "B": "A DML trigger that calls `sp_invoke_external_rest_endpoint`",
+        "C": "Microsoft Foundry data pipeline",
+        "D": "Azure Logic Apps polling on a 1-minute recurrence"
+      },
+      "correctAnswer": "C",
+      "shortAnswer": "The 2026 blueprint explicitly lists Microsoft Foundry alongside triggers, Change Tracking, CES, CDC, Azure Functions, and Logic Apps as a valid embedding-maintenance method. Foundry is the most managed: declarative source/embed/sink with built-in retry and monitoring, no infrastructure to operate. Logic Apps (D) is low-code but still requires connector configuration and a polling cadence.",
+      "explanation": ""
+    },
+    {
+      "id": "practice-questions-03-ai-capabilities-q019",
+      "domain": "ai-capabilities",
+      "title": "CES vs Azure Functions SQL Trigger *(2026 update)*",
+      "difficulty": "hard",
+      "question": "A SQL Database in Microsoft Fabric must publish row changes for near-real-time consumption by a downstream Lakehouse pipeline. The team prefers zero infrastructure to operate. Which is the most appropriate choice?",
+      "choices": {
+        "A": "CDC with a custom pipeline reading from `cdc.fn_cdc_get_all_changes_*`",
+        "B": "Change Event Streaming (CES) publishing to Fabric Eventstream / Azure Event Hubs, with the Lakehouse hop handled downstream",
+        "C": "Azure Functions with `SqlTrigger` binding",
+        "D": "Azure Logic Apps SQL connector on a 1-minute recurrence"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "CES is the engine-side, push-based change stream from SQL Database in Fabric. Its native destinations are Fabric Eventstream or Azure Event Hubs; the Lakehouse hop is configured downstream (Eventstream → Lakehouse). No SQL Agent, no Azure Functions, no polling. Azure Functions and Logic Apps work but require operational ownership. CDC requires a custom consumer.",
+      "explanation": ""
+    },
+    {
+      "id": "practice-questions-03-ai-capabilities-q020",
+      "domain": "ai-capabilities",
+      "title": "VECTOR_SEARCH — Recall Tuning *(2026 update)*",
+      "difficulty": "medium",
+      "question": "A developer notices that `VECTOR_SEARCH` against a latest-version DiskANN index is occasionally missing relevant items that an exact `VECTOR_DISTANCE` query would surface. They cannot afford to give up the ANN performance gain. Which is the recommended way to raise recall?",
+      "choices": {
+        "A": "Drop the DiskANN index and re-create it with `METRIC = 'dot'`",
+        "B": "Increase the candidate count via `SELECT TOP (N) WITH APPROXIMATE …` (the current syntax)",
+        "C": "Normalize the stored vectors with `VECTOR_NORMALIZE`",
+        "D": "Switch from `VECTOR(1536)` to `VECTOR(3072)`"
+      },
+      "correctAnswer": "B",
+      "shortAnswer": "On latest-version vector indexes, the candidate count is controlled by `SELECT TOP (N) WITH APPROXIMATE …`. Increasing N raises recall at modest CPU/latency cost. The older `TOP_N` parameter on `VECTOR_SEARCH` is **deprecated** and is preserved only for backward compatibility with earlier-version indexes (passing it against a latest-version index raises Msg 42274). Re-creating the index with a different metric (A) changes the meaning of the search; normalization (C) is required before using `dot`, not a recall fix; increasing dimensions (D) requires a different model and re-embedding.",
+      "explanation": ""
+    }
+  ]
+}

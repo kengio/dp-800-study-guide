@@ -103,6 +103,7 @@ pie title Exam Domain Distribution
 | [Code Examples](resources/code-examples/tsql/tsql-code-examples.md) | Standalone T-SQL code example files (incl. end-to-end RAG walkthrough) |
 | [Cheat Sheets](resources/cheat-sheets/cheat-sheets.md) | Quick-reference guides for exam topics (each includes Gotchas & Traps + Before the Exam checklist) |
 | [Anki Deck](resources/anki/anki-deck.md) | ~130 spaced-repetition cards generated from the cheat sheets, with tag-based filtering |
+| [Adaptive Practice Quiz](../practice/README.md) | Browser-based JSON-driven quiz — 160 questions across 3 banks, with adaptive selection, exam timer, and per-bank progress. **Live: [kengio.github.io/dp-800-study-guide](https://kengio.github.io/dp-800-study-guide/)** |
 | [Final Review](resources/final-review.md) | 20-minute exam-morning scan: top facts and last-minute traps for all three domains |
 | [Appendix](resources/appendix/appendix.md) | Glossary, comparison tables, error messages |
 

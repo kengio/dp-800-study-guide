@@ -311,7 +311,7 @@ This guide ships as a living resource. The roadmap below is what's planned for t
 
 - 🌱 **Renewal-assessment guide** for those who took DP-800 in 2026 and need to renew
 - 🌱 **Companion guide for related exams** (e.g., DP-700 Fabric Data Engineer, AI-102 AI Engineer cross-references)
-- 🌱 **Adaptive practice questions** — JSON-driven question bank with difficulty tagging
+- ✅ **Adaptive practice questions** — JSON-driven question bank with difficulty tagging — live at [kengio.github.io/dp-800-study-guide](https://kengio.github.io/dp-800-study-guide/) and sourced from [`practice/`](./practice/README.md) (160 questions across 3 banks)
 
 Legend: ✅ done · 🔄 in progress / next up · ⏳ planned · 🌱 ideas being explored
 
