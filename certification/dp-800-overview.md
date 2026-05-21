@@ -104,6 +104,7 @@ pie title Exam Domain Distribution
 | [Cheat Sheets](resources/cheat-sheets/cheat-sheets.md) | Quick-reference guides for exam topics (each includes Gotchas & Traps + Before the Exam checklist) |
 | [Anki Deck](resources/anki/anki-deck.md) | ~130 spaced-repetition cards generated from the cheat sheets, with tag-based filtering |
 | [Adaptive Practice Quiz](../practice/README.md) | Browser-based JSON-driven quiz — 160 questions across 3 banks, with adaptive selection, exam timer, and per-bank progress. **Live: [kengio.github.io/dp-800-study-guide](https://kengio.github.io/dp-800-study-guide/)** |
+| [Hands-on Labs](resources/labs/labs.md) | 4 runnable T-SQL labs — vector search + DiskANN, end-to-end RAG, full-text + hybrid RRF, and MCP server endpoints. ~1,870 lines of tested setup + steps + cleanup |
 | [Final Review](resources/final-review.md) | 20-minute exam-morning scan: top facts and last-minute traps for all three domains |
 | [Renewal Guide](resources/renewal-guide.md) | DP-800 annual-renewal workflow: free/unproctored/open-book assessment, 6-month window, what to prep |
 | [Companion Exams](resources/companion-exams.md) | DP-700 + AI-102 cross-references with overlap matrices, retirement warnings, and recommended next-step paths |

@@ -296,7 +296,7 @@ This guide ships as a living resource. The roadmap below is what's planned for t
 - ✅ **Case-study mini-blocks** in both mock exams (mirroring real DP-800 format) — complete
 - ✅ **Practice-question rebalancing** (+2 Hard Domain 1, +2 Easy Domain 2, +1 REGEXP) — complete
 - ✅ **Mental-model phrasings** in highest-leverage Domain 1 / 2 topics — complete
-- 🔄 **Hands-on lab pack** — runnable T-SQL scripts walking through vector search, RAG, full-text, and MCP scenarios — landing in a follow-up commit
+- ✅ **Hands-on lab pack** — runnable T-SQL scripts walking through vector search, RAG, full-text, and MCP scenarios — see [`certification/resources/labs/labs.md`](./certification/resources/labs/labs.md) (4 labs · ~1,870 lines)
 - ⏸ **Half-precision vector** examples — feature still **public preview**, no published examples yet; deferred until GA
 - ✅ **Microsoft Foundry walkthrough** as an embedding-maintenance method — see [`certification/09-models-embeddings/02-embedding-maintenance.md#method-7-microsoft-foundry`](./certification/09-models-embeddings/02-embedding-maintenance.md)
 - 🔄 **Video walkthroughs** of the hardest topics — outside the text-only scope of this guide; community contributions welcome
