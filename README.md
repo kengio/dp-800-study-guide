@@ -303,10 +303,10 @@ This guide ships as a living resource. The roadmap below is what's planned for t
 
 ### Q4 2026 (3–6 months out)
 
-- ⏳ **Azure SQL DiskANN GA** content updates — currently **public preview** on SS2025 + Azure SQL + Fabric; will refresh on GA announcement
-- ⏳ **Half-precision vector GA** content updates — currently **preview**; will refresh on GA
-- ⏳ **Updated mock exams** following any Microsoft blueprint refresh — blueprint verified unchanged as of 2026-05-22 (still "Skills measured as of March 12, 2026"); will refresh when Microsoft bumps the date
-- ⏳ **Community contributor list** in CONTRIBUTORS.md — awaiting first community PR
+- ⏳ **Azure SQL DiskANN GA** content updates — currently **public preview** on SS2025 + Azure SQL + Fabric; will refresh on GA announcement *(last verified 2026-05-22 — `learn.microsoft.com/en-us/sql/sql-server/ai/vectors`: "Approximate vector index and vector search are in preview")*
+- ⏳ **Half-precision vector GA** content updates — currently **preview**; will refresh on GA *(last verified 2026-05-22 — `learn.microsoft.com/en-us/sql/t-sql/data-types/vector-data-type`: "`float16` vector is currently available for preview")*
+- ⏳ **Updated mock exams** following any Microsoft blueprint refresh — blueprint verified unchanged as of 2026-05-22 (still "Skills measured as of March 12, 2026", page `updated_at: 2026-03-23` is a cosmetic edit); will refresh when Microsoft bumps the "Skills measured as of" date
+- ⏳ **Community contributor list** in CONTRIBUTORS.md — awaiting first community PR *(last verified 2026-05-22 — all 11 merged PRs to date are from `@kengio`)*
 - ✅ **Spaced-repetition deck (Anki)** generated from cheat-sheet facts — see [`certification/resources/anki/`](./certification/resources/anki/anki-deck.md) (130 cards across 6 cheat sheets)
 - ✅ **Translation scaffolding** so non-English learners can fork and translate — see [`TRANSLATING.md`](./TRANSLATING.md)
 
