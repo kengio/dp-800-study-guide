@@ -4,7 +4,9 @@ Notable changes to the DP-800 study guide.
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/). Dates use ISO 8601. Each section is grouped under the Microsoft blueprint date it tracks, so future readers can match guide versions to the version of the exam they were preparing for.
 
-## [Unreleased]
+## [1.2.0] — 2026-05-22 — Hands-on labs + renewal + companion exams + Foundry walkthrough
+
+Closes out the GA-eligible roadmap items from `README.md`. Still tracking the Microsoft DP-800 blueprint dated **2026-03-12** (verified unchanged as of this release — the page's 2026-03-23 `updated_at` was a cosmetic edit, not a content refresh, so mock exams remain aligned).
 
 ### Added
 
