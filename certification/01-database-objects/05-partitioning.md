@@ -55,6 +55,9 @@ AS RANGE RIGHT FOR VALUES (
 > [!warning] Common Mistake
 > Creating a partition function is not enough — you must also create a partition scheme that maps the function's ranges to filegroups, then create the table ON that scheme. The exam may ask you to identify which step is missing.
 
+> [!note] Mental model — RANGE LEFT vs RANGE RIGHT
+> Think of the boundary value as a person standing at a doorway. **RANGE LEFT** = the person belongs to the **left** room (boundary is the rightmost member of the left partition). **RANGE RIGHT** = the person belongs to the **right** room (boundary is the leftmost member of the right partition). For dates, RANGE RIGHT is almost always what you want — value `'2025-01-01'` belongs to the January partition, not December.
+
 **RANGE LEFT vs RANGE RIGHT:**
 
 | Direction | Boundary value belongs to | Typical use |

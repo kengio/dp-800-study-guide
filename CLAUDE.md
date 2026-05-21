@@ -158,6 +158,27 @@ Each cheat sheet (`resources/cheat-sheets/`) ends with:
 1. `## Gotchas & Traps` — 4–8 bullets on common errors and exam traps specific to the topic
 2. `## Before the Exam, I Can…` — 5–8 unchecked checkboxes (`- [ ]`) the reader should be able to tick before taking the exam
 
+### Mock Exam Structure
+
+Each mock exam (`resources/mock-exam/` and `resources/mock-exam-2/`) has:
+
+- `mock-exam-N.md` — landing page with instructions, scoring guide, domain breakdown
+- `questions.md` — 50 questions total: 45 standalone (Qs 1–45) followed by 1 case-study block (Qs 46–50)
+- `mock-exam-N-debrief.md` — per-question map to topic file + cheat sheet, plus a "study plan by miss count" section that triages study by domain weakness
+
+### Case-Study Blocks
+
+Mock exams end with a case-study block to mirror the real DP-800 format:
+
+- One multi-paragraph scenario at the start of the block
+- 5 linked sub-questions covering 2–3 domains in a single business scenario
+- Cross-domain by design — exam case studies typically blend security, performance, and AI features
+- Each sub-question has its own difficulty rating and follows the same answer-callout format as standalone questions
+
+### Mental Models
+
+Use `> [!note] Mental model — <topic>` callouts to give learners durable, concrete analogies for abstract concepts (e.g., Always Encrypted = locked briefcase, row versioning = polaroids in tempdb, RANGE LEFT/RIGHT = person at a doorway, GRANT/DENY/REVOKE = bouncer at a club). Place these in topic files near the relevant concept, after the `Common Mistake` warning.
+
 ## Exam Domain Mapping
 
 - **Domain 1 — Design and develop (35–40%):** 01-database-objects, 02-programmability-objects, 03-advanced-tsql, 04-ai-assisted-tools

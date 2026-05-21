@@ -85,6 +85,16 @@ tags:
 | 44 | CREATE EXTERNAL MODEL — Credential | `CREDENTIAL = [name]` references DSC | [01-external-models.md](../../09-models-embeddings/01-external-models.md), [05-secure-endpoints.md](../../05-data-security-compliance/05-secure-endpoints.md) | [security](../cheat-sheets/security-quick-ref.md), [vector-ai](../cheat-sheets/vector-ai-quick-ref.md) |
 | 45 | Vector Search — Combining with WHERE | Pre-filter subquery passed to TVF, or `WHERE` outside `TOP (N) ... WITH APPROXIMATE` | [02-vector-search.md](../../10-intelligent-search/02-vector-search.md) | [vector-ai](../cheat-sheets/vector-ai-quick-ref.md) |
 
+### Case Study: Northwind RAG Product Catalog (Qs 46–50)
+
+| # | Topic | Key concept tested | Re-read | Cheat sheet |
+| :---: | :--- | :--- | :--- | :--- |
+| 46 | Chunking strategy for varied-length text | Paragraph-based + 10–20 % overlap preserves semantic units | [03-chunking-generation.md](../../09-models-embeddings/03-chunking-generation.md) | [vector-ai](../cheat-sheets/vector-ai-quick-ref.md) |
+| 47 | Embedding maintenance at high write volume | Change Tracking + batched background job (Azure Functions SQL trigger) | [02-embedding-maintenance.md](../../09-models-embeddings/02-embedding-maintenance.md) | [vector-ai](../cheat-sheets/vector-ai-quick-ref.md) |
+| 48 | Vector index choice & metric matching | DiskANN + `cosine`; query metric must match index metric | [02-vector-search.md](../../10-intelligent-search/02-vector-search.md) | [vector-ai](../cheat-sheets/vector-ai-quick-ref.md) |
+| 49 | Hybrid search with RRF | Vector + FTS independently ranked, combined via `Σ 1/(60+rank)` | [03-hybrid-search-rrf.md](../../10-intelligent-search/03-hybrid-search-rrf.md) | [vector-ai](../cheat-sheets/vector-ai-quick-ref.md) |
+| 50 | RAG grounding + response parsing | Low temperature + system message + `$.result.choices[0].message.content` envelope | [02-prompts-and-responses.md](../../11-rag/02-prompts-and-responses.md), [rag-end-to-end-walkthrough.md](../code-examples/tsql/rag-end-to-end-walkthrough.md) | [vector-ai](../cheat-sheets/vector-ai-quick-ref.md) |
+
 ---
 
 ## Study plan by miss count

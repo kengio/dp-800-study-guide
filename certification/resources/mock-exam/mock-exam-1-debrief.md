@@ -85,6 +85,16 @@ tags:
 | 44 | CREATE EXTERNAL MODEL — Model Type | `MODEL_TYPE = EMBEDDINGS \| COMPLETIONS` (NOT `TASK`) | [01-external-models.md](../../09-models-embeddings/01-external-models.md) | [vector-ai](../cheat-sheets/vector-ai-quick-ref.md) |
 | 45 | DATABASE SCOPED CREDENTIAL | `IDENTITY = 'HTTPEndpointHeaders'` for API key injection | [02-prompts-and-responses.md](../../11-rag/02-prompts-and-responses.md), [05-secure-endpoints.md](../../05-data-security-compliance/05-secure-endpoints.md) | [security](../cheat-sheets/security-quick-ref.md), [vector-ai](../cheat-sheets/vector-ai-quick-ref.md) |
 
+### Case Study: Contoso HR Migration (Qs 46–50)
+
+| # | Topic | Key concept tested | Re-read | Cheat sheet |
+| :---: | :--- | :--- | :--- | :--- |
+| 46 | Always Encrypted — DETERMINISTIC + BIN2 | Server-blind encryption + equality filtering needs BIN2 collation | [01-encryption.md](../../05-data-security-compliance/01-encryption.md) | [security](../cheat-sheets/security-quick-ref.md) |
+| 47 | Always Encrypted — RANDOMIZED for free-text | Use RANDOMIZED when no filtering needed (stronger security) | [01-encryption.md](../../05-data-security-compliance/01-encryption.md) | [security](../cheat-sheets/security-quick-ref.md) |
+| 48 | RLS with `SESSION_CONTEXT` (`@read_only = 1`) | Single shared login + pooled connections → SESSION_CONTEXT is the way | [02-dynamic-data-masking-rls.md](../../05-data-security-compliance/02-dynamic-data-masking-rls.md) | [security](../cheat-sheets/security-quick-ref.md) |
+| 49 | Passwordless model endpoint via Managed Identity | DSC with `IDENTITY = 'Managed Identity'` + RBAC on Azure OpenAI | [05-secure-endpoints.md](../../05-data-security-compliance/05-secure-endpoints.md) | [security](../cheat-sheets/security-quick-ref.md) |
+| 50 | CES → Eventstream → Lakehouse | Push-based, zero-infra change feed (no SQL Agent, no polling) | [04-change-event-handling.md](../../08-azure-services-integration/04-change-event-handling.md) | — |
+
 ---
 
 ## Study plan by miss count

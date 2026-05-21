@@ -430,4 +430,40 @@ D. Use the Azure CLI task to call `az keyvault secret show` and echo the value
 
 ---
 
+## Question 21: Role Membership — Adding a User
+
+**Question** *(Easy)*:
+
+A DBA needs to grant the user `ReportReader` read-only access to all tables in a database. Which single command achieves this?
+
+A. `ALTER ROLE db_datareader ADD MEMBER [ReportReader]`
+B. `GRANT SELECT TO [ReportReader]`
+C. `EXEC sp_addrolemember 'reader', 'ReportReader'`
+D. `CREATE ROLE [ReportReader] AS db_datareader`
+
+> [!success]- Answer
+> **A. `ALTER ROLE db_datareader ADD MEMBER [ReportReader]`**
+>
+> `db_datareader` is the built-in database role granting `SELECT` on all tables. `ALTER ROLE ... ADD MEMBER` is the modern syntax (replacing the legacy `sp_addrolemember`). Option B's bare `GRANT SELECT TO user` doesn't specify the object/schema. Option C uses deprecated syntax (still works but `ALTER ROLE` is preferred). Option D is invalid — `CREATE ROLE` doesn't take an existing role as a template.
+
+---
+
+## Question 22: TDE — Default State on Azure SQL
+
+**Question** *(Easy)*:
+
+A new Azure SQL Database is provisioned. The team asks whether Transparent Data Encryption (TDE) needs to be explicitly enabled to encrypt data at rest. What is the default behavior?
+
+A. TDE must be enabled with `ALTER DATABASE ... SET ENCRYPTION ON`
+B. TDE is enabled **by default** for all new Azure SQL databases — encryption at rest is automatic
+C. TDE requires Azure Key Vault setup before it can be turned on
+D. TDE is only available on Premium tier and above
+
+> [!success]- Answer
+> **B. TDE is enabled by default for all new Azure SQL databases**
+>
+> Azure SQL Database has TDE enabled by default using a service-managed key — encryption at rest is automatic with no setup required. Customers can optionally bring their own key (BYOK) via Azure Key Vault for additional control, but the default state is encrypted. On **on-prem SQL Server**, TDE must be explicitly configured. This is the difference: Azure SQL = on by default; SQL Server on-prem = off by default.
+
+---
+
 **[← Back to Practice Questions](./practice-questions.md)**

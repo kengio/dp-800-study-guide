@@ -8,7 +8,7 @@ tags:
 
 # DP-800 Mock Exam 1 — Questions
 
-Complete all 45 questions before checking answers. Time limit: 60 minutes.
+Complete all 50 questions (45 standalone + 5-question case study) before checking answers. Time limit: 70 minutes.
 
 ---
 
@@ -735,6 +735,103 @@ D. `IDENTITY = 'API Key'`
 > **C. `IDENTITY = 'HTTPEndpointHeaders'`**
 >
 > When `sp_invoke_external_rest_endpoint` uses a credential with `IDENTITY = 'HTTPEndpointHeaders'`, it parses the `SECRET` as a JSON object and injects each key-value pair as an HTTP request header. For Azure OpenAI: `SECRET = '{"api-key":"your-key-here"}'` results in the `api-key` header being sent with every request.
+
+---
+
+## Case Study: Contoso HR Migration *(5 linked questions, ~10 minutes)*
+
+> [!info] Case-study format
+> The real DP-800 includes interactive case studies — a multi-paragraph scenario followed by linked questions. Read the whole scenario once, then answer Q46–Q50 in order. You can navigate within the case study, but cannot return to it after submission.
+
+**Scenario**
+
+Contoso is migrating its on-prem HR application to **Azure SQL Database** with new AI-enhanced features. The application currently uses SQL authentication with a shared service account. Requirements:
+
+1. **PII protection**: the `Employees` table has `NationalId` (used in equality lookups by HR staff) and `SalaryNotes nvarchar(max)` (free-text manager notes; never filtered).
+2. **Tenant isolation**: HR staff should only see employees in their own region. The web app uses connection pooling with a single SQL login.
+3. **AI features**: the team wants to build a "policy lookup" assistant — embed company policies and answer employee questions using `sp_invoke_external_rest_endpoint` calling Azure OpenAI.
+4. **No stored secrets**: leadership has mandated **passwordless** for all service-to-service auth.
+5. **Change tracking**: when an employee record changes, a downstream Lakehouse in Microsoft Fabric must receive the change in near real-time **without polling or SQL Agent jobs**.
+
+---
+
+### Question 46: PII protection for `NationalId` *(Medium)*
+
+`NationalId` must be encrypted such that the **server never sees plaintext**, AND the app must still be able to filter `WHERE NationalId = @value`. Which configuration meets both requirements?
+
+A. Dynamic Data Masking with `partial()` mask on `NationalId`
+B. Always Encrypted with **DETERMINISTIC** encryption and a **BIN2 collation** on the column
+C. Always Encrypted with **RANDOMIZED** encryption
+D. Transparent Data Encryption (TDE) at the database level
+
+> [!success]- Answer
+> **B. Always Encrypted with DETERMINISTIC encryption and a BIN2 collation on the column**
+>
+> Always Encrypted = server never sees plaintext (client driver encrypts/decrypts using a Column Master Key held client-side). DETERMINISTIC enables equality predicates. For `char`/`varchar`/`nvarchar` columns, a BIN2 collation is required (e.g., `Latin1_General_BIN2`). RANDOMIZED would prevent the filter. DDM doesn't encrypt — privileged users see plaintext. TDE encrypts at rest but the server holds the key and sees plaintext in memory.
+
+---
+
+### Question 47: PII protection for `SalaryNotes` *(Medium)*
+
+`SalaryNotes` is free-text, never queried with equality filters, but must still be encrypted such that the server never sees plaintext. Which is the appropriate choice and why?
+
+A. Always Encrypted with DETERMINISTIC — same as `NationalId` for consistency
+B. Always Encrypted with **RANDOMIZED** — stronger security; equality filtering not needed
+C. Dynamic Data Masking with `default()` — simpler to implement
+D. No encryption — `nvarchar(max)` cannot be encrypted with Always Encrypted
+
+> [!success]- Answer
+> **B. Always Encrypted with RANDOMIZED — stronger security; equality filtering not needed**
+>
+> RANDOMIZED is cryptographically stronger (same plaintext → different ciphertext each time, defeating frequency analysis). Use it whenever equality filtering / JOIN / GROUP BY is **not** required. `nvarchar(max)` columns are supported by Always Encrypted. DDM doesn't actually encrypt and is bypassed by privileged users.
+
+---
+
+### Question 48: Tenant isolation with a shared login *(Hard)*
+
+HR staff use the web app, which connects with a single pooled SQL login. Each request should only return employees in the user's region. Which combination implements this correctly?
+
+A. Application-side `WHERE` clause — easier than RLS
+B. Row-Level Security with a filter predicate that reads `SUSER_SNAME()`
+C. Row-Level Security with a filter predicate that reads `SESSION_CONTEXT(N'RegionId')`, set by the app via `sp_set_session_context` with `@read_only = 1`
+D. Dynamic Data Masking on the `Region` column
+
+> [!success]- Answer
+> **C. RLS with a filter predicate reading `SESSION_CONTEXT(N'RegionId')`, set with `@read_only = 1`**
+>
+> With connection pooling and a single SQL login, `SUSER_SNAME()`/`USER_NAME()` are the same for every request — so they can't distinguish users. The app sets `SESSION_CONTEXT` with the authenticated user's region before each request; the inline TVF predicate reads it. `@read_only = 1` prevents the client from tampering with the value mid-session. Option A (app-side WHERE) is bypassable. DDM hides columns, not rows.
+
+---
+
+### Question 49: Passwordless access to Azure OpenAI *(Medium)*
+
+The policy-lookup assistant needs `sp_invoke_external_rest_endpoint` to call Azure OpenAI **without storing the API key in T-SQL or in app config**. Which approach satisfies the passwordless mandate?
+
+A. Store the key in a DATABASE SCOPED CREDENTIAL with `IDENTITY = 'HTTPEndpointHeaders'`
+B. Pass the key in the `@headers` parameter at call time
+C. Enable Managed Identity on the Azure SQL Database; grant it `Cognitive Services OpenAI User` on the Azure OpenAI resource; create a DATABASE SCOPED CREDENTIAL with `IDENTITY = 'Managed Identity'`
+D. Store the key encrypted in a table and decrypt at call time using `DECRYPTBYPASSPHRASE`
+
+> [!success]- Answer
+> **C. Managed Identity on Azure SQL → `Cognitive Services OpenAI User` on Azure OpenAI → DATABASE SCOPED CREDENTIAL with `IDENTITY = 'Managed Identity'`**
+>
+> True passwordless: the SQL database's managed identity obtains an Entra ID token to call Azure OpenAI. The documented role for Azure OpenAI inference access is **`Cognitive Services OpenAI User`** (or `Cognitive Services OpenAI Contributor` for write access) — not the generic `Cognitive Services User`. No key stored anywhere. Option A still stores a key (just in the credential store). Option B passes the key in plaintext. Option D adds complexity without removing the secret.
+
+---
+
+### Question 50: Near-real-time change feed to Fabric Lakehouse *(Hard)*
+
+Contoso decides to migrate `Employees` to **SQL database in Microsoft Fabric** so it lands in OneLake alongside other Fabric data. When rows change, a Lakehouse table must receive the change near real-time. Requirements: **no SQL Agent**, **no polling**, **no Azure Functions to operate**. Which mechanism fits?
+
+A. CDC with a custom .NET reader running on a VM
+B. Change Tracking with a 30-second polling job in Azure Automation
+C. **Change Event Streaming (CES)** in Fabric SQL, with the Lakehouse selected as the destination
+D. A DML trigger on `Employees` calling `sp_invoke_external_rest_endpoint` to push to a Fabric REST endpoint
+
+> [!success]- Answer
+> **C. Change Event Streaming (CES) in Fabric SQL, with the Lakehouse selected as the destination**
+>
+> CES is engine-side, push-based, and requires no SQL Agent, no polling, and no consumer infrastructure. Available on **SQL database in Microsoft Fabric**, it streams changes to **Eventstream, Lakehouse, or KQL Database** as native destinations. CDC needs a consumer process. Polling violates the requirement. A synchronous trigger calling an external endpoint blocks the DML transaction.
 
 ---
 

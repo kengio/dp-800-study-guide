@@ -22,7 +22,7 @@ SQL Server provides multiple encryption layers: Transparent Data Encryption (TDE
 
 > [!tip] What the Exam Tests
 > - **TDE**: protects at rest (stolen backup/disk); server sees plaintext; zero app changes; on by default in Azure SQL
-> - **Always Encrypted**: server NEVER sees plaintext; CMK client-side in Key Vault; driver handles encrypt/decrypt; app must use Always Encrypted-aware driver
+> - **Always Encrypted**: server NEVER sees plaintext; CMK lives in key store (Azure Key Vault / HSM / Windows cert store), accessed only by the client driver; driver handles encrypt/decrypt; app must use Always Encrypted-aware driver
 > - **Column-level** (`ENCRYPTBYKEY`): manual encrypt/decrypt in app or T-SQL; server sees plaintext; most flexible but most effort
 
 ---
@@ -127,6 +127,9 @@ CREATE TABLE dbo.Patients (
 
 > [!warning] Common Mistake
 > TDE and Always Encrypted are often confused on the exam. TDE: server DOES see plaintext (it decrypts to run queries). Always Encrypted: server NEVER sees plaintext (encryption/decryption happens in the client driver). The key differentiator in exam scenarios is whether the database administrator (DBA) should be prevented from seeing the data.
+
+> [!note] Mental model — Always Encrypted
+> Think of Always Encrypted like sending your DBA a **locked briefcase**. They hold the briefcase (encrypted column), but the CMK (key) lives in your key store — Azure Key Vault, an HSM, or the Windows cert store. Only your client driver can use the CMK to unlock the CEK; the database engine never sees either in plaintext. The DBA can stack briefcases, ship them, back them up — but never look inside. **DETERMINISTIC** is like always using the same lock pattern so the DBA can sort briefcases (enabling equality compare). **RANDOMIZED** is a new lock each time — most secure, but the DBA can't tell two briefcases apart.
 
 ---
 

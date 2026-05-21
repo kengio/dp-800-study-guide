@@ -92,6 +92,8 @@ DENY DELETE ON dbo.Orders TO ReportUser;
 
 -- REVOKE: remove a previously granted or denied permission
 REVOKE SELECT ON dbo.Customers FROM ReportUser;
+-- Note: REVOKE on its own does NOT block access — it only undoes a prior GRANT or DENY.
+-- If the user still has access via role membership, REVOKE-on-the-user leaves the role grant intact.
 
 -- Schema-level permissions
 GRANT SELECT ON SCHEMA::Reports TO ReportUser;
@@ -104,6 +106,9 @@ SELECT * FROM sys.database_permissions WHERE grantee_principal_id = USER_ID('Rep
 
 > [!warning] Common Mistake
 > REVOKE ≠ DENY. REVOKE removes a permission entry (the user falls back to inherited permissions). DENY explicitly blocks access. If you GRANT access through a role and then REVOKE from the role, the user may still have access through another path. To explicitly block, use DENY.
+
+> [!note] Mental model — GRANT / DENY / REVOKE
+> Think of it like a **bouncer at a club**. `GRANT` = the bouncer waves you in. `DENY` = the bouncer's permanent banned list — even if a friend (role) is on the guest list and tries to vouch for you, the ban overrules. `REVOKE` = the bouncer just erases your entry on the list (or your name from the banned list); it doesn't add a ban. The only way to truly stop someone from entering is `DENY`. The only way to undo a `DENY` is `REVOKE` of that DENY.
 
 ---
 
