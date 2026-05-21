@@ -47,6 +47,24 @@ tags:
 
 ---
 
+## Contents
+
+- [Why this guide exists](#why-this-guide-exists)
+- [Who this is for](#who-this-is-for)
+- [What's covered](#whats-covered)
+- [Exam at a glance](#exam-at-a-glance)
+- [2026 updates you should know](#2026-updates-you-should-know)
+- [Getting started with Obsidian](#getting-started-with-obsidian-recommended)
+- [How to use this guide](#how-to-use-this-guide)
+- [Study roadmap](#study-roadmap) — 4-week, 8-week, and 12-week plans
+- [Roadmap for the guide itself](#roadmap-for-the-guide-itself)
+- [Repository layout](#repository-layout)
+- [Official Microsoft resources](#official-microsoft-resources)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
 ## Why this guide exists
 
 The DP-800 is Microsoft's first certification focused on building **AI-enabled database solutions** — vector search, embeddings, RAG, and intelligent search inside SQL Server, Azure SQL, and SQL databases in Microsoft Fabric. The official skills list is broad and changes quickly. Public study resources are scarce.
@@ -97,14 +115,26 @@ Domain 3: Implement AI capabilities in database solutions   ██████�
 
 ### Skills measured (high level)
 
-**Domain 1 — Design and develop**
+<details>
+<summary><b>Domain 1 — Design and develop database solutions (35–40 %)</b></summary>
+
 Tables · indexes · columnstore · specialized tables (in-memory, temporal, external, ledger, graph) · JSON columns and indexes · constraints · sequences · partitioning · views · functions · stored procedures · triggers · CTEs · window functions · JSON functions · regex (`REGEXP_LIKE`, `REGEXP_MATCHES`, `REGEXP_SPLIT_TO_TABLE`, etc.) · fuzzy matching (`EDIT_DISTANCE`, `JARO_WINKLER_DISTANCE`) · graph queries with `MATCH` · GitHub Copilot · MCP server endpoints
 
-**Domain 2 — Secure, optimize, deploy**
+</details>
+
+<details>
+<summary><b>Domain 2 — Secure, optimize, and deploy database solutions (35–40 %)</b></summary>
+
 Always Encrypted · column encryption · Dynamic Data Masking · Row-Level Security · object-level permissions · passwordless access · auditing · Managed Identity for model endpoints · secure GraphQL/REST/MCP endpoints · isolation levels · DMVs · Query Store · Query Performance Insight · blocking and deadlocks · SQL Database Projects (SDK-style) · schema drift detection · CI/CD pipelines · Data API Builder · Azure Monitor · CDC · Change Tracking · CES · Azure Functions SQL trigger · Logic Apps
 
-**Domain 3 — AI capabilities**
+</details>
+
+<details>
+<summary><b>Domain 3 — Implement AI capabilities in database solutions (25–30 %)</b></summary>
+
 External models · embedding maintenance (triggers, CT, CDC, CES, Azure Functions, Logic Apps, Microsoft Foundry) · chunking · embedding generation · full-text search · `VECTOR` data type · `VECTOR_DISTANCE` · `VECTOR_SEARCH` · `VECTOR_NORMALIZE` · `VECTORPROPERTY` · DiskANN indexes · ANN vs ENN · hybrid search · RRF (Reciprocal Rank Fusion) · RAG with `sp_invoke_external_rest_endpoint`
+
+</details>
 
 ## 2026 updates you should know
 
@@ -169,8 +199,6 @@ No problem. The guide also renders perfectly in:
 4. **Take the [practice questions](./certification/resources/practice-questions/practice-questions.md)** — aim for 70 %+ per domain before moving on.
 5. **Sit the two [mock exams](./certification/resources/mock-exam/mock-exam-1.md) under timed conditions** when you think you're close.
 6. **Read [`final-review.md`](./certification/resources/final-review.md) the morning of the exam** — it's the 20-minute scan.
-
-> The guide works in any Markdown viewer. It's also optimized for **Obsidian** — wikilinks, callouts, Mermaid diagrams, and Graph View all render correctly.
 
 ## Study roadmap
 
