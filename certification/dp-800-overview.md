@@ -107,7 +107,7 @@ pie title Exam Domain Distribution
 | [Hands-on Labs](resources/labs/labs.md) | 4 runnable T-SQL labs — vector search + DiskANN, end-to-end RAG, full-text + hybrid RRF, and MCP server endpoints. ~1,870 lines of tested setup + steps + cleanup |
 | [Final Review](resources/final-review.md) | 20-minute exam-morning scan: top facts and last-minute traps for all three domains |
 | [Renewal Guide](resources/renewal-guide.md) | DP-800 annual-renewal workflow: free/unproctored/open-book assessment, 6-month window, what to prep |
-| [Companion Exams](resources/companion-exams.md) | DP-700 + AI-102 cross-references with overlap matrices, retirement warnings, and recommended next-step paths |
+| [Companion Exams](resources/companion-exams.md) | DP-700 (active) + AI-102 (retired Jun 30, 2026) cross-references with overlap matrices, current status notes, and recommended next-step paths |
 | [Appendix](resources/appendix/appendix.md) | Glossary, comparison tables, error messages |
 
 ## Study Progress Tracker

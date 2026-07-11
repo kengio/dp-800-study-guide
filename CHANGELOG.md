@@ -4,6 +4,26 @@ Notable changes to the DP-800 study guide.
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/). Dates use ISO 8601. Each section is grouped under the Microsoft blueprint date it tracks, so future readers can match guide versions to the version of the exam they were preparing for.
 
+## [1.2.1] — 2026-07-11 — Companion-exam status refresh
+
+Still tracking the Microsoft DP-800 blueprint dated **2026-03-12** (unaffected by this release). Corrects stale companion-certification claims in `certification/resources/companion-exams.md` that had drifted from the live Microsoft Learn pages.
+
+### Fixed
+
+- **DP-600 was wrongly marked retired.** `companion-exams.md` said "(PL-300, DP-600 retired)" — DP-600 (Fabric Analytics Engineer Associate) is **active**; its skills-measured page now reads "as of July 21, 2026", the same refresh date as DP-700
+- **AI-102 retirement language converted to past tense.** AI-102 retired **June 30, 2026** (date has now passed) — the `[!warning]` callout, the ~5-week prep-window note, the comparison-table Retirement cell, and both sequencing paths that assumed scheduling "before retirement" (Paths B and D) all still spoke in future tense. Reworked Paths B and D to reflect that AI-102 is no longer schedulable and point readers to the [skills-hub blog](https://techcommunity.microsoft.com/blog/skills-hub-blog/the-ai-job-boom-is-here-are-you-ready-to-showcase-your-skills/4494128) for the successor
+- **AI-102 renewal-cycle claim corrected.** The guide previously said already-earned AI-102 credentials "remain valid through their normal one-year renewal cycle even after the exam retires" — per the live Microsoft Learn cert page, the certification **and** its renewal assessment are both retired, so credentials remain valid only until their normal expiry and can no longer be renewed
+- **DP-700 blueprint date updated** Apr 20, 2026 → **Jul 21, 2026**. The only skills change: "Configure Dataflows Gen2 workspace settings" → "Configure Apache Airflow workspace settings"
+- **README.md** and **`certification/dp-800-overview.md`** — updated the two companion-exams summary lines to reflect DP-700 active/July 2026 and AI-102 retired, instead of the generic "retirement warning" phrasing
+
+### Added
+
+- **DP-700 companion study guide pointer** — links to the new [dp-700-study-guide](https://github.com/kengio/dp-700-study-guide) repo (same format/family as this guide) and its live practice quiz at [kengio.github.io/dp-700-study-guide](https://kengio.github.io/dp-700-study-guide/), added to the DP-700 section and the Official Documentation list in `companion-exams.md`
+
+### Verified
+
+- All claims in this entry checked live against `learn.microsoft.com` on 2026-07-11: [DP-600 study guide](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-600) ("Skills measured as of July 21, 2026"), [DP-700 study guide](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-700) ("Skills measured as of July 21, 2026", Airflow workspace-settings change), [AI-102 study guide](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-102) ("This exam was retired on June 30, 2026"), and the [AI-102 cert page](https://learn.microsoft.com/en-us/credentials/certifications/azure-ai-engineer/) ("This certification and the renewal assessment are retired")
+
 ## [1.2.0] — 2026-05-22 — Hands-on labs + renewal + companion exams + Foundry walkthrough
 
 Closes out the GA-eligible roadmap items from `README.md`. Still tracking the Microsoft DP-800 blueprint dated **2026-03-12** (verified unchanged as of this release — the page's 2026-03-23 `updated_at` was a cosmetic edit, not a content refresh, so mock exams remain aligned).

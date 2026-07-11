@@ -14,13 +14,13 @@ tags:
 > [!abstract]
 >
 > - **Microsoft Certified: Fabric Data Engineer Associate (DP-700)** — natural next step for SQL/data folks; shares CI/CD, RLS, DDM, security, T-SQL transformations
-> - **Microsoft Certified: Azure AI Engineer Associate (AI-102)** — natural next step for AI-focused folks; shares RAG, Azure OpenAI, vector concepts, prompt engineering. **AI-102 retires June 30, 2026** — check [Microsoft Learn](https://learn.microsoft.com/en-us/credentials/certifications/azure-ai-engineer/) for the successor before scheduling
+> - **Microsoft Certified: Azure AI Engineer Associate (AI-102)** — natural next step for AI-focused folks; shares RAG, Azure OpenAI, vector concepts, prompt engineering. **AI-102 retired June 30, 2026** — the exam is no longer schedulable; watch the [skills-hub blog](https://techcommunity.microsoft.com/blog/skills-hub-blog/the-ai-job-boom-is-here-are-you-ready-to-showcase-your-skills/4494128) for the successor announcement
 > - **DP-800 prep gives you a meaningful head start** on both — this guide maps the overlapping content so you know what's review vs. genuinely new
 
 > [!tip] How to use this guide
 >
 > - **Already passed DP-800?** Read the "What transfers from DP-800" rows below to see which domains you can skim vs. study deeply for the next exam
-> - **Deciding between DP-700 and AI-102?** The recommended paths section below picks the better fit based on your role
+> - **Deciding between DP-700 and the AI-102 track?** The recommended paths section below picks the better fit based on your role — note AI-102 itself is retired (see below); its path is on hold pending a successor
 > - **Stacking certifications?** The exam-blueprint comparison table at the end shows the structural shape of each so you can sequence them
 
 ---
@@ -29,17 +29,20 @@ tags:
 
 | Exam | Cert | Blueprint | Format | Retirement | DP-800 overlap |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **[DP-700](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-700)** | Fabric Data Engineer Associate | Apr 20, 2026 | ~50 q · 100 min · scaled 700/1000 | Active | **Medium** (~30% of skills overlap with DP-800 Domain 2) |
-| **[AI-102](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-102)** | Azure AI Engineer Associate | Dec 23, 2025 | ~50 q · 120 min · scaled 700/1000 | ⚠️ **Jun 30, 2026** | **Medium-low** (~20% overlap, mostly DP-800 Domain 3) |
+| **[DP-700](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-700)** | Fabric Data Engineer Associate | Jul 21, 2026 | ~50 q · 100 min · scaled 700/1000 | Active | **Medium** (~30% of skills overlap with DP-800 Domain 2) |
+| **[AI-102](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-102)** | Azure AI Engineer Associate | Dec 23, 2025 | ~50 q · 120 min · scaled 700/1000 | 🔴 **Retired Jun 30, 2026** | **Medium-low** (~20% overlap, mostly DP-800 Domain 3) |
+
+> [!note] DP-700 blueprint refresh — July 21, 2026
+> Skills measured refreshed to **July 21, 2026** (published in advance — the same refresh date DP-600's skills-measured page carries). The only substantive change vs. the prior April 2026 blueprint: "Configure Dataflows Gen2 workspace settings" → "Configure Apache Airflow workspace settings" — Fabric is adding native Airflow orchestration support. Everything else in the blueprint is unchanged. A full companion guide now exists for DP-700 — see "Companion study guide" below.
 
 > [!warning] AI-102 retirement
-> The AI-102 exam **retires June 30, 2026**. Microsoft announced this on the [skills hub blog](https://techcommunity.microsoft.com/blog/skills-hub-blog/the-ai-job-boom-is-here-are-you-ready-to-showcase-your-skills/4494128). If you're considering it, **schedule before the retirement date** or wait for the announced successor. Already-earned AI-102 credentials remain valid through their normal one-year renewal cycle even after the exam retires.
+> The AI-102 exam **retired June 30, 2026** — this certification and its renewal assessment are both retired, per the [skills-hub blog](https://techcommunity.microsoft.com/blog/skills-hub-blog/the-ai-job-boom-is-here-are-you-ready-to-showcase-your-skills/4494128). It's no longer schedulable and no successor has been announced yet — check the [Microsoft Learn cert page](https://learn.microsoft.com/en-us/credentials/certifications/azure-ai-engineer/) or the skills-hub blog for updates. Already-earned AI-102 credentials remain valid until their normal one-year expiry, but **cannot be renewed** past that date since the renewal assessment itself is retired.
 
 ---
 
 ## DP-700 — Implementing Data Engineering Solutions Using Microsoft Fabric
 
-**Audience.** Data engineers building Fabric analytics pipelines — Lakehouse, OneLake, Eventstreams, Spark, KQL. Sits between Power BI / data analyst work (PL-300, DP-600 retired) and platform-deep data infrastructure roles.
+**Audience.** Data engineers building Fabric analytics pipelines — Lakehouse, OneLake, Eventstreams, Spark, KQL. Sits between Power BI / data analyst work (PL-300, DP-600 — both active) and platform-deep data infrastructure roles. DP-600 (Fabric Analytics Engineer Associate) is **not** retired — its skills-measured list was refreshed to July 21, 2026, the same date as this DP-700 refresh.
 
 **Skills at a glance.**
 
@@ -71,6 +74,8 @@ tags:
 - Pipeline orchestration patterns with parameters and dynamic expressions
 
 **Recommended prep budget if you already have DP-800.** Roughly **40–50% less** than starting from scratch. Skip the security overlap and the SQL Database Projects work; focus your time on OneLake, Eventstreams, Spark, and KQL. Plan ~30 hours instead of the ~60 hours a cold start would need.
+
+**Companion study guide.** A full DP-700 study guide now exists in the same format and family as this repo: [dp-700-study-guide](https://github.com/kengio/dp-700-study-guide), with a live practice quiz at [kengio.github.io/dp-700-study-guide](https://kengio.github.io/dp-700-study-guide/).
 
 ---
 
@@ -112,10 +117,10 @@ tags:
 - Responsible AI: content filters, blocklists, prompt shields, harm detection
 - Container deployment for AI workloads (local + edge)
 
-**Recommended prep budget if you already have DP-800.** Roughly **15–25% less** than starting from scratch. The AI fundamentals (RAG, embeddings, prompt engineering) transfer well but they're only ~15–20% of the AI-102 blueprint. Plan ~50 hours instead of ~60–70 hours.
+**Recommended prep budget if you already have DP-800.** This section is now historical — AI-102 is retired and no longer schedulable, so the budget below applies only if/when a successor exam is announced with a similar blueprint. Roughly **15–25% less** than starting from scratch. The AI fundamentals (RAG, embeddings, prompt engineering) transfer well but they're only ~15–20% of the AI-102 blueprint. Plan ~50 hours instead of ~60–70 hours.
 
-> [!warning] Time pressure
-> AI-102 retires June 30, 2026. If you want this credential, your prep window is **roughly 5 weeks from this guide's blueprint date**. Past the retirement, the successor exam will likely cover similar ground but with a re-blueprinted skills list.
+> [!warning] AI-102 has retired
+> AI-102 **retired June 30, 2026** and its prep window has closed — the exam is no longer schedulable. The certification and renewal assessment are both retired per the [skills-hub blog](https://techcommunity.microsoft.com/blog/skills-hub-blog/the-ai-job-boom-is-here-are-you-ready-to-showcase-your-skills/4494128); watch that blog for the successor announcement, which will likely cover similar ground but with a re-blueprinted skills list.
 
 ---
 
@@ -128,13 +133,13 @@ tags:
 - **Sequence**: DP-800 → 3 months consolidation → DP-700
 - **Total time investment**: ~90 hours (60 for DP-800, ~30 for DP-700 with overlap credit)
 
-### Path B: DP-800 → AI-102 (AI engineering depth) — schedule before Jun 30, 2026
+### Path B: DP-800 → AI-102 successor (AI engineering depth) — on hold, AI-102 retired
 
 - **Best for**: Database engineers who want to deepen the AI stack beyond in-database vectors and RAG
-- **Why**: DP-800's Domain 3 is the perfect on-ramp — you understand vectors, embeddings, RAG, and Azure OpenAI; AI-102 expands to the rest of the Azure AI surface
-- **Sequence**: DP-800 → consolidate ~4 weeks → AI-102 (before retirement)
-- **Total time investment**: ~110 hours (60 for DP-800, ~50 for AI-102 with overlap credit)
-- **Risk**: AI-102 retires Jun 30, 2026 — if you can't make the date, wait for the successor announcement
+- **Why**: DP-800's Domain 3 is the perfect on-ramp — you understand vectors, embeddings, RAG, and Azure OpenAI; the AI-102 surface (or its successor) expands to the rest of the Azure AI stack
+- **Status**: AI-102 **retired June 30, 2026** and is no longer schedulable — this path is on hold until Microsoft announces a successor exam. Watch the [skills-hub blog](https://techcommunity.microsoft.com/blog/skills-hub-blog/the-ai-job-boom-is-here-are-you-ready-to-showcase-your-skills/4494128) for updates
+- **Sequence (once a successor ships)**: DP-800 → consolidate ~4 weeks → successor exam
+- **Total time investment**: ~110 hours estimated (60 for DP-800, ~50 for the AI exam with overlap credit) — subject to change once the successor's blueprint is published
 
 ### Path C: DP-800 standalone, then renew annually
 
@@ -143,12 +148,12 @@ tags:
 - **Sequence**: Pass DP-800 → renew annually (see [renewal-guide.md](./renewal-guide.md)) → revisit related certs when blueprints stabilise
 - **Total time investment**: 60 hours initial + ~3 hours per annual renewal
 
-### Path D: DP-800 → both DP-700 and AI-102 (full data + AI surface)
+### Path D: DP-800 → DP-700 → AI-102 successor (full data + AI surface, once available)
 
 - **Best for**: Architects, platform leads, anyone whose role spans data engineering AND AI integration
-- **Why**: Together these three certs cover the entire "data + AI on Microsoft" surface that platform-spanning roles require
-- **Sequence**: DP-800 → AI-102 (before Jun 30, 2026 retirement) → DP-700
-- **Total time investment**: ~140 hours total
+- **Why**: Together these certs cover the entire "data + AI on Microsoft" surface that platform-spanning roles require
+- **Sequence**: DP-800 → DP-700 → (AI-102 successor, once Microsoft announces it — AI-102 itself **retired June 30, 2026** and is no longer schedulable)
+- **Total time investment**: ~140 hours total, pending the successor's published blueprint
 
 ---
 
@@ -180,9 +185,9 @@ tags:
 
 > [!tip] Exam Tips for stacking
 >
-> - **DP-700 first if your day job is data engineering**, AI-102 first if your day job is AI integration. Sequence by relevance to current work, not blueprint date
+> - **DP-700 is the schedulable option right now.** AI-102 has retired, so if your day job is AI integration, use the DP-800 → AI-102-successor time to instead deepen DP-700 or watch the skills-hub blog for the successor exam
 > - **Don't pay for the same skill twice.** If you've done DP-800 prep, skip the overlap rows above for the next exam — your time is better spent on net-new content
-> - **AI-102 retirement is a hard deadline.** If you want the credential, schedule it now and reverse-engineer your prep timeline from the exam date, not from "when I feel ready"
+> - **AI-102 has already retired (June 30, 2026).** It's no longer schedulable and the renewal assessment is retired too — check the skills-hub blog before planning further AI-102-adjacent prep
 > - **Renewals stack independently.** Each certification has its own 1-year renewal window. Calendar them.
 
 ## Related Topics
@@ -195,7 +200,10 @@ tags:
 ## Official Documentation
 
 - [DP-700 Skills Measured](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-700) — current blueprint with change log
-- [AI-102 Skills Measured](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-102) — current blueprint with change log + retirement notice
+- [DP-700 companion study guide](https://github.com/kengio/dp-700-study-guide) — full study guide in this repo's format, with a [live practice quiz](https://kengio.github.io/dp-700-study-guide/)
+- [DP-600 Skills Measured](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-600) — Fabric Analytics Engineer Associate; active, not retired
+- [AI-102 Skills Measured](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-102) — retired blueprint, kept for reference; page carries the retirement notice
+- [Skills-hub blog: AI job boom](https://techcommunity.microsoft.com/blog/skills-hub-blog/the-ai-job-boom-is-here-are-you-ready-to-showcase-your-skills/4494128) — Microsoft's AI-102 retirement announcement; watch for the successor here
 - [Microsoft Certification Path Browser](https://learn.microsoft.com/en-us/credentials/browse/) — full catalogue
 - [Fabric Data Engineer Associate cert page](https://learn.microsoft.com/en-us/credentials/certifications/fabric-data-engineering-associate/)
 - [Azure AI Engineer Associate cert page](https://learn.microsoft.com/en-us/credentials/certifications/azure-ai-engineer/)
