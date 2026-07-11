@@ -81,7 +81,7 @@ tags:
 
 | Topic | Link |
 | :--- | :--- |
-| Azure SQL Service Tiers | <https://learn.microsoft.com/en-us/azure/azure-sql/database/service-tiers-overview> |
+| Azure SQL Service Tiers | <https://learn.microsoft.com/en-us/azure/azure-sql/database/purchasing-models> |
 | Transaction Isolation Levels | <https://learn.microsoft.com/en-us/sql/t-sql/statements/set-transaction-isolation-level-transact-sql> |
 | Row Versioning Isolation | <https://learn.microsoft.com/en-us/sql/relational-databases/sql-server-transaction-locking-and-row-versioning-guide> |
 | Query Store | <https://learn.microsoft.com/en-us/sql/relational-databases/performance/monitoring-performance-by-using-the-query-store> |
@@ -114,13 +114,13 @@ tags:
 
 | Topic | Link |
 | :--- | :--- |
-| AI in Azure SQL | <https://learn.microsoft.com/en-us/azure/azure-sql/database/ai-artificial-intelligence-intelligent-insights-overview> |
+| AI in Azure SQL | <https://learn.microsoft.com/en-us/azure/azure-sql/database/ai-artificial-intelligence-intelligent-applications> |
 | sp_invoke_external_rest_endpoint | <https://learn.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sp-invoke-external-rest-endpoint-transact-sql> |
 | Vector Data Type | <https://learn.microsoft.com/en-us/sql/t-sql/data-types/vector-data-type> |
 | VECTOR_DISTANCE | <https://learn.microsoft.com/en-us/sql/t-sql/functions/vector-distance-transact-sql> |
 | VECTOR_SEARCH | <https://learn.microsoft.com/en-us/sql/t-sql/functions/vector-search-transact-sql> |
 | Full-Text Search | <https://learn.microsoft.com/en-us/sql/relational-databases/search/full-text-search> |
-| Native Vector Support in Azure SQL | <https://learn.microsoft.com/en-us/azure/azure-sql/database/vector-search-overview> |
+| Native Vector Support in Azure SQL | <https://learn.microsoft.com/en-us/sql/sql-server/ai/vectors> |
 
 ### AI-Assisted Development
 
@@ -129,7 +129,7 @@ tags:
 | GitHub Copilot Docs | <https://docs.github.com/en/copilot> |
 | Copilot Custom Instructions | <https://docs.github.com/en/copilot/customizing-copilot/adding-repository-custom-instructions-for-github-copilot> |
 | Copilot in Fabric | <https://learn.microsoft.com/en-us/fabric/fundamentals/copilot-fabric-overview> |
-| MCP for SQL Server | <https://learn.microsoft.com/en-us/sql/tools/mcp/overview> |
+| MCP for SQL Server | <https://learn.microsoft.com/en-us/sql/mcp/> |
 | Model Context Protocol (MCP) | <https://modelcontextprotocol.io/> |
 
 ## Community Resources

@@ -364,7 +364,7 @@ Copilot Chat and toggle `lab-products` off.
 ## Official Documentation
 
 - <https://modelcontextprotocol.io/>
-- <https://learn.microsoft.com/en-us/sql/tools/mcp/overview>
+- <https://learn.microsoft.com/en-us/sql/mcp/>
 - <https://learn.microsoft.com/en-us/fabric/fundamentals/copilot-fabric-overview>
 - <https://learn.microsoft.com/en-us/azure/azure-sql/database/authentication-aad-overview>
 - <https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/overview>

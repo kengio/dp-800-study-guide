@@ -430,7 +430,7 @@ the `dbo.Products` table you just populated.
 
 - <https://learn.microsoft.com/en-us/sql/t-sql/data-types/vector-data-type>
 - <https://learn.microsoft.com/en-us/sql/t-sql/functions/vector-distance-transact-sql>
-- <https://learn.microsoft.com/en-us/azure/azure-sql/database/vector-index>
+- <https://learn.microsoft.com/en-us/sql/sql-server/ai/vectors>
 - <https://learn.microsoft.com/en-us/sql/t-sql/functions/vectorproperty-transact-sql>
 
 ---

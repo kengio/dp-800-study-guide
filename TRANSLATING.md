@@ -36,7 +36,7 @@ A translation does **not** need to be complete to be useful. Even a single trans
 
 ## Locale codes
 
-Use [BCP 47](https://www.rfc-editor.org/info/bcp47) tags:
+Use [BCP 47](https://datatracker.ietf.org/doc/bcp47/) tags:
 
 - Language only: `th` (Thai), `ja` (Japanese), `vi` (Vietnamese), `pt` (Portuguese)
 - Language + region when meaningful: `pt-BR` (Brazilian Portuguese), `es-MX` (Mexican Spanish), `zh-Hans` (Simplified Chinese), `zh-Hant` (Traditional Chinese)

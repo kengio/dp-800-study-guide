@@ -419,7 +419,7 @@ DROP FULLTEXT CATALOG ProductFTSCatalog;
 - <https://learn.microsoft.com/en-us/sql/t-sql/queries/contains-transact-sql>
 - <https://learn.microsoft.com/en-us/sql/relational-databases/system-functions/containstable-transact-sql>
 - <https://learn.microsoft.com/en-us/sql/relational-databases/system-functions/freetexttable-transact-sql>
-- <https://learn.microsoft.com/en-us/azure/azure-sql/database/hybrid-search>
+- <https://devblogs.microsoft.com/azure-sql/enhancing-search-capabilities-in-sql-server-and-azure-sql-with-hybrid-search-and-rrf-re-ranking/>
 
 ---
 
