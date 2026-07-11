@@ -81,7 +81,7 @@ tags:
 
 | Topic | Link |
 | :--- | :--- |
-| Azure SQL Service Tiers | <https://learn.microsoft.com/en-us/azure/azure-sql/database/purchasing-models> |
+| Azure SQL Service Tiers | <https://learn.microsoft.com/en-us/azure/azure-sql/database/service-tiers-sql-database-vcore> |
 | Transaction Isolation Levels | <https://learn.microsoft.com/en-us/sql/t-sql/statements/set-transaction-isolation-level-transact-sql> |
 | Row Versioning Isolation | <https://learn.microsoft.com/en-us/sql/relational-databases/sql-server-transaction-locking-and-row-versioning-guide> |
 | Query Store | <https://learn.microsoft.com/en-us/sql/relational-databases/performance/monitoring-performance-by-using-the-query-store> |

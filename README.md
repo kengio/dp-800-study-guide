@@ -313,7 +313,7 @@ This guide ships as a living resource. The roadmap below is what's planned for t
 ### Q1 2027 (6–12 months out)
 
 - ✅ **Renewal-assessment guide** for those who took DP-800 in 2026 and need to renew — see [`certification/resources/renewal-guide.md`](./certification/resources/renewal-guide.md)
-- ✅ **Companion guide for related exams** (DP-700 Fabric Data Engineer — active, July 2026 blueprint; AI-102 AI Engineer — retired June 30, 2026) — see [`certification/resources/companion-exams.md`](./certification/resources/companion-exams.md)
+- ✅ **Companion guide for related exams** (DP-700 Fabric Data Engineer — active, July 2026 blueprint; AI-102 AI Engineer — retired June 30, 2026, succeeded by AI-103 Azure AI Apps and Agents Developer Associate) — see [`certification/resources/companion-exams.md`](./certification/resources/companion-exams.md)
 - ✅ **Adaptive practice questions** — JSON-driven question bank with difficulty tagging — live at [kengio.github.io/dp-800-study-guide](https://kengio.github.io/dp-800-study-guide/) and sourced from [`practice/`](./practice/README.md) (160 questions across 3 banks)
 
 Legend: ✅ done · 🔄 in progress / next up · ⏸ deferred until upstream GA · ⏳ planned · 🌱 ideas being explored

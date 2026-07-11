@@ -399,7 +399,7 @@ D. Increase the cost threshold for parallelism to 100
 
 ## Official Documentation
 
-- [Azure SQL Service Tiers](https://learn.microsoft.com/en-us/azure/azure-sql/database/purchasing-models)
+- [Azure SQL Service Tiers](https://learn.microsoft.com/en-us/azure/azure-sql/database/service-tiers-sql-database-vcore)
 - [ALTER DATABASE SCOPED CONFIGURATION](https://learn.microsoft.com/en-us/sql/t-sql/statements/alter-database-scoped-configuration-transact-sql)
 - [Automatic Tuning](https://learn.microsoft.com/en-us/azure/azure-sql/database/automatic-tuning-overview)
 - [Query Store Overview](https://learn.microsoft.com/en-us/sql/relational-databases/performance/monitoring-performance-by-using-the-query-store)
