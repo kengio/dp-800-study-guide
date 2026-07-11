@@ -476,7 +476,7 @@ GraphQL pagination response:
 
 - [DAB REST Endpoints](https://learn.microsoft.com/en-us/azure/data-api-builder/rest)
 - [DAB GraphQL Endpoints](https://learn.microsoft.com/en-us/azure/data-api-builder/graphql)
-- [DAB Pagination](https://learn.microsoft.com/en-us/azure/data-api-builder/pagination)
+- [DAB Pagination](https://learn.microsoft.com/en-us/azure/data-api-builder/concept/api/pagination)
 
 ---
 

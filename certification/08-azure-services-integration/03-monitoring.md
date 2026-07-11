@@ -368,7 +368,7 @@ AzureDiagnostics
 
 ## Official Documentation
 
-- [Azure SQL Monitoring](https://learn.microsoft.com/en-us/azure/azure-sql/database/monitoring-overview)
+- [Azure SQL Monitoring](https://learn.microsoft.com/en-us/azure/azure-sql/database/monitor-tune-overview)
 - [Log Analytics with Azure SQL](https://learn.microsoft.com/en-us/azure/azure-sql/database/metrics-diagnostic-telemetry-logging-streaming-export-configure)
 - [Query Performance Insight](https://learn.microsoft.com/en-us/azure/azure-sql/database/query-performance-insight-use)
 - [Intelligent Insights](https://learn.microsoft.com/en-us/azure/azure-sql/database/intelligent-insights-overview)

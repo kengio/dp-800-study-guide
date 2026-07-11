@@ -294,7 +294,7 @@ CREATE INDEX IX_Person_Name ON Person(Name);
 
 - [SQL Graph Architecture](https://learn.microsoft.com/en-us/sql/relational-databases/graphs/sql-graph-architecture)
 - [MATCH (SQL Graph)](https://learn.microsoft.com/en-us/sql/t-sql/queries/match-sql-graph)
-- [SHORTEST_PATH (SQL Graph)](https://learn.microsoft.com/en-us/sql/t-sql/queries/shortest-path-sql-graph)
+- [SHORTEST_PATH (SQL Graph)](https://learn.microsoft.com/en-us/sql/relational-databases/graphs/sql-graph-shortest-path)
 
 ---
 

@@ -343,7 +343,7 @@ PRINT 'Reference data load complete.';
 
 - [tSQLt Framework](https://tsqlt.org/full-user-guide/)
 - [MERGE (T-SQL)](https://learn.microsoft.com/en-us/sql/t-sql/statements/merge-transact-sql)
-- [SQL Database Projects - Post-Deployment Scripts](https://learn.microsoft.com/en-us/azure/azure-sql/database/sql-projects-overview)
+- [SQL Database Projects - Post-Deployment Scripts](https://learn.microsoft.com/en-us/sql/tools/sql-database-projects/concepts/pre-post-deployment-scripts)
 
 ---
 

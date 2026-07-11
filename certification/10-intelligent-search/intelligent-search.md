@@ -74,7 +74,7 @@ flowchart TD
 
 - [09-Models & Embeddings](../09-models-embeddings/models-embeddings.md)
 - [11-RAG](../11-rag/rag.md)
-- [Official: Vector Search in Azure SQL](https://learn.microsoft.com/en-us/azure/azure-sql/database/ai-artificial-intelligence-intelligent-insights-overview)
+- [Official: Vector Search in Azure SQL](https://learn.microsoft.com/en-us/azure/azure-sql/database/ai-artificial-intelligence-intelligent-applications)
 
 ## Next Steps
 

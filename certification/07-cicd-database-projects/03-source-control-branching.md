@@ -292,7 +292,7 @@ CREATE TABLE [dbo].[Orders]
 
 ## Official Documentation
 
-- [SQL Projects Source Control](https://learn.microsoft.com/en-us/azure/azure-sql/database/sql-projects-overview)
+- [SQL Projects Source Control](https://learn.microsoft.com/en-us/fabric/database/sql/source-control)
 - [Azure DevOps Branch Policies](https://learn.microsoft.com/en-us/azure/devops/repos/git/branch-policies)
 - [GitHub CODEOWNERS](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners)
 

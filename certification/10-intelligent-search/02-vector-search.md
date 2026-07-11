@@ -374,7 +374,7 @@ ORDER BY vs.distance ASC;
 - [VECTOR Data Type](https://learn.microsoft.com/en-us/sql/t-sql/data-types/vector-data-type)
 - [VECTOR_DISTANCE](https://learn.microsoft.com/en-us/sql/t-sql/functions/vector-distance-transact-sql)
 - [VECTOR_SEARCH](https://learn.microsoft.com/en-us/sql/t-sql/functions/vector-search-transact-sql)
-- [DiskANN Vector Index](https://learn.microsoft.com/en-us/azure/azure-sql/database/vector-index)
+- [DiskANN Vector Index](https://learn.microsoft.com/en-us/sql/sql-server/ai/vectors)
 
 ---
 

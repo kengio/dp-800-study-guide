@@ -376,7 +376,7 @@ D. db_owner role membership
 
 ## Official Documentation
 
-- [External Models in Fabric SQL](https://learn.microsoft.com/en-us/fabric/database/sql/ai-external-model)
+- [External Models in Fabric SQL](https://learn.microsoft.com/en-us/fabric/database/sql/use-case-ai-application)
 - [CREATE EXTERNAL MODEL](https://learn.microsoft.com/en-us/sql/t-sql/statements/create-external-model-transact-sql)
 - [Azure OpenAI Models](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models)
 

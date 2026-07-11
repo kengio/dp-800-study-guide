@@ -319,9 +319,9 @@ SDK-style projects support referencing shared objects as NuGet packages:
 
 ## Official Documentation
 
-- [SQL Database Projects Overview](https://learn.microsoft.com/en-us/azure/azure-sql/database/sql-projects-overview)
+- [SQL Database Projects Overview](https://learn.microsoft.com/en-us/sql/tools/sql-database-projects/sql-database-projects)
 - [sqlpackage CLI Reference](https://learn.microsoft.com/en-us/sql/tools/sqlpackage/sqlpackage)
-- [SDK-style SQL Projects](https://learn.microsoft.com/en-us/sql/tools/sql-database-projects/concepts/sdk-style-projects)
+- [SDK-style SQL Projects](https://learn.microsoft.com/en-us/sql/tools/sql-database-projects/sql-database-projects#original-projects-vs-sdk-style-projects)
 
 ---
 

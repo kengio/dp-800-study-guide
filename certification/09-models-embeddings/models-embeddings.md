@@ -75,7 +75,7 @@ flowchart TD
 
 - [08-Azure Services Integration](../08-azure-services-integration/azure-services-integration.md)
 - [10-Intelligent Search](../10-intelligent-search/intelligent-search.md)
-- [Official: AI in Azure SQL](https://learn.microsoft.com/en-us/azure/azure-sql/database/ai-artificial-intelligence-intelligent-insights-overview)
+- [Official: AI in Azure SQL](https://learn.microsoft.com/en-us/azure/azure-sql/database/ai-artificial-intelligence-intelligent-applications)
 
 ## Next Steps
 

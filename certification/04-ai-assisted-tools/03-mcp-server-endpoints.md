@@ -447,7 +447,7 @@ D. GitHub Copilot does not support MCP servers for database access
 ## Official Documentation
 
 - [Model Context Protocol (MCP) Spec](https://modelcontextprotocol.io/)
-- [SQL Server MCP Server](https://learn.microsoft.com/en-us/sql/tools/mcp/overview)
+- [SQL Server MCP Server](https://learn.microsoft.com/en-us/sql/mcp/)
 - [Microsoft Fabric MCP](https://learn.microsoft.com/en-us/fabric/fundamentals/copilot-fabric-overview)
 
 ---

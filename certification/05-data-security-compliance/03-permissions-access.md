@@ -363,7 +363,7 @@ D. The procedure runs only if the user has db_datareader role
 - [Managed Identity for Azure SQL](https://learn.microsoft.com/en-us/azure/azure-sql/database/authentication-azure-ad-user-assigned-managed-identity)
 - [Contained Database Users](https://learn.microsoft.com/en-us/sql/relational-databases/security/contained-database-users-making-your-database-portable)
 - [EXECUTE AS (Transact-SQL)](https://learn.microsoft.com/en-us/sql/t-sql/statements/execute-as-transact-sql)
-- [Ownership Chaining](https://learn.microsoft.com/en-us/sql/relational-databases/security/ownership-and-user-schema-separation)
+- [Ownership Chaining](https://learn.microsoft.com/en-us/sql/relational-databases/security/authentication-access/ownership-and-user-schema-separation)
 
 ---
 

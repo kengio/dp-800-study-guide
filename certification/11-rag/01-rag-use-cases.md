@@ -375,8 +375,8 @@ Advantages: Managed search service with built-in RRF; scales independently of da
 ## Official Documentation
 
 - [RAG with Azure SQL](https://learn.microsoft.com/en-us/azure/azure-sql/database/ai-artificial-intelligence-intelligent-applications)
-- [Azure OpenAI RAG Patterns](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/retrieval-augmented-generation)
-- [Fabric SQL AI Features](https://learn.microsoft.com/en-us/fabric/database/sql/ai-embedding-generation)
+- [Azure OpenAI RAG Patterns](https://learn.microsoft.com/en-us/azure/foundry/concepts/retrieval-augmented-generation)
+- [Fabric SQL AI Features](https://learn.microsoft.com/en-us/fabric/database/sql/use-case-ai-application)
 
 ---
 

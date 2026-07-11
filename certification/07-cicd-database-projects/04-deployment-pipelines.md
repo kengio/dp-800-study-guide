@@ -376,7 +376,7 @@ sqlpackage /Action:Publish \
 
 ## Official Documentation
 
-- [Azure Pipelines with SQL Database Projects](https://learn.microsoft.com/en-us/azure/azure-sql/database/sql-projects-pipelines)
+- [Azure Pipelines with SQL Database Projects](https://learn.microsoft.com/en-us/azure/devops/pipelines/targets/azure-sqldb)
 - [sqlpackage Reference](https://learn.microsoft.com/en-us/sql/tools/sqlpackage/sqlpackage)
 - [Azure Key Vault in Pipelines](https://learn.microsoft.com/en-us/azure/devops/pipelines/release/azure-key-vault)
 
