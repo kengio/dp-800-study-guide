@@ -15,7 +15,7 @@ tags:
 > [!abstract]
 >
 > - **Microsoft Certified: Fabric Data Engineer Associate (DP-700)** — natural next step for SQL/data folks; shares CI/CD, RLS, DDM, security, T-SQL transformations
-> - **Microsoft Certified: Azure AI Apps and Agents Developer Associate (AI-103)** — natural next step for AI-focused folks; shares RAG, Azure OpenAI, vector concepts, prompt engineering. AI-102 **retired June 30, 2026** and was succeeded by [AI-103](https://learn.microsoft.com/en-us/credentials/certifications/azure-ai-apps-and-agents-developer-associate/) — live and schedulable now, [skills measured as of April 16, 2026](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-103)
+> - **Microsoft Certified: Azure AI Apps and Agents Developer Associate (AI-103)** — natural next step for AI-focused folks; shares RAG, Azure OpenAI, vector concepts, prompt engineering. AI-102 **retired June 30, 2026** and was succeeded by [AI-103](https://learn.microsoft.com/en-us/credentials/certifications/azure-ai-apps-and-agents-developer-associate/) — live and schedulable now (==currently in beta== — expect delayed scoring and evolving question content until it exits beta), [skills measured as of April 16, 2026](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-103)
 > - **DP-800 prep gives you a meaningful head start** on both — this guide maps the overlapping content so you know what's review vs. genuinely new
 
 > [!tip] How to use this guide
@@ -148,7 +148,7 @@ tags:
 ### Path C: DP-800 standalone, then renew annually
 
 - **Best for**: Specialists whose job is squarely "AI-enabled databases"; nothing else maps directly
-- **Why**: DP-800 is the only Microsoft credential targeting this niche — neither DP-700 nor AI-102 fills the same gap
+- **Why**: DP-800 is the only Microsoft credential targeting this niche — neither DP-700 nor AI-103 fills the same gap
 - **Sequence**: Pass DP-800 → renew annually (see [renewal-guide.md](./renewal-guide.md)) → revisit related certs when blueprints stabilise
 - **Total time investment**: 60 hours initial + ~3 hours per annual renewal
 
@@ -182,7 +182,7 @@ tags:
 
 - **Career-laddering**: pick your next exam based on where you want to specialise (data vs AI)
 - **Team planning**: identify which certifications cover which gaps on a data + AI team
-- **Hiring**: understand what a candidate with DP-800 knows that's transferable to a DP-700 or AI-102 role
+- **Hiring**: understand what a candidate with DP-800 knows that's transferable to a DP-700 or AI-103 role
 - **Cert-stacking**: sequence multiple certifications efficiently by exploiting overlap
 
 ## Exam Tips
